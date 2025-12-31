@@ -1,0 +1,14 @@
+includes:
+	- phpstan-baseline.neon
+parameters:
+    level: 5
+    paths:
+        - better-external-links.php
+        - includes/
+    scanFiles:
+        - better-external-links.php
+    scanDirectories:
+        - includes
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    ignoreErrors:

@@ -1,0 +1,580 @@
+<?php
+/**
+ * Settings class.
+ *
+ * Handles plugin settings and admin interface.
+ *
+ * @package WebberZone\External_Link_Accessibility
+ * @since 1.0.0
+ */
+
+namespace WebberZone\External_Link_Accessibility;
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Settings class.
+ *
+ * @since 1.0.0
+ */
+class Settings {
+
+	/**
+	 * Settings option name.
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	private $option_name = 'wz_ela_settings';
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct() {
+		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+	}
+
+	/**
+	 * Add settings page to admin menu.
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_settings_page() {
+		add_options_page(
+			__( 'External Link Accessibility', 'external-link-accessibility' ),
+			__( 'Link Accessibility', 'external-link-accessibility' ),
+			'manage_options',
+			'external-link-accessibility',
+			array( $this, 'render_settings_page' )
+		);
+	}
+
+	/**
+	 * Register plugin settings.
+	 *
+	 * @since 1.0.0
+	 */
+	public function register_settings() {
+		register_setting(
+			'wz_ela_settings_group',
+			$this->option_name,
+			array( $this, 'sanitize_settings' )
+		);
+
+		// General section.
+		add_settings_section(
+			'wz_ela_general_section',
+			__( 'General Settings', 'external-link-accessibility' ),
+			array( $this, 'render_general_section' ),
+			'external-link-accessibility'
+		);
+
+		add_settings_field(
+			'warning_method',
+			__( 'Warning Method', 'external-link-accessibility' ),
+			array( $this, 'render_warning_method_field' ),
+			'external-link-accessibility',
+			'wz_ela_general_section'
+		);
+
+		add_settings_field(
+			'scope',
+			__( 'Link Scope', 'external-link-accessibility' ),
+			array( $this, 'render_scope_field' ),
+			'external-link-accessibility',
+			'wz_ela_general_section'
+		);
+
+		add_settings_field(
+			'enabled_post_types',
+			__( 'Enabled Post Types', 'external-link-accessibility' ),
+			array( $this, 'render_post_types_field' ),
+			'external-link-accessibility',
+			'wz_ela_general_section'
+		);
+
+		// Inline indicators section.
+		add_settings_section(
+			'wz_ela_inline_section',
+			__( 'Inline Indicators', 'external-link-accessibility' ),
+			array( $this, 'render_inline_section' ),
+			'external-link-accessibility'
+		);
+
+		add_settings_field(
+			'visual_indicator',
+			__( 'Visual Indicator', 'external-link-accessibility' ),
+			array( $this, 'render_visual_indicator_field' ),
+			'external-link-accessibility',
+			'wz_ela_inline_section'
+		);
+
+		add_settings_field(
+			'indicator_text',
+			__( 'Indicator Text', 'external-link-accessibility' ),
+			array( $this, 'render_indicator_text_field' ),
+			'external-link-accessibility',
+			'wz_ela_inline_section'
+		);
+
+		add_settings_field(
+			'screen_reader_text',
+			__( 'Screen Reader Text', 'external-link-accessibility' ),
+			array( $this, 'render_screen_reader_text_field' ),
+			'external-link-accessibility',
+			'wz_ela_inline_section'
+		);
+
+		// Modal section.
+		add_settings_section(
+			'wz_ela_modal_section',
+			__( 'Modal Settings', 'external-link-accessibility' ),
+			array( $this, 'render_modal_section' ),
+			'external-link-accessibility'
+		);
+
+		add_settings_field(
+			'modal_title',
+			__( 'Modal Title', 'external-link-accessibility' ),
+			array( $this, 'render_modal_title_field' ),
+			'external-link-accessibility',
+			'wz_ela_modal_section'
+		);
+
+		add_settings_field(
+			'modal_message',
+			__( 'Modal Message', 'external-link-accessibility' ),
+			array( $this, 'render_modal_message_field' ),
+			'external-link-accessibility',
+			'wz_ela_modal_section'
+		);
+
+		add_settings_field(
+			'modal_continue_text',
+			__( 'Continue Button Text', 'external-link-accessibility' ),
+			array( $this, 'render_modal_continue_text_field' ),
+			'external-link-accessibility',
+			'wz_ela_modal_section'
+		);
+
+		add_settings_field(
+			'modal_cancel_text',
+			__( 'Cancel Button Text', 'external-link-accessibility' ),
+			array( $this, 'render_modal_cancel_text_field' ),
+			'external-link-accessibility',
+			'wz_ela_modal_section'
+		);
+
+		// Redirect section.
+		add_settings_section(
+			'wz_ela_redirect_section',
+			__( 'Redirect Screen Settings', 'external-link-accessibility' ),
+			array( $this, 'render_redirect_section' ),
+			'external-link-accessibility'
+		);
+
+		add_settings_field(
+			'redirect_message',
+			__( 'Redirect Message', 'external-link-accessibility' ),
+			array( $this, 'render_redirect_message_field' ),
+			'external-link-accessibility',
+			'wz_ela_redirect_section'
+		);
+
+		// Advanced section.
+		add_settings_section(
+			'wz_ela_advanced_section',
+			__( 'Advanced Settings', 'external-link-accessibility' ),
+			array( $this, 'render_advanced_section' ),
+			'external-link-accessibility'
+		);
+
+		add_settings_field(
+			'excluded_domains',
+			__( 'Excluded Domains', 'external-link-accessibility' ),
+			array( $this, 'render_excluded_domains_field' ),
+			'external-link-accessibility',
+			'wz_ela_advanced_section'
+		);
+	}
+
+	/**
+	 * Render settings page.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_settings_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<form action="options.php" method="post">
+				<?php
+				settings_fields( 'wz_ela_settings_group' );
+				do_settings_sections( 'external-link-accessibility' );
+				submit_button();
+				?>
+			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render general section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_general_section() {
+		echo '<p>' . esc_html__( 'Configure how the plugin handles external links and new window warnings.', 'external-link-accessibility' ) . '</p>';
+	}
+
+	/**
+	 * Render warning method field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_warning_method_field() {
+		$settings = $this->get_settings();
+		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
+		?>
+		<fieldset>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[warning_method]" value="inline" <?php checked( $method, 'inline' ); ?> />
+				<?php esc_html_e( 'Inline indicators only', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[warning_method]" value="modal" <?php checked( $method, 'modal' ); ?> />
+				<?php esc_html_e( 'Modal dialog', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[warning_method]" value="redirect" <?php checked( $method, 'redirect' ); ?> />
+				<?php esc_html_e( 'Redirect screen', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[warning_method]" value="inline_modal" <?php checked( $method, 'inline_modal' ); ?> />
+				<?php esc_html_e( 'Inline + modal (for external only)', 'external-link-accessibility' ); ?>
+			</label>
+		</fieldset>
+		<?php
+	}
+
+	/**
+	 * Render scope field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_scope_field() {
+		$settings = $this->get_settings();
+		$scope    = isset( $settings['scope'] ) ? $settings['scope'] : 'external';
+		?>
+		<fieldset>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[scope]" value="external" <?php checked( $scope, 'external' ); ?> />
+				<?php esc_html_e( 'External links only', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[scope]" value="target_blank" <?php checked( $scope, 'target_blank' ); ?> />
+				<?php esc_html_e( 'All target="_blank" links', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[scope]" value="both" <?php checked( $scope, 'both' ); ?> />
+				<?php esc_html_e( 'Both (with different treatments)', 'external-link-accessibility' ); ?>
+			</label>
+		</fieldset>
+		<?php
+	}
+
+	/**
+	 * Render post types field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_post_types_field() {
+		$settings   = $this->get_settings();
+		$enabled    = isset( $settings['enabled_post_types'] ) ? $settings['enabled_post_types'] : array( 'post', 'page' );
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
+
+		foreach ( $post_types as $post_type ) {
+			$checked = in_array( $post_type->name, $enabled, true );
+			?>
+			<label>
+				<input type="checkbox" name="<?php echo esc_attr( $this->option_name ); ?>[enabled_post_types][]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( $checked ); ?> />
+				<?php echo esc_html( $post_type->label ); ?>
+			</label><br>
+			<?php
+		}
+	}
+
+	/**
+	 * Render inline section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_inline_section() {
+		echo '<p>' . esc_html__( 'Configure visual and screen reader indicators for links.', 'external-link-accessibility' ) . '</p>';
+	}
+
+	/**
+	 * Render visual indicator field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_visual_indicator_field() {
+		$settings  = $this->get_settings();
+		$indicator = isset( $settings['visual_indicator'] ) ? $settings['visual_indicator'] : 'icon';
+		?>
+		<fieldset>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[visual_indicator]" value="icon" <?php checked( $indicator, 'icon' ); ?> />
+				<?php esc_html_e( 'Icon (↗)', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[visual_indicator]" value="text" <?php checked( $indicator, 'text' ); ?> />
+				<?php esc_html_e( 'Text', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[visual_indicator]" value="both" <?php checked( $indicator, 'both' ); ?> />
+				<?php esc_html_e( 'Icon + text', 'external-link-accessibility' ); ?>
+			</label><br>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $this->option_name ); ?>[visual_indicator]" value="none" <?php checked( $indicator, 'none' ); ?> />
+				<?php esc_html_e( 'None (screen reader only)', 'external-link-accessibility' ); ?>
+			</label>
+		</fieldset>
+		<?php
+	}
+
+	/**
+	 * Render indicator text field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_indicator_text_field() {
+		$settings = $this->get_settings();
+		$text     = isset( $settings['indicator_text'] ) ? $settings['indicator_text'] : __( '(opens in new window)', 'external-link-accessibility' );
+		?>
+		<input type="text" name="<?php echo esc_attr( $this->option_name ); ?>[indicator_text]" value="<?php echo esc_attr( $text ); ?>" class="regular-text" />
+		<p class="description"><?php esc_html_e( 'Text displayed next to links (when text indicator is enabled).', 'external-link-accessibility' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Render screen reader text field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_screen_reader_text_field() {
+		$settings = $this->get_settings();
+		$text     = isset( $settings['screen_reader_text'] ) ? $settings['screen_reader_text'] : __( 'Opens in a new window', 'external-link-accessibility' );
+		?>
+		<input type="text" name="<?php echo esc_attr( $this->option_name ); ?>[screen_reader_text]" value="<?php echo esc_attr( $text ); ?>" class="regular-text" />
+		<p class="description"><?php esc_html_e( 'Hidden text for screen readers.', 'external-link-accessibility' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Render modal section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_modal_section() {
+		echo '<p>' . esc_html__( 'Customize the modal dialog that appears when users click external links.', 'external-link-accessibility' ) . '</p>';
+	}
+
+	/**
+	 * Render modal title field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_modal_title_field() {
+		$settings = $this->get_settings();
+		$title    = isset( $settings['modal_title'] ) ? $settings['modal_title'] : __( 'You are leaving this site', 'external-link-accessibility' );
+		?>
+		<input type="text" name="<?php echo esc_attr( $this->option_name ); ?>[modal_title]" value="<?php echo esc_attr( $title ); ?>" class="regular-text" />
+		<?php
+	}
+
+	/**
+	 * Render modal message field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_modal_message_field() {
+		$settings = $this->get_settings();
+		$message  = isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'external-link-accessibility' );
+		?>
+		<textarea name="<?php echo esc_attr( $this->option_name ); ?>[modal_message]" rows="3" class="large-text"><?php echo esc_textarea( $message ); ?></textarea>
+		<?php
+	}
+
+	/**
+	 * Render modal continue text field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_modal_continue_text_field() {
+		$settings = $this->get_settings();
+		$text     = isset( $settings['modal_continue_text'] ) ? $settings['modal_continue_text'] : __( 'Continue', 'external-link-accessibility' );
+		?>
+		<input type="text" name="<?php echo esc_attr( $this->option_name ); ?>[modal_continue_text]" value="<?php echo esc_attr( $text ); ?>" class="regular-text" />
+		<?php
+	}
+
+	/**
+	 * Render modal cancel text field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_modal_cancel_text_field() {
+		$settings = $this->get_settings();
+		$text     = isset( $settings['modal_cancel_text'] ) ? $settings['modal_cancel_text'] : __( 'Cancel', 'external-link-accessibility' );
+		?>
+		<input type="text" name="<?php echo esc_attr( $this->option_name ); ?>[modal_cancel_text]" value="<?php echo esc_attr( $text ); ?>" class="regular-text" />
+		<?php
+	}
+
+	/**
+	 * Render redirect section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_redirect_section() {
+		echo '<p>' . esc_html__( 'Customize the intermediate redirect page shown before external sites.', 'external-link-accessibility' ) . '</p>';
+	}
+
+	/**
+	 * Render redirect message field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_redirect_message_field() {
+		$settings = $this->get_settings();
+		$message  = isset( $settings['redirect_message'] ) ? $settings['redirect_message'] : __( 'You are being redirected to an external site.', 'external-link-accessibility' );
+		?>
+		<textarea name="<?php echo esc_attr( $this->option_name ); ?>[redirect_message]" rows="3" class="large-text"><?php echo esc_textarea( $message ); ?></textarea>
+		<?php
+	}
+
+	/**
+	 * Render advanced section description.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_advanced_section() {
+		echo '<p>' . esc_html__( 'Advanced configuration options.', 'external-link-accessibility' ) . '</p>';
+	}
+
+	/**
+	 * Render excluded domains field.
+	 *
+	 * @since 1.0.0
+	 */
+	public function render_excluded_domains_field() {
+		$settings       = $this->get_settings();
+		$domains        = isset( $settings['excluded_domains'] ) ? $settings['excluded_domains'] : array();
+		$domains_string = is_array( $domains ) ? implode( "\n", $domains ) : '';
+		?>
+		<textarea name="<?php echo esc_attr( $this->option_name ); ?>[excluded_domains]" rows="5" class="large-text"><?php echo esc_textarea( $domains_string ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'external-link-accessibility' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Sanitize settings.
+	 *
+	 * @since 1.0.0
+	 * @param array $input Raw input data.
+	 * @return array Sanitized settings.
+	 */
+	public function sanitize_settings( $input ) {
+		$sanitized = array();
+
+		// Warning method.
+		$allowed_methods             = array( 'inline', 'modal', 'redirect', 'inline_modal' );
+		$sanitized['warning_method'] = isset( $input['warning_method'] ) && in_array( $input['warning_method'], $allowed_methods, true )
+			? $input['warning_method']
+			: 'inline';
+
+		// Scope.
+		$allowed_scopes     = array( 'external', 'target_blank', 'both' );
+		$sanitized['scope'] = isset( $input['scope'] ) && in_array( $input['scope'], $allowed_scopes, true )
+			? $input['scope']
+			: 'external';
+
+		// Visual indicator.
+		$allowed_indicators            = array( 'icon', 'text', 'both', 'none' );
+		$sanitized['visual_indicator'] = isset( $input['visual_indicator'] ) && in_array( $input['visual_indicator'], $allowed_indicators, true )
+			? $input['visual_indicator']
+			: 'icon';
+
+		// Text fields.
+		$text_fields = array(
+			'indicator_text',
+			'screen_reader_text',
+			'modal_title',
+			'modal_message',
+			'modal_continue_text',
+			'modal_cancel_text',
+			'redirect_message',
+		);
+
+		foreach ( $text_fields as $field ) {
+			$sanitized[ $field ] = isset( $input[ $field ] ) ? sanitize_text_field( $input[ $field ] ) : '';
+		}
+
+		// Post types.
+		$sanitized['enabled_post_types'] = isset( $input['enabled_post_types'] ) && is_array( $input['enabled_post_types'] )
+			? array_map( 'sanitize_key', $input['enabled_post_types'] )
+			: array( 'post', 'page' );
+
+		// Excluded domains.
+		if ( isset( $input['excluded_domains'] ) && ! empty( $input['excluded_domains'] ) ) {
+			$domains                       = explode( "\n", $input['excluded_domains'] );
+			$domains                       = array_map( 'trim', $domains );
+			$domains                       = array_filter( $domains );
+			$sanitized['excluded_domains'] = array_map( 'sanitize_text_field', $domains );
+		} else {
+			$sanitized['excluded_domains'] = array();
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Get plugin settings.
+	 *
+	 * @since 1.0.0
+	 * @return array Plugin settings.
+	 */
+	public function get_settings() {
+		return get_option( $this->option_name, array() );
+	}
+
+	/**
+	 * Enqueue admin assets.
+	 *
+	 * @since 1.0.0
+	 * @param string $hook Current admin page hook.
+	 */
+	public function enqueue_admin_assets( $hook ) {
+		if ( 'settings_page_external-link-accessibility' !== $hook ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'wz-ela-admin',
+			WZ_ELA_PLUGIN_URL . 'assets/css/admin.css',
+			array(),
+			WZ_ELA_VERSION
+		);
+	}
+}

@@ -1,5 +1,16 @@
 <?php
 /**
+ * Better External Links.
+ *
+ * Enhances accessibility by warning users when links open in new windows or navigate to external sites.
+ *
+ * @package   WebberZone\Better_External_Links
+ * @author    Ajay D'Souza
+ * @license   GPL-2.0+
+ * @link      https://webberzone.com
+ * @copyright 2008-2026 Ajay D'Souza
+ *
+ * @wordpress-plugin
  * Plugin Name: Better External Links
  * Plugin URI: https://webberzone.com/plugins/better-external-links/
  * Description: Enhances accessibility by warning users when links open in new windows or navigate to external sites.
@@ -10,8 +21,6 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: better-external-links
  * Domain Path: /languages
- *
- * @package WebberZone\Better_External_Links
  */
 
 namespace WebberZone\Better_External_Links;

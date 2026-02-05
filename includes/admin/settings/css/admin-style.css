@@ -114,43 +114,41 @@
 /* Responsiveness for smaller screens */
 @media screen and (max-width: 768px) {
 	.wz-repeater-wrapper {
-	margin-bottom: 1rem;
-}
+		margin-bottom: 1rem;
+	}
 
-.wz-repeater-item {
-	flex-direction: column;
-}
+	.wz-repeater-item {
+		flex-direction: column;
+	}
 
-.repeater-item-actions {
-	flex-direction: column;
-	align-items: flex-start;
-}
+	.repeater-item-actions {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 
-.repeater-item-actions .button {
-	margin-bottom: 0.5rem;
-}
-
+	.repeater-item-actions .button {
+		margin-bottom: 0.5rem;
+	}
 }
 
 /* Field input responsive tweaks */
 @media screen and (max-width: 480px) {
 	.wz-repeater-field-label {
-	font-size: 0.85rem;
-}
+		font-size: 0.85rem;
+	}
 
-.wz-repeater-field-input {
-	font-size: 0.85rem;
-}
+	.wz-repeater-field-input {
+		font-size: 0.85rem;
+	}
 
-.repeater-item-actions .button {
-	font-size: 0.85rem;
-}
+	.repeater-item-actions .button {
+		font-size: 0.85rem;
+	}
 
-.add-item {
-	font-size: 1rem;
-	padding: 0.5rem;
-}
-
+	.add-item {
+		font-size: 1rem;
+		padding: 0.5rem;
+	}
 }
 
 /* Repeater Fields */

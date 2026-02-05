@@ -1,133 +1,155 @@
+/**
+ * CodeMirror Media Insertion functionality.
+ *
+ * Handles media library integration for CodeMirror editor instances.
+ *
+ * @since 1.0.0
+ */
 jQuery(document).ready(function ($) {
+
+	/**
+	 * Insert string into CodeMirror editor.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {Object} editor CodeMirror instance.
+	 * @param {string} str    String to insert.
+	 */
 	function insertString(editor, str) {
-	var selection = editor.getSelection();
-	if (selection.length > 0) {
-	editor.replaceSelection(str);
-}
+		var selection = editor.getSelection();
 
-else {
-	var doc = editor.getDoc();
-	var cursor = doc.getCursor();
-	var pos = {
-	line: cursor.line,
+		if (selection.length > 0) {
+			editor.replaceSelection(str);
+		} else {
+			var doc = editor.getDoc();
+			var cursor = doc.getCursor();
+			var pos = {
+				line: cursor.line,
 				ch: cursor.ch
-}
+			};
 
-doc.replaceRange(str, pos);
-}
+			doc.replaceRange(str, pos);
+		}
+	}
 
-
-}
-
-// Media selector.
-	$('.insert-codemirror-media').on('click', function (event) {
-	event.preventDefault();
-	var self = $(this);
-	var editor = $('#wp-content-editor-container .CodeMirror')[0].CodeMirror;
+	/**
+	 * Generate attachment HTML via AJAX.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {Object} props      Display properties.
+	 * @param {Object} attachment Attachment object.
+	 * @return {Promise} jQuery AJAX promise.
+	 */
 	function attachmentHtml(props, attachment) {
-	var caption = attachment.caption,
-				options, html;
-	// If captions are disabled, clear the caption.
-			if (!wp.media.view.settings.captions) {
-	delete attachment.caption;
-}
+		var caption = attachment.caption;
+		var options;
+		var html;
 
-props = wp.media.string.props(props, attachment);
-	options = {
-	id: attachment.id,
-				post_content: attachment.description,
-				post_excerpt: caption
-}
+		// Clear caption if disabled globally.
+		if (!wp.media.view.settings.captions) {
+			delete attachment.caption;
+		}
 
-;
-	if (props.linkUrl) {
-	options.url = props.linkUrl;
-}
+		props = wp.media.string.props(props, attachment);
 
-if ('image' === attachment.type) {
-	html = wp.media.string.image(props);
-	_.each( {
-	align: 'align',
-					size: 'image-size',
-					alt: 'image_alt'
-}
+		options = {
+			id: attachment.id,
+			post_content: attachment.description,
+			post_excerpt: caption
+		};
 
-, function (option, prop) {
-	if (props[prop]) {
-	options[option] = props[prop];
-}
+		if (props.linkUrl) {
+			options.url = props.linkUrl;
+		}
 
+		if ('image' === attachment.type) {
+			html = wp.media.string.image(props);
 
-}
+			_.each({
+				align: 'align',
+				size: 'image-size',
+				alt: 'image_alt'
+			}, function (option, prop) {
+				if (props[prop]) {
+					options[option] = props[prop];
+				}
+			});
+		} else if ('video' === attachment.type) {
+			html = wp.media.string.video(props, attachment);
+		} else if ('audio' === attachment.type) {
+			html = wp.media.string.audio(props, attachment);
+		} else {
+			html = wp.media.string.link(props);
+			options.post_title = props.title;
+		}
 
-);
-}
+		return $.ajax({
+			type: 'POST',
+			dataType: 'json',
+			url: ajaxurl,
+			data: {
+				action: 'send-attachment-to-editor',
+				nonce: wp.media.view.settings.nonce.sendToEditor,
+				attachment: options,
+				html: html,
+				post_id: wp.media.view.settings.post.id
+			}
+		});
+	}
 
-else if ('video' === attachment.type) {
-	html = wp.media.string.video(props, attachment);
-}
+	/**
+	 * Process media selection and insert into editor.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {Object} editor    CodeMirror instance.
+	 * @param {Object} fileFrame Media frame instance.
+	 */
+	function processMediaSelection(editor, fileFrame) {
+		var selection = fileFrame.state().get('selection');
+		var promises = [];
 
-else if ('audio' === attachment.type) {
-	html = wp.media.string.audio(props, attachment);
-}
+		selection.each(function (attachment) {
+			var props = fileFrame.state().display(attachment).toJSON();
+			var promise = attachmentHtml(props, attachment.toJSON()).done(function (response) {
+				insertString(editor, response.data);
+			});
 
-else {
-	html = wp.media.string.link(props);
-	options.post_title = props.title;
-}
+			promises.push(promise);
+		});
 
-return $.ajax( {
-	type: 'POST',
-				dataType: 'json',
-				url: ajaxurl,
-				data: {
-	action: 'send-attachment-to-editor',
-					nonce: wp.media.view.settings.nonce.sendToEditor,
-					attachment: options,
-					html: html,
-					post_id: wp.media.view.settings.post.id
-}
+		$.when.apply($, promises).always(function () {
+			fileFrame.close();
+		});
+	}
 
-,
-				success: function (response) {
-	//mediaHtml = response.data;
-}
+	/**
+	 * Handle media insertion button clicks.
+	 *
+	 * @since 1.0.0
+	 */
+	$('.insert-codemirror-media').on('click', function (event) {
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		event.stopPropagation();
+		$(this).removeClass('add_media');
 
+		var editor = $('#wp-content-editor-container .CodeMirror')[0].CodeMirror;
+		var fileFrame;
 
-}
-
-);
-}
-
-// Create the media frame.
-		var file_frame = wp.media.frames.file_frame = wp.media( {
-	frame: 'post',
+		fileFrame = wp.media.frames.file_frame = wp.media({
+			frame: 'post',
 			state: 'insert',
-			multiple: true
-}
+			multiple: false
+		});
 
-);
-	file_frame.on('insert', function () {
-	var selection = file_frame.state().get('selection');
-	selection.map(function (attachment) {
-	var props = file_frame.state().display(attachment).toJSON();
-	$.when(attachmentHtml(props, attachment.toJSON())).done(function (response) {
-	mediaHtml = response.data;
-	insertString(editor, mediaHtml);
-}
+		// Remove old handlers and add insert handler only.
+		fileFrame.off('insert').on('insert', function () {
+			processMediaSelection(editor, fileFrame);
+		});
 
-);
-}
+		fileFrame.open();
+	});
 
-);
-}
-
-);
-	// Finally, open the modal
-		file_frame.open();
-}
-
-);
-}
-
-);
+});

@@ -1,77 +1,63 @@
-jQuery(document).ready(function($) {
+/**
+ * Initialise CodeMirror editors for various code types.
+ *
+ * @since 1.0.0
+ */
+jQuery(document).ready(function ($) {
+	/**
+	 * Mark form as modified.
+	 *
+	 * @since 1.0.0
+	 */
 	function confirmFormChange() {
-	formmodified=1;
-}
+		formmodified = 1;
+	}
 
-// Initialise CodeMirror.
-	$( ".codemirror_html" ).each( function( index, element ) {
-	if( $( element ).length && typeof wp.codeEditor === 'object' ) {
-	var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {
-}
+	/**
+	 * Initialise a CodeMirror editor with specified mode.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param {jQuery} $element The textarea element to initialise.
+	 * @param {string} mode     The CodeMirror mode (e.g., 'javascript', 'css').
+	 */
+	function initialiseCodeMirror($element, mode) {
+		if (!$element.length || typeof wp.codeEditor !== 'object') {
+			return;
+		}
 
-;
-	editorSettings.codemirror = _.extend( {
-}
+		// Skip if already initialised.
+		if ($element.data('codemirror-initialised')) {
+			return;
+		}
 
-,
-				editorSettings.codemirror, {
-}
+		const editorSettings = wp.codeEditor.defaultSettings ? _.clone(wp.codeEditor.defaultSettings) : {};
 
-);
-	var editor = wp.codeEditor.initialize( $( element ), editorSettings );
-	editor.codemirror.on( 'change', confirmFormChange );
-}
+		editorSettings.codemirror = _.extend(
+			{},
+			editorSettings.codemirror,
+			mode ? { mode: mode } : {}
+		);
 
+		const editor = wp.codeEditor.initialize($element, editorSettings);
+		editor.codemirror.on('change', confirmFormChange);
 
-}
+		// Mark as initialised.
+		$element.data('codemirror-initialised', true);
+	}
 
-);
-	$( ".codemirror_js" ).each( function( index, element ) {
-	if( $( element ).length && typeof wp.codeEditor === 'object' ) {
-	var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {
-}
+	// Initialise HTML editors.
+	$('.codemirror_html').each(function () {
+		initialiseCodeMirror($(this), null);
+	});
 
-;
-	editorSettings.codemirror = _.extend( {
-}
+	// Initialise JavaScript editors.
+	$('.codemirror_js').each(function () {
+		initialiseCodeMirror($(this), 'javascript');
+	});
 
-,
-				editorSettings.codemirror, {
-	mode: 'javascript',
-}
-
-);
-	var editor = wp.codeEditor.initialize( $( element ), editorSettings );
-	editor.codemirror.on( 'change', confirmFormChange );
-}
-
-
-}
-
-);
-	$( ".codemirror_css" ).each( function( index, element ) {
-	if( $( element ).length && typeof wp.codeEditor === 'object' ) {
-	var editorSettings = wp.codeEditor.defaultSettings ? _.clone( wp.codeEditor.defaultSettings ) : {
-}
-
-;
-	editorSettings.codemirror = _.extend( {
-}
-
-,
-				editorSettings.codemirror, {
-	mode: 'css',
-}
-
-);
-	var editor = wp.codeEditor.initialize( $( element ), editorSettings );
-	editor.codemirror.on( 'change', confirmFormChange );
-}
-
-
-}
-
-);
-}
-
-);
+	// Initialise CSS editors.
+	$('.codemirror_css').each(function () {
+		initialiseCodeMirror($(this), 'css');
+	});
+});

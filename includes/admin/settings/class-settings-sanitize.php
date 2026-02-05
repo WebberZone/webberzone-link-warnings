@@ -1,8 +1,8 @@
 <?php
 /**
- * Settings sanitization.
- *
  * Functions to sanitize settings.
+ *
+ * @link  https://webberzone.com
  *
  * @package WebberZone\Better_External_Links
  */

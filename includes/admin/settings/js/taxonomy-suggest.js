@@ -1,133 +1,108 @@
 jQuery(document).ready(function($) {
 	// Function to add auto suggest.
 	$.fn.WZTagsSuggest = function( options ) {
-	var cache;
-	var last;
-	var $element = $( this );
-	options = options || {
-}
+		var cache;
+		var last;
+		var $element = $( this );
 
-;
-	var taxonomy = options.taxonomy || $element.attr( 'data-wp-taxonomy' ) || 'category';
-	var tag_search = options.tag_search || $element.attr( 'data-wp-action' ) || 'wz_tags_search';
-	delete( options.taxonomy );
-	delete( options.tag_search );
-	function split( val ) {
-	return val.split( /,(?=(?:(?:[^"]*") {
-	2
-}
+		options = options || {};
 
-)*[^"]*$)/ );
-	// Split typical CSV format, with commas and double quotes.
-}
+		var taxonomy = options.taxonomy || $element.attr( 'data-wp-taxonomy' ) || 'category';
+		var tag_search = options.tag_search || $element.attr( 'data-wp-action' ) || 'wz_tags_search';
+		delete( options.taxonomy );
+		delete( options.tag_search );
 
-function extractLast( term ) {
-	return split( term ).pop();
-}
+		function split( val ) {
+			return val.split( /,(?=(?:(?:[^"]*"){2})*[^"]*$)/ ); // Split typical CSV format, with commas and double quotes.
+		}
 
-options = $.extend( {
-	minLength: 2,
+		function extractLast( term ) {
+			return split( term ).pop();
+		}
+
+		options = $.extend({
+			minLength: 2,
 			position: {
-	my: 'left top+2',
+				my: 'left top+2',
 				at: 'left bottom',
 				collision: 'none'
-}
-
-,
+			},
 			source: function( request, response ) {
-	var term;
-	if ( last === request.term ) {
-	response( cache );
-	return;
-}
+				var term;
 
-term = extractLast( request.term );
-	if ( last === request.term ) {
-	response( cache );
-	return;
-}
+				if ( last === request.term ) {
+					response( cache );
+					return;
+				}
 
-$.ajax( {
-	type: 'POST',
+				term = extractLast( request.term );
+
+				if ( last === request.term ) {
+					response( cache );
+					return;
+				}
+
+				$.ajax({
+					type: 'POST',
 					dataType: 'json',
 					url: ajaxurl,
 					data: {
-	action: tag_search,
+						action: tag_search,
 						tax: taxonomy,
 						q: term
-}
+					},
+				}).done( function( data ) {
+					cache = data;
+					response( data );
+				});
 
-,
-}
+				last = request.term;
 
-).done( function( data ) {
-	cache = data;
-	response( data );
-}
-
-);
-	last = request.term;
-}
-
-,
+			},
 			search: function() {
-	// Custom minLength.
+				// Custom minLength.
 				var term = extractLast( this.value );
-	if ( term.length < 2 ) {
-	return false;
-}
 
-
-}
-
-,
+				if ( term.length < 2 ) {
+					return false;
+				}
+			},
 			focus: function( event, ui ) {
-	// Prevent value inserted on focus.
+				// Prevent value inserted on focus.
 				event.preventDefault();
-}
-
-,
+			},
 			select: function( event, ui ) {
-	var terms = split( this.value );
-	var val   = ui.item.value;
-	if ( val.indexOf(',') !== -1 ) {
-	val = '"' + val + '"'
-}
+				var terms = split( this.value );
+				var val   = ui.item.value;
 
-// Remove the last user input.
+				if ( val.indexOf(',') !== -1 ) {
+					val = '"' + val + '"'
+				}
+
+				// Remove the last user input.
 				terms.pop();
-	// Add the selected item.
+
+				// Add the selected item.
 				terms.push( val );
-	// Add placeholder to get the comma-and-space at the end.
+
+				// Add placeholder to get the comma-and-space at the end.
 				terms.push( "" );
-	this.value = terms.join( ", " );
-	return false;
-}
+				this.value = terms.join( ", " );
+				return false;
+			}
+		}, options );
 
-
-}
-
-, options );
-	$element.on( "keydown", function( event ) {
-	// Don't navigate away from the field on tab when selecting an item.
+		$element.on( "keydown", function( event ) {
+				// Don't navigate away from the field on tab when selecting an item.
 				if ( event.keyCode === $.ui.keyCode.TAB &&
 				$( this ).autocomplete( 'instance' ).menu.active ) {
-	event.preventDefault();
-}
-
-
-}
-
-)
+					event.preventDefault();
+				}
+			})
 			.autocomplete( options );
-}
+	};
 
-;
 	$( '.category_autocomplete' ).each( function ( i, element ) {
-	$( element ).WZTagsSuggest();
-}
-
-);
-}
-
-);
+		$( element ).WZTagsSuggest();
+	});
+});

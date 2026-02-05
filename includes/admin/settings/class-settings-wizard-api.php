@@ -11,7 +11,6 @@
 namespace WebberZone\Better_External_Links\Admin\Settings;
 
 use WebberZone\Better_External_Links\Admin\Settings\Settings_Sanitize;
-use WebberZone\Better_External_Links\Admin\Settings\Settings_API;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -20,6 +19,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Settings Wizard API class
+ *
+ * @since 4.2.0
  */
 class Settings_Wizard_API {
 
@@ -28,7 +29,7 @@ class Settings_Wizard_API {
 	 *
 	 * @var string
 	 */
-	public const VERSION = Settings_API::VERSION;
+	public const VERSION = '1.0.0';
 
 	/**
 	 * Settings sanitizer instance.
@@ -125,7 +126,6 @@ class Settings_Wizard_API {
 	 *     @type array  $translation_strings  Translation strings.
 	 *     @type string $page_slug            Wizard page slug.
 	 *     @type array  $menu_args           Menu arguments array with parent and capability.
-	 *     @type bool   $hide_when_completed Whether to hide the wizard submenu item after completion.
 	 * }
 	 */
 	public function __construct( $settings_key, $prefix, $args = array() ) {
@@ -138,7 +138,6 @@ class Settings_Wizard_API {
 			'translation_strings' => array(),
 			'admin_menu_position' => 999,
 			'page_slug'           => "{$prefix}_wizard",
-			'hide_when_completed' => true,
 			'menu_args'           => array(
 				'parent'     => '', // Empty for dashboard, or parent slug for submenu.
 				'capability' => 'manage_options',
@@ -195,7 +194,6 @@ class Settings_Wizard_API {
 			'finish_setup'          => 'Finish Setup',
 			'skip_wizard'           => 'Skip Wizard',
 			'step_of'               => 'Step %1$d of %2$d',
-			'steps_nav_aria_label'  => 'Setup Wizard Steps',
 			'wizard_complete'       => 'Wizard Complete!',
 			'setup_complete'        => 'Setup has been completed successfully.',
 			'go_to_settings'        => 'Go to Settings',
@@ -225,38 +223,13 @@ class Settings_Wizard_API {
 		$parent     = ! empty( $this->menu_args['parent'] ) ? $this->menu_args['parent'] : 'index.php';
 
 		$this->page_id = add_submenu_page(
-			$parent,
-			(string) $this->translation_strings['page_title'],
-			(string) $this->translation_strings['menu_title'],
+			$this->is_wizard_completed() ? 'options.php' : $parent,
+			$this->translation_strings['page_title'],
+			$this->translation_strings['menu_title'],
 			$capability,
 			$this->page_slug,
 			array( $this, 'render_wizard_page' )
 		);
-
-		$hide_when_completed = isset( $this->args['hide_when_completed'] ) ? (bool) $this->args['hide_when_completed'] : true;
-		if ( $hide_when_completed && $this->is_wizard_completed() ) {
-			add_action( 'admin_head', array( $this, 'hide_completed_wizard_submenu' ) );
-		}
-	}
-
-	/**
-	 * Hide wizard submenu item when the wizard is completed.
-	 *
-	 * @return void
-	 */
-	public function hide_completed_wizard_submenu() {
-		if ( ! $this->is_wizard_completed() ) {
-			return;
-		}
-		$slug = sanitize_key( $this->page_slug );
-		?>
-		<style>
-			#adminmenu a[href$="page=<?php echo esc_attr( $slug ); ?>"],
-			#adminmenu a[href*="page=<?php echo esc_attr( $slug ); ?>&"] {
-				display: none;
-			}
-		</style>
-		<?php
 	}
 
 	/**
@@ -311,7 +284,7 @@ class Settings_Wizard_API {
 		// Localize Tom Select settings for wizard.
 		wp_localize_script(
 			'wz-' . $this->prefix . '-tom-select-init',
-			"{$this->prefix}TomSelectSettings",
+			'WZKBTomSelectSettings',
 			array(
 				'action'   => $this->prefix . '_taxonomy_search_tom_select',
 				'nonce'    => wp_create_nonce( $this->prefix . '_taxonomy_search_tom_select' ),
@@ -364,7 +337,7 @@ class Settings_Wizard_API {
 				break;
 
 			case 'skip_wizard':
-				$this->mark_wizard_completed();
+				$this->complete_wizard();
 				$this->redirect_to_admin();
 				break;
 			default:
@@ -486,7 +459,13 @@ class Settings_Wizard_API {
 	 * Redirect to the admin page after wizard completion.
 	 */
 	protected function redirect_to_admin() {
-		$url = $this->get_completion_redirect_url();
+		$url = add_query_arg(
+			array(
+				'page'             => str_replace( '_wizard', '', $this->page_slug ),
+				'wizard-completed' => '1',
+			),
+			admin_url( 'admin.php' )
+		);
 		wp_safe_redirect( $url );
 		exit;
 	}
@@ -632,27 +611,45 @@ class Settings_Wizard_API {
 							<table class="form-table">
 								<?php
 								foreach ( $step_config['settings'] as $setting_id => $field ) {
-									$args = Settings_API::parse_field_args( $field );
+									$args = wp_parse_args(
+										$field,
+										array(
+											'id'          => null,
+											'name'        => '',
+											'desc'        => '',
+											'type'        => null,
+											'default'     => '',
+											'options'     => '',
+											'max'         => null,
+											'min'         => null,
+											'step'        => null,
+											'size'        => null,
+											'field_class' => '',
+											'field_attributes' => '',
+											'placeholder' => '',
+											'pro'         => false,
+										)
+									);
 
 									// Get all settings from the main settings array.
 									$all_settings = get_option( $this->settings_key, array() );
 
 									// Check if this setting exists in the saved settings.
-									$value = $all_settings[ $setting_id ] ?? null;
+									$value = isset( $all_settings[ $setting_id ] ) ? $all_settings[ $setting_id ] : null;
 
 									// Use saved value if it exists, otherwise use default.
-									$args['value'] = ( null !== $value ) ? $value : ( $args['default'] ?? '' );
+									$args['value'] = ( null !== $value ) ? $value : ( isset( $args['default'] ) ? $args['default'] : '' );
 									$type          = $args['type'] ?? 'text';
 									$callback      = method_exists( $this->settings_form, "callback_{$type}" ) ? array( $this->settings_form, "callback_{$type}" ) : array( $this->settings_form, 'callback_missing' );
 
 									echo '<tr>';
 									echo '<th scope="row">';
 									if ( ! empty( $args['name'] ) ) {
-										echo '<label for="' . esc_attr( $setting_id ) . '">' . esc_html( wp_strip_all_tags( $args['name'] ) ) . '</label>';
+										echo '<label for="' . esc_attr( $setting_id ) . '">' . esc_html( $args['name'] ) . '</label>';
 									}
 									echo '</th>';
 									echo '<td>';
-									\call_user_func( $callback, $args );
+									call_user_func( $callback, $args );
 									echo '</td>';
 									echo '</tr>';
 								}
@@ -698,7 +695,7 @@ class Settings_Wizard_API {
 	 * @return string Skip wizard link URL.
 	 */
 	protected function get_skip_link_url() {
-		return $this->get_completion_redirect_url();
+		return admin_url( 'index.php' );
 	}
 
 	/**
@@ -723,9 +720,9 @@ class Settings_Wizard_API {
 				</button>
 			<?php endif; ?>
 
-			<button type="submit" name="wizard_action" value="skip_wizard" class="button wizard-button-skip">
+			<a href="<?php echo esc_url( $this->get_skip_link_url() ); ?>" class="button wizard-button-skip">
 				<?php echo esc_html( $this->translation_strings['skip_wizard'] ); ?>
-			</button>
+			</a>
 		</div>
 		<?php
 	}
@@ -832,7 +829,7 @@ class Settings_Wizard_API {
 	protected function render_wizard_steps_navigation() {
 		$step_keys = array_keys( $this->steps );
 		?>
-		<ol class="wizard-steps-nav" role="tablist" aria-label="<?php echo esc_attr( $this->translation_strings['steps_nav_aria_label'] ?? 'Setup Wizard Steps' ); ?>">
+		<ol class="wizard-steps-nav" role="tablist" aria-label="<?php esc_attr_e( 'Setup Wizard Steps', 'knowledgebase' ); ?>">
 			<?php
 			foreach ( $step_keys as $index => $step_key ) :
 				$step_number  = $index + 1;

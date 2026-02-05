@@ -2,7 +2,7 @@
 /**
  * Admin Banner helper.
  *
- * @package WebberZone\Knowledge_Base
+ * @package WebberZone\Better_External_Links
  */
 
 namespace WebberZone\Better_External_Links\Admin;
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Copy-paste friendly: adjust namespaces and configuration per plugin.
  *
- * @since 4.2.2
+ * @since 1.0.0
  */
 class Admin_Banner {
 

@@ -93,7 +93,7 @@ class Main {
 	 * @since 1.0.0
 	 */
 	private function load_dependencies() {
-		require_once WZ_BEL_PLUGIN_DIR . 'includes/autoloader.php';
+		require_once WZ_BEL_PLUGIN_DIR . 'includes/options-api.php';
 	}
 
 	/**
@@ -104,6 +104,7 @@ class Main {
 	private function init_hooks() {
 		Hook_Registry::add_action( 'plugins_loaded', array( $this, 'init' ) );
 		Hook_Registry::add_action( 'init', array( $this, 'load_textdomain' ) );
+		Hook_Registry::add_action( 'init', array( $this, 'init_admin' ) );
 	}
 
 	/**
@@ -115,9 +116,6 @@ class Main {
 		$this->content_processor = new Content_Processor();
 		$this->frontend_handler  = new Frontend_Handler();
 		$this->redirect_handler  = new Redirect_Handler();
-
-		// Initialize admin components.
-		Hook_Registry::add_action( 'init', array( $this, 'init_admin' ) );
 	}
 
 	/**

@@ -43,7 +43,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 		$settings_key = 'wz_bel_settings';
 		$prefix       = 'wz_bel';
 
-		$this->settings_page_url = admin_url( 'options-general.php?page=better-external-links' );
+		$this->settings_page_url = admin_url( 'options-general.php?page=wz-bel-settings' );
 
 		$args = array(
 			'steps'               => $this->get_wizard_steps(),
@@ -89,37 +89,94 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 * @return array Wizard steps.
 	 */
 	public function get_wizard_steps() {
-		return array(
-			'welcome' => array(
-				'title'   => esc_html__( 'Welcome', 'better-external-links' ),
-				'content' => array( $this, 'welcome_content' ),
-				'handler' => '',
+		$all_settings_grouped = Settings::get_registered_settings();
+		$all_settings         = array();
+		foreach ( $all_settings_grouped as $section_settings ) {
+			$all_settings = array_merge( $all_settings, $section_settings );
+		}
+
+		$general_keys = array(
+			'warning_method',
+			'scope',
+			'enabled_post_types',
+		);
+
+		$modal_keys = array(
+			'modal_title',
+			'modal_message',
+			'modal_continue_text',
+			'modal_cancel_text',
+		);
+
+		$content_keys = array(
+			'visual_indicator',
+			'indicator_text',
+			'screen_reader_text',
+		);
+
+		$redirect_keys = array(
+			'redirect_message',
+		);
+
+		$steps = array(
+			'welcome'  => array(
+				'title'       => __( 'Welcome to Better External Links', 'better-external-links' ),
+				'description' => __( 'Thank you for installing Better External Links! This wizard will help you configure the essential settings to make your external links accessible and user-friendly.', 'better-external-links' ),
+				'settings'    => array(),
 			),
-			'basic'   => array(
-				'title'   => esc_html__( 'Basic Settings', 'better-external-links' ),
-				'content' => array( $this, 'basic_content' ),
-				'handler' => array( $this, 'basic_save' ),
+			'general'  => array(
+				'title'       => __( 'General Settings', 'better-external-links' ),
+				'description' => __( 'Choose how to warn users about external links and which links should be processed.', 'better-external-links' ),
+				'settings'    => $this->build_step_settings( $general_keys, $all_settings ),
 			),
-			'content' => array(
-				'title'   => esc_html__( 'Content Settings', 'better-external-links' ),
-				'content' => array( $this, 'content_content' ),
-				'handler' => array( $this, 'content_save' ),
+			'content'  => array(
+				'title'       => __( 'Visual Indicators', 'better-external-links' ),
+				'description' => __( 'Configure visual indicators and screen reader text for accessibility.', 'better-external-links' ),
+				'settings'    => $this->build_step_settings( $content_keys, $all_settings ),
 			),
-			'modal'   => array(
-				'title'   => esc_html__( 'Modal Settings', 'better-external-links' ),
-				'content' => array( $this, 'modal_content' ),
-				'handler' => array( $this, 'modal_save' ),
+			'modal'    => array(
+				'title'       => __( 'Modal Dialog', 'better-external-links' ),
+				'description' => __( 'Customize the modal dialog text and buttons.', 'better-external-links' ),
+				'settings'    => $this->build_step_settings( $modal_keys, $all_settings ),
 			),
-			'ready'   => array(
-				'title'   => esc_html__( 'Ready!', 'better-external-links' ),
-				'content' => array( $this, 'ready_content' ),
-				'handler' => array( $this, 'ready_save' ),
+			'redirect' => array(
+				'title'       => __( 'Redirect Screen', 'better-external-links' ),
+				'description' => __( 'Configure the redirect screen message.', 'better-external-links' ),
+				'settings'    => $this->build_step_settings( $redirect_keys, $all_settings ),
 			),
 		);
+
+		/**
+		 * Filter wizard steps.
+		 *
+		 * @param array $steps Wizard steps.
+		 */
+		return apply_filters( 'wz_bel_wizard_steps', $steps );
 	}
 
 	/**
-	 * Get translation strings.
+	 * Build settings array for a wizard step from keys.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $keys Setting keys for this step.
+	 * @param array $all_settings All settings array.
+	 * @return array
+	 */
+	protected function build_step_settings( $keys, $all_settings ) {
+		$step_settings = array();
+
+		foreach ( $keys as $key ) {
+			if ( isset( $all_settings[ $key ] ) ) {
+				$step_settings[ $key ] = $all_settings[ $key ];
+			}
+		}
+
+		return $step_settings;
+	}
+
+	/**
+	 * Get translation strings for the wizard.
 	 *
 	 * @since 1.0.0
 	 *
@@ -127,292 +184,85 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 */
 	public function get_translation_strings() {
 		return array(
-			'branding'           => esc_html__( 'Better External Links', 'better-external-links' ),
-			'welcome_title'      => esc_html__( 'Welcome to Better External Links!', 'better-external-links' ),
-			'welcome_subtitle'   => esc_html__( 'Thank you for installing! This quick setup wizard will help you configure the basic settings.', 'better-external-links' ),
-			'btn_start'          => esc_html__( 'Let\'s go!', 'better-external-links' ),
-			'btn_skip'           => esc_html__( 'Not right now', 'better-external-links' ),
-			'btn_next'           => esc_html__( 'Continue', 'better-external-links' ),
-			'btn_previous'       => esc_html__( 'Previous', 'better-external-links' ),
-			'btn_finish'         => esc_html__( 'Finish', 'better-external-links' ),
-			'completed_title'    => esc_html__( 'You\'re all set!', 'better-external-links' ),
-			'completed_subtitle' => esc_html__( 'Your plugin is now configured and ready to use.', 'better-external-links' ),
+			'page_title'      => __( 'Better External Links Setup Wizard', 'better-external-links' ),
+			'menu_title'      => __( 'Setup Wizard', 'better-external-links' ),
+			'next_step'       => __( 'Next Step', 'better-external-links' ),
+			'previous_step'   => __( 'Previous Step', 'better-external-links' ),
+			'finish_setup'    => __( 'Finish Setup', 'better-external-links' ),
+			'skip_wizard'     => __( 'Skip Wizard', 'better-external-links' ),
+			/* translators: %1$d: Current step number, %2$d: Total number of steps */
+			'step_of'         => __( 'Step %1$d of %2$d', 'better-external-links' ),
+			'wizard_complete' => __( 'Setup Complete!', 'better-external-links' ),
+			'setup_complete'  => __( 'Your Better External Links plugin has been configured successfully. Your external links are now accessible and user-friendly!', 'better-external-links' ),
+			'go_to_settings'  => __( 'Go to Settings', 'better-external-links' ),
 		);
 	}
 
 	/**
-	 * Welcome step content.
+	 * Trigger wizard on plugin activation.
 	 *
 	 * @since 1.0.0
 	 */
-	public function welcome_content() {
-		?>
-		<p><?php esc_html_e( 'This wizard will walk you through:', 'better-external-links' ); ?></p>
-		<ul>
-			<li><?php esc_html_e( 'Choosing your warning method', 'better-external-links' ); ?></li>
-			<li><?php esc_html_e( 'Configuring visual indicators', 'better-external-links' ); ?></li>
-			<li><?php esc_html_e( 'Setting up modal dialogs', 'better-external-links' ); ?></li>
-		</ul>
-		<p><strong><?php esc_html_e( 'No worries - you can always change these settings later in the plugin settings page.', 'better-external-links' ); ?></strong></p>
-		<?php
+	public function trigger_wizard_on_activation() {
+		// Set a transient that will trigger the wizard on first admin page visit.
+		set_transient( 'wz_bel_show_wizard_activation_redirect', true, HOUR_IN_SECONDS );
+
+		// Also set an option for more persistent storage in multisite environments.
+		update_option( 'wz_bel_show_wizard', true );
 	}
 
 	/**
-	 * Basic settings content.
+	 * Register the wizard notice.
 	 *
 	 * @since 1.0.0
 	 */
-	public function basic_content() {
-		$settings = $this->settings_form->get_settings();
-		?>
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row">
-					<label for="warning_method"><?php esc_html_e( 'Warning Method', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<?php
-					$methods = array(
-						'inline'       => esc_html__( 'Inline indicators only', 'better-external-links' ),
-						'modal'        => esc_html__( 'Modal dialog', 'better-external-links' ),
-						'redirect'     => esc_html__( 'Redirect screen', 'better-external-links' ),
-						'inline_modal' => esc_html__( 'Inline + modal (for external only)', 'better-external-links' ),
-					);
-					foreach ( $methods as $value => $label ) {
-						?>
-						<label>
-							<input type="radio" name="warning_method" value="<?php echo esc_attr( $value ); ?>" <?php checked( $settings['warning_method'], $value ); ?> required>
-							<?php echo esc_html( $label ); ?>
-						</label><br>
-						<?php
-					}
-					?>
-					<p class="description"><?php esc_html_e( 'Choose how to warn users about external links.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="scope"><?php esc_html_e( 'Link Scope', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<?php
-					$scopes = array(
-						'external'     => esc_html__( 'External links only', 'better-external-links' ),
-						'target_blank' => esc_html__( 'All target="_blank" links', 'better-external-links' ),
-						'both'         => esc_html__( 'Both (with different treatments)', 'better-external-links' ),
-					);
-					foreach ( $scopes as $value => $label ) {
-						?>
-						<label>
-							<input type="radio" name="scope" value="<?php echo esc_attr( $value ); ?>" <?php checked( $settings['scope'], $value ); ?> required>
-							<?php echo esc_html( $label ); ?>
-						</label><br>
-						<?php
-					}
-					?>
-					<p class="description"><?php esc_html_e( 'Which links should be processed.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-		</table>
-		<?php
-	}
+	public function register_wizard_notice() {
+		// Check if wizard should be shown.
+		$show_wizard = get_transient( 'wz_bel_show_wizard_activation_redirect' ) || get_option( 'wz_bel_show_wizard', false );
 
-	/**
-	 * Basic settings save handler.
-	 *
-	 * @since 1.0.0
-	 */
-	public function basic_save() {
-		// Nonce is verified by the parent class.
-		// Nonce is verified by the parent class before calling this handler.
-		if ( isset( $_POST['warning_method'] ) && isset( $_POST['scope'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings = $this->settings_form->get_settings();
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['warning_method'] = sanitize_key( $_POST['warning_method'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['scope'] = sanitize_key( $_POST['scope'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$this->settings_form->update_settings( $settings );
+		if ( ! $show_wizard || $this->is_wizard_completed() ) {
+			return;
+		}
+
+		// Check if we're already on the wizard page.
+		$page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 'wz_bel_wizard' === $page ) {
+			return;
+		}
+
+		// Add admin notice.
+		Hook_Registry::add_action(
+			'admin_notices',
+			function () {
+				?>
+				<div class="notice notice-info is-dismissible">
+					<p><?php esc_html_e( 'Welcome to Better External Links! Would you like to run the setup wizard to configure the plugin?', 'better-external-links' ); ?></p>
+					<p>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wz_bel_wizard' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Run Setup Wizard', 'better-external-links' ); ?></a>
+						<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wz_bel_dismiss_wizard', '1' ), 'wz_bel_dismiss_wizard' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Skip Setup', 'better-external-links' ); ?></a>
+					</p>
+				</div>
+				<?php
+			}
+		);
+
+		// Handle dismissal.
+		if ( isset( $_GET['wz_bel_dismiss_wizard'] ) && check_admin_referer( 'wz_bel_dismiss_wizard' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			delete_transient( 'wz_bel_show_wizard_activation_redirect' );
+			delete_option( 'wz_bel_show_wizard' );
+			wp_safe_redirect( remove_query_arg( array( 'wz_bel_dismiss_wizard', '_wpnonce' ) ) );
+			exit;
 		}
 	}
 
 	/**
-	 * Content settings content.
+	 * Get the URL to redirect to after wizard completion.
 	 *
 	 * @since 1.0.0
-	 */
-	public function content_content() {
-		$settings = $this->settings_form->get_settings();
-		?>
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row">
-					<label for="visual_indicator"><?php esc_html_e( 'Visual Indicator', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<?php
-					$indicators = array(
-						'icon' => esc_html__( 'Icon (↗)', 'better-external-links' ),
-						'text' => esc_html__( 'Text', 'better-external-links' ),
-						'both' => esc_html__( 'Icon + text', 'better-external-links' ),
-						'none' => esc_html__( 'None (screen reader only)', 'better-external-links' ),
-					);
-					foreach ( $indicators as $value => $label ) {
-						?>
-						<label>
-							<input type="radio" name="visual_indicator" value="<?php echo esc_attr( $value ); ?>" <?php checked( $settings['visual_indicator'], $value ); ?> required>
-							<?php echo esc_html( $label ); ?>
-						</label><br>
-						<?php
-					}
-					?>
-					<p class="description"><?php esc_html_e( 'Choose what visual indicator to display.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="indicator_text"><?php esc_html_e( 'Indicator Text', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="indicator_text" name="indicator_text" value="<?php echo esc_attr( $settings['indicator_text'] ); ?>" class="regular-text">
-					<p class="description"><?php esc_html_e( 'Text displayed next to links (when text indicator is enabled).', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="screen_reader_text"><?php esc_html_e( 'Screen Reader Text', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="screen_reader_text" name="screen_reader_text" value="<?php echo esc_attr( $settings['screen_reader_text'] ); ?>" class="regular-text">
-					<p class="description"><?php esc_html_e( 'Hidden text for screen readers.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-		</table>
-		<?php
-	}
-
-	/**
-	 * Content settings save handler.
 	 *
-	 * @since 1.0.0
+	 * @return string Redirect URL.
 	 */
-	public function content_save() {
-		// Nonce is verified by the parent class.
-		// Nonce is verified by the parent class before calling this handler.
-		if ( isset( $_POST['visual_indicator'] ) && isset( $_POST['indicator_text'] ) && isset( $_POST['screen_reader_text'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings = $this->settings_form->get_settings();
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['visual_indicator'] = sanitize_key( $_POST['visual_indicator'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['indicator_text'] = sanitize_text_field( wp_unslash( $_POST['indicator_text'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['screen_reader_text'] = sanitize_text_field( wp_unslash( $_POST['screen_reader_text'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$this->settings_form->update_settings( $settings );
-		}
-	}
-
-	/**
-	 * Modal settings content.
-	 *
-	 * @since 1.0.0
-	 */
-	public function modal_content() {
-		$settings = $this->settings_form->get_settings();
-		?>
-		<table class="form-table" role="presentation">
-			<tr>
-				<th scope="row">
-					<label for="modal_title"><?php esc_html_e( 'Modal Title', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="modal_title" name="modal_title" value="<?php echo esc_attr( $settings['modal_title'] ); ?>" class="regular-text">
-					<p class="description"><?php esc_html_e( 'Title shown in the modal dialog.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="modal_message"><?php esc_html_e( 'Modal Message', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<textarea id="modal_message" name="modal_message" rows="3" class="large-text"><?php echo esc_textarea( $settings['modal_message'] ); ?></textarea>
-					<p class="description"><?php esc_html_e( 'Message shown in the modal dialog.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="modal_continue_text"><?php esc_html_e( 'Continue Button Text', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="modal_continue_text" name="modal_continue_text" value="<?php echo esc_attr( $settings['modal_continue_text'] ); ?>" class="regular-text">
-					<p class="description"><?php esc_html_e( 'Text for the continue button.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row">
-					<label for="modal_cancel_text"><?php esc_html_e( 'Cancel Button Text', 'better-external-links' ); ?></label>
-				</th>
-				<td>
-					<input type="text" id="modal_cancel_text" name="modal_cancel_text" value="<?php echo esc_attr( $settings['modal_cancel_text'] ); ?>" class="regular-text">
-					<p class="description"><?php esc_html_e( 'Text for the cancel button.', 'better-external-links' ); ?></p>
-				</td>
-			</tr>
-		</table>
-		<?php
-	}
-
-	/**
-	 * Modal settings save handler.
-	 *
-	 * @since 1.0.0
-	 */
-	public function modal_save() {
-		// Nonce is verified by the parent class.
-		// Nonce is verified by the parent class before calling this handler.
-		if ( isset( $_POST['modal_title'] ) && isset( $_POST['modal_message'] ) && isset( $_POST['modal_continue_text'] ) && isset( $_POST['modal_cancel_text'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings = $this->settings_form->get_settings();
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['modal_title'] = sanitize_text_field( wp_unslash( $_POST['modal_title'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['modal_message'] = sanitize_textarea_field( wp_unslash( $_POST['modal_message'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['modal_continue_text'] = sanitize_text_field( wp_unslash( $_POST['modal_continue_text'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			// Nonce is verified by the parent class before calling this handler.
-			$settings['modal_cancel_text'] = sanitize_text_field( wp_unslash( $_POST['modal_cancel_text'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$this->settings_form->update_settings( $settings );
-		}
-	}
-
-	/**
-	 * Ready step content.
-	 *
-	 * @since 1.0.0
-	 */
-	public function ready_content() {
-		?>
-		<div class="wz-bel-setup-features">
-			<h3><?php esc_html_e( 'What\'s next?', 'better-external-links' ); ?></h3>
-			<ul>
-				<li><?php esc_html_e( 'Your external links will now be automatically processed according to your settings', 'better-external-links' ); ?></li>
-				<li><?php esc_html_e( 'You can fine-tune all settings in the plugin settings page', 'better-external-links' ); ?></li>
-				<li><?php esc_html_e( 'Check out our documentation for advanced features and tips', 'better-external-links' ); ?></li>
-			</ul>
-		</div>
-		
-		<div class="wz-bel-setup-support">
-			<h3><?php esc_html_e( 'Need help?', 'better-external-links' ); ?></h3>
-			<p><?php esc_html_e( 'If you have any questions or need assistance, please don\'t hesitate to reach out to our support team.', 'better-external-links' ); ?></p>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Ready step save handler.
-	 *
-	 * @since 1.0.0
-	 */
-	public function ready_save() {
-		update_option( 'wz_bel_setup_completed', true );
+	protected function get_completion_redirect_url() {
+		return $this->settings_page_url;
 	}
 }

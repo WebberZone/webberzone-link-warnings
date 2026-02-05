@@ -245,7 +245,9 @@ class Settings {
 	public static function get_registered_settings() {
 		$settings = array(
 			'general'  => self::settings_general(),
-			'content'  => self::settings_content(),
+			'inline'   => self::settings_inline(),
+			'modal'    => self::settings_modal(),
+			'redirect' => self::settings_redirect(),
 			'advanced' => self::settings_advanced(),
 		);
 
@@ -261,7 +263,7 @@ class Settings {
 	 */
 	public static function settings_general() {
 		$settings = array(
-			'warning_method'      => array(
+			'warning_method'     => array(
 				'id'      => 'warning_method',
 				'name'    => esc_html__( 'Warning Method', 'better-external-links' ),
 				'desc'    => esc_html__( 'Choose how to warn users about external links.', 'better-external-links' ),
@@ -274,7 +276,7 @@ class Settings {
 					'inline_modal' => esc_html__( 'Inline + modal (for external only)', 'better-external-links' ),
 				),
 			),
-			'scope'               => array(
+			'scope'              => array(
 				'id'      => 'scope',
 				'name'    => esc_html__( 'Link Scope', 'better-external-links' ),
 				'desc'    => esc_html__( 'Which links should be processed.', 'better-external-links' ),
@@ -286,7 +288,7 @@ class Settings {
 					'both'         => esc_html__( 'Both (with different treatments)', 'better-external-links' ),
 				),
 			),
-			'enabled_post_types'  => array(
+			'enabled_post_types' => array(
 				'id'      => 'enabled_post_types',
 				'name'    => esc_html__( 'Enabled Post Types', 'better-external-links' ),
 				'desc'    => esc_html__( 'Select post types where link warnings should be enabled.', 'better-external-links' ),
@@ -294,66 +296,19 @@ class Settings {
 				'default' => array( 'post', 'page' ),
 				'options' => 'public',
 			),
-			'modal_heading'       => array(
-				'id'   => 'modal_heading',
-				'name' => esc_html__( 'Modal Settings', 'better-external-links' ),
-				'desc' => esc_html__( 'Configure the modal dialog appearance and text.', 'better-external-links' ),
-				'type' => 'heading',
-			),
-			'modal_title'         => array(
-				'id'      => 'modal_title',
-				'name'    => esc_html__( 'Modal Title', 'better-external-links' ),
-				'desc'    => esc_html__( 'Title shown in the modal dialog.', 'better-external-links' ),
-				'type'    => 'text',
-				'default' => __( 'You are leaving this site', 'better-external-links' ),
-			),
-			'modal_message'       => array(
-				'id'      => 'modal_message',
-				'name'    => esc_html__( 'Modal Message', 'better-external-links' ),
-				'desc'    => esc_html__( 'Message shown in the modal dialog.', 'better-external-links' ),
-				'type'    => 'textarea',
-				'default' => __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
-			),
-			'modal_continue_text' => array(
-				'id'      => 'modal_continue_text',
-				'name'    => esc_html__( 'Continue Button Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Text for the continue button.', 'better-external-links' ),
-				'type'    => 'text',
-				'default' => __( 'Continue', 'better-external-links' ),
-			),
-			'modal_cancel_text'   => array(
-				'id'      => 'modal_cancel_text',
-				'name'    => esc_html__( 'Cancel Button Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Text for the cancel button.', 'better-external-links' ),
-				'type'    => 'text',
-				'default' => __( 'Cancel', 'better-external-links' ),
-			),
-			'redirect_heading'    => array(
-				'id'   => 'redirect_heading',
-				'name' => esc_html__( 'Redirect Settings', 'better-external-links' ),
-				'desc' => esc_html__( 'Configure the redirect screen.', 'better-external-links' ),
-				'type' => 'heading',
-			),
-			'redirect_message'    => array(
-				'id'      => 'redirect_message',
-				'name'    => esc_html__( 'Redirect Message', 'better-external-links' ),
-				'desc'    => esc_html__( 'Message shown on the redirect page.', 'better-external-links' ),
-				'type'    => 'textarea',
-				'default' => __( 'You are being redirected to an external site.', 'better-external-links' ),
-			),
 		);
 
 		return apply_filters( self::$prefix . '_settings_general', $settings );
 	}
 
 	/**
-	 * Content settings.
+	 * Inline indicator settings.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array Content settings.
+	 * @return array Inline indicator settings.
 	 */
-	public static function settings_content() {
+	public static function settings_inline() {
 		$settings = array(
 			'visual_indicator'   => array(
 				'id'      => 'visual_indicator',
@@ -384,9 +339,71 @@ class Settings {
 			),
 		);
 
-		return apply_filters( self::$prefix . '_settings_content', $settings );
+		return apply_filters( self::$prefix . '_settings_inline', $settings );
 	}
 
+	/**
+	 * Modal dialog settings.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array Modal dialog settings.
+	 */
+	public static function settings_modal() {
+		$settings = array(
+			'modal_title'         => array(
+				'id'      => 'modal_title',
+				'name'    => esc_html__( 'Modal Title', 'better-external-links' ),
+				'desc'    => esc_html__( 'Title shown in the modal dialog.', 'better-external-links' ),
+				'type'    => 'text',
+				'default' => __( 'You are leaving this site', 'better-external-links' ),
+			),
+			'modal_message'       => array(
+				'id'      => 'modal_message',
+				'name'    => esc_html__( 'Modal Message', 'better-external-links' ),
+				'desc'    => esc_html__( 'Message shown in the modal dialog.', 'better-external-links' ),
+				'type'    => 'textarea',
+				'default' => __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
+			),
+			'modal_continue_text' => array(
+				'id'      => 'modal_continue_text',
+				'name'    => esc_html__( 'Continue Button Text', 'better-external-links' ),
+				'desc'    => esc_html__( 'Text for the continue button.', 'better-external-links' ),
+				'type'    => 'text',
+				'default' => __( 'Continue', 'better-external-links' ),
+			),
+			'modal_cancel_text'   => array(
+				'id'      => 'modal_cancel_text',
+				'name'    => esc_html__( 'Cancel Button Text', 'better-external-links' ),
+				'desc'    => esc_html__( 'Text for the cancel button.', 'better-external-links' ),
+				'type'    => 'text',
+				'default' => __( 'Cancel', 'better-external-links' ),
+			),
+		);
+
+		return apply_filters( self::$prefix . '_settings_modal', $settings );
+	}
+
+	/**
+	 * Redirect screen settings.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array Redirect screen settings.
+	 */
+	public static function settings_redirect() {
+		$settings = array(
+			'redirect_message' => array(
+				'id'      => 'redirect_message',
+				'name'    => esc_html__( 'Redirect Message', 'better-external-links' ),
+				'desc'    => esc_html__( 'Message shown on the redirect page.', 'better-external-links' ),
+				'type'    => 'textarea',
+				'default' => __( 'You are being redirected to an external site.', 'better-external-links' ),
+			),
+		);
+
+		return apply_filters( self::$prefix . '_settings_redirect', $settings );
+	}
 
 	/**
 	 * Advanced settings.

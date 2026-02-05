@@ -53,7 +53,13 @@ class Options_API {
 	 * @return array Better External Links settings
 	 */
 	public static function get_settings() {
-		$settings = get_option( self::SETTINGS_OPTION );
+		$settings = get_option( self::SETTINGS_OPTION, array() );
+
+		if ( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		$settings = wp_parse_args( $settings, self::get_settings_defaults() );
 
 		/**
 		 * Settings array

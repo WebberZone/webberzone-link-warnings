@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // Include the Options_API class if not already loaded.
-if ( ! class_exists( 'WebberZone\Better_External_Links\Options_API' ) ) {
+if ( ! class_exists( '\WebberZone\Better_External_Links\Options_API' ) ) {
 	require_once __DIR__ . '/class-options-api.php';
 }
 
@@ -24,7 +24,7 @@ if ( ! class_exists( 'WebberZone\Better_External_Links\Options_API' ) ) {
  * @return array Settings
  */
 function wzbel_get_settings() {
-	return WebberZone\Better_External_Links\Options_API::get_settings();
+	return \WebberZone\Better_External_Links\Options_API::get_settings();
 }
 
 /**
@@ -40,7 +40,7 @@ function wzbel_get_settings() {
  * @return mixed The option value or the default value if the option does not exist.
  */
 function wzbel_get_option( $key = '', $default_value = null ) {
-	return WebberZone\Better_External_Links\Options_API::get_option( $key, $default_value );
+	return \WebberZone\Better_External_Links\Options_API::get_option( $key, $default_value );
 }
 
 /**
@@ -57,7 +57,7 @@ function wzbel_get_option( $key = '', $default_value = null ) {
  * @return boolean   True if updated, false if not.
  */
 function wzbel_update_option( $key = '', $value = false ) {
-	return WebberZone\Better_External_Links\Options_API::update_option( $key, $value );
+	return \WebberZone\Better_External_Links\Options_API::update_option( $key, $value );
 }
 
 /**
@@ -71,7 +71,7 @@ function wzbel_update_option( $key = '', $value = false ) {
  * @return boolean   True if updated, false if not.
  */
 function wzbel_delete_option( $key = '' ) {
-	return WebberZone\Better_External_Links\Options_API::delete_option( $key );
+	return \WebberZone\Better_External_Links\Options_API::delete_option( $key );
 }
 
 /**
@@ -82,7 +82,7 @@ function wzbel_delete_option( $key = '' ) {
  * @return array Default settings
  */
 function wzbel_settings_defaults() {
-	return WebberZone\Better_External_Links\Options_API::get_settings_defaults();
+	return \WebberZone\Better_External_Links\Options_API::get_settings_defaults();
 }
 
 /**
@@ -94,7 +94,7 @@ function wzbel_settings_defaults() {
  * @return mixed
  */
 function wzbel_get_default_option( $key = '' ) {
-	return WebberZone\Better_External_Links\Options_API::get_default_option( $key );
+	return \WebberZone\Better_External_Links\Options_API::get_default_option( $key );
 }
 
 /**
@@ -104,7 +104,7 @@ function wzbel_get_default_option( $key = '' ) {
  * @return bool Success status.
  */
 function wzbel_settings_reset() {
-	return WebberZone\Better_External_Links\Options_API::reset_settings();
+	return \WebberZone\Better_External_Links\Options_API::reset_settings();
 }
 
 /**
@@ -118,5 +118,5 @@ function wzbel_settings_reset() {
  * @return bool True if settings were updated, false otherwise.
  */
 function wzbel_update_settings( array $settings, bool $merge = true, bool $autoload = true ) {
-	return WebberZone\Better_External_Links\Options_API::update_settings( $settings, $merge, $autoload );
+	return \WebberZone\Better_External_Links\Options_API::update_settings( $settings, $merge, $autoload );
 }

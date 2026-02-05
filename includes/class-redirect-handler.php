@@ -219,7 +219,7 @@ class Redirect_Handler {
 		$destination = isset( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		wp_localize_script(
-			'wz-ela-redirect',
+			'wz-bel-redirect',
 			'wzElaRedirect',
 			array(
 				'destination' => $destination,

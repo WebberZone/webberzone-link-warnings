@@ -217,7 +217,7 @@ class Content_Processor {
 	 * @return string|null ARIA label.
 	 */
 	private function get_aria_label( $existing_label ) {
-		$screen_reader_text = isset( $this->settings['screen_reader_text'] ) ? $this->settings['screen_reader_text'] : __( 'Opens in a new window', 'better-external-links' );
+		$screen_reader_text = $this->settings['screen_reader_text'] ?? __( 'Opens in a new window', 'better-external-links' );
 
 		if ( $existing_label ) {
 			return $existing_label . ', ' . $screen_reader_text;

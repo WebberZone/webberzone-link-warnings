@@ -94,7 +94,7 @@ class Frontend_Handler {
 
 		?>
 		<div id="wz-ela-modal" class="wz-ela-modal" role="dialog" aria-modal="true" aria-labelledby="wz-ela-modal-title" aria-describedby="wz-ela-modal-message" hidden>
-			<div class="wz-ela-modal-overlay" data-wz-ela-close></div>
+			<div class="wz-ela-modal-overlay" data-wz-ela-close role="presentation"></div>
 			<div class="wz-ela-modal-container">
 				<button type="button" class="wz-ela-modal-close-btn" data-wz-ela-close aria-label="<?php esc_attr_e( 'Close dialog', 'better-external-links' ); ?>">
 					<span aria-hidden="true">&times;</span>

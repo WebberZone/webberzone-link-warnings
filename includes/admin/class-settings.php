@@ -79,10 +79,8 @@ class Settings {
 		$this->menu_slug    = 'wz-bel-settings';
 
 		Hook_Registry::add_action( 'admin_menu', array( $this, 'initialise_settings' ) );
-		Hook_Registry::add_action( 'admin_head', array( $this, 'admin_head' ), 11 );
 		Hook_Registry::add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 11, 2 );
 		Hook_Registry::add_filter( 'plugin_action_links_' . plugin_basename( WZ_BEL_PLUGIN_FILE ), array( $this, 'plugin_actions_links' ) );
-		Hook_Registry::add_filter( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 99 );
 
 		Hook_Registry::add_filter( self::$prefix . '_settings_sanitize', array( $this, 'change_settings_on_save' ), 99 );
 	}
@@ -459,8 +457,8 @@ class Settings {
 	public function get_help_sidebar() {
 		$help_sidebar =
 			'<p><strong>' . esc_html__( 'For more information:', 'better-external-links' ) . '</strong></p>' .
-			'<p><a href="https://webberzone.com/plugins/better-external-links/" target="_blank">' . esc_html__( 'Plugin Homepage', 'better-external-links' ) . '</a></p>' .
-			'<p><a href="https://webberzone.com/support/" target="_blank">' . esc_html__( 'Support', 'better-external-links' ) . '</a></p>';
+			'<p><a href="https://webberzone.com/plugins/better-external-links/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Plugin Homepage', 'better-external-links' ) . '</a></p>' .
+			'<p><a href="https://webberzone.com/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'better-external-links' ) . '</a></p>';
 
 		return apply_filters( self::$prefix . '_settings_help_sidebar', $help_sidebar );
 	}
@@ -496,7 +494,7 @@ class Settings {
 	public function get_admin_footer_text() {
 		$footer_text = sprintf(
 			/* translators: 1: Better External Links link, 2: Plugin rating link */
-			__( 'Thank you for using <a href="%1$s" target="_blank">Better External Links</a>! Please <a href="%2$s" target="_blank">rate us</a> on WordPress.org', 'better-external-links' ),
+			__( 'Thank you for using <a href="%1$s" target="_blank" rel="noopener noreferrer">Better External Links</a>! Please <a href="%2$s" target="_blank" rel="noopener noreferrer">rate us</a> on WordPress.org', 'better-external-links' ),
 			'https://webberzone.com/plugins/better-external-links/',
 			'https://wordpress.org/support/plugin/better-external-links/reviews/#new-post'
 		);
@@ -541,25 +539,5 @@ class Settings {
 		}
 
 		return $links;
-	}
-
-	/**
-	 * Enqueue admin scripts and styles.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $hook Current admin page hook.
-	 */
-	public function admin_enqueue_scripts( $hook ) {
-		// Enqueue scripts only on plugin settings page.
-	}
-
-	/**
-	 * Add custom CSS to admin head.
-	 *
-	 * @since 1.0.0
-	 */
-	public function admin_head() {
-		// Add custom CSS if needed.
 	}
 }

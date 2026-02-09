@@ -103,7 +103,6 @@ class Main {
 	 */
 	private function init_hooks() {
 		Hook_Registry::add_action( 'plugins_loaded', array( $this, 'init' ) );
-		Hook_Registry::add_action( 'init', array( $this, 'load_textdomain' ) );
 		Hook_Registry::add_action( 'init', array( $this, 'init_admin' ) );
 	}
 
@@ -127,18 +126,5 @@ class Main {
 		if ( is_admin() ) {
 			$this->admin = new Admin\Admin();
 		}
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 *
-	 * @since 1.0.0
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain(
-			'better-external-links',
-			false,
-			dirname( WZ_BEL_PLUGIN_BASENAME ) . '/languages'
-		);
 	}
 }

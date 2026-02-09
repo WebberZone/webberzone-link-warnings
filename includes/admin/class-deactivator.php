@@ -52,7 +52,7 @@ class Deactivator {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'wz_bel_deactivate' );
+		do_action( 'wz_bel_deactivate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**

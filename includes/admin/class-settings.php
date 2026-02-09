@@ -166,7 +166,7 @@ class Settings {
 			}
 		}
 
-		return apply_filters( self::$prefix . '_settings_defaults', $defaults );
+		return apply_filters( self::$prefix . '_settings_defaults', $defaults ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -191,7 +191,7 @@ class Settings {
 			'previous_saved'       => esc_html__( 'Previously saved', 'better-external-links' ),
 		);
 
-		return apply_filters( self::$prefix . '_translation_strings', $strings );
+		return apply_filters( self::$prefix . '_translation_strings', $strings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -211,7 +211,7 @@ class Settings {
 			'menu_slug'     => $this->menu_slug,
 		);
 
-		return apply_filters( self::$prefix . '_settings_menus', $menus );
+		return apply_filters( self::$prefix . '_settings_menus', $menus ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -228,7 +228,7 @@ class Settings {
 			'advanced' => esc_html__( 'Advanced', 'better-external-links' ),
 		);
 
-		return apply_filters( self::$prefix . '_settings_sections', $settings_sections );
+		return apply_filters( self::$prefix . '_settings_sections', $settings_sections ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Settings {
 			'advanced' => self::settings_advanced(),
 		);
 
-		return apply_filters( self::$prefix . '_registered_settings', $settings );
+		return apply_filters( self::$prefix . '_registered_settings', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -292,7 +292,7 @@ class Settings {
 			),
 		);
 
-		return apply_filters( self::$prefix . '_settings_general', $settings );
+		return apply_filters( self::$prefix . '_settings_general', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -408,7 +408,7 @@ class Settings {
 		 *
 		 * @param array $settings Display settings.
 		 */
-		return apply_filters( self::$prefix . '_settings_display', $settings );
+		return apply_filters( self::$prefix . '_settings_display', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -429,7 +429,7 @@ class Settings {
 			),
 		);
 
-		return apply_filters( self::$prefix . '_settings_advanced', $settings );
+		return apply_filters( self::$prefix . '_settings_advanced', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -460,7 +460,7 @@ class Settings {
 			'<p><a href="https://webberzone.com/plugins/better-external-links/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Plugin Homepage', 'better-external-links' ) . '</a></p>' .
 			'<p><a href="https://webberzone.com/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'better-external-links' ) . '</a></p>';
 
-		return apply_filters( self::$prefix . '_settings_help_sidebar', $help_sidebar );
+		return apply_filters( self::$prefix . '_settings_help_sidebar', $help_sidebar ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -481,7 +481,7 @@ class Settings {
 			),
 		);
 
-		return apply_filters( self::$prefix . '_settings_help_tabs', $help_tabs );
+		return apply_filters( self::$prefix . '_settings_help_tabs', $help_tabs ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**

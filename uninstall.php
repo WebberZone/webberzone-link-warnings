@@ -20,13 +20,13 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  *
  * @since 1.0.0
  */
-do_action( 'wz_bel_uninstall' );
+do_action( 'wz_bel_uninstall' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 global $wpdb;
 
 if ( is_multisite() ) {
 
-	$sites = get_sites(
+	$sites = get_sites( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 		array(
 			'archived' => 0,
 			'spam'     => 0,
@@ -34,7 +34,7 @@ if ( is_multisite() ) {
 		)
 	);
 
-	foreach ( $sites as $site ) {
+	foreach ( $sites as $site ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 		switch_to_blog( (int) $site->blog_id );
 		wz_bel_delete_data();
 		restore_current_blog();
@@ -48,7 +48,7 @@ if ( is_multisite() ) {
  *
  * @since 1.0.0
  */
-function wz_bel_delete_data() {
+function wz_bel_delete_data() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 
 	// Delete plugin settings.
 	delete_option( 'wz_bel_settings' );

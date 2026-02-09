@@ -268,7 +268,7 @@ class Content_Processor {
 		 * @param array  $excluded_domains Array of excluded domains.
 		 * @param string $link_host        The link host being checked.
 		 */
-		$excluded_domains = apply_filters( 'wz_bel_excluded_domains', $excluded_domains, $link_host );
+		$excluded_domains = apply_filters( 'wz_bel_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		foreach ( $excluded_domains as $domain ) {
 			if ( false !== strpos( $link_host, $domain ) ) {

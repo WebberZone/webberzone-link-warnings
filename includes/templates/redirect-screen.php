@@ -60,16 +60,17 @@ get_header();
 
 		<?php if ( $countdown > 0 ) : ?>
 			<?php
-			$countdown_str = (string) $countdown;
+			$wz_bel_countdown_str = (string) $countdown; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 			/* translators: %s: countdown number */
-			$countdown_text   = esc_html__( 'Redirecting automatically in %s seconds...', 'better-external-links' );
-			$countdown_markup = sprintf(
-				$countdown_text,
-				'<span class="wz-ela-countdown-number">' . esc_html( $countdown_str ) . '</span>'
+			$wz_bel_countdown_text = esc_html__( 'Redirecting automatically in %s seconds...', 'better-external-links' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+			$wz_bel_countdown_markup = sprintf( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+				$wz_bel_countdown_text,
+				'<span class="wz-ela-countdown-number">' . esc_html( $wz_bel_countdown_str ) . '</span>'
 			);
 			?>
-			<p class="wz-ela-redirect-countdown" data-countdown="<?php echo esc_attr( $countdown_str ); ?>" aria-live="polite">
-				<?php echo wp_kses( $countdown_markup, array( 'span' => array( 'class' => true ) ) ); ?>
+			<p class="wz-ela-redirect-countdown" data-countdown="<?php echo esc_attr( $wz_bel_countdown_str ); ?>" aria-live="polite">
+				<?php echo wp_kses( $wz_bel_countdown_markup, array( 'span' => array( 'class' => true ) ) ); ?>
 			</p>
 		<?php endif; ?>
 	</div>

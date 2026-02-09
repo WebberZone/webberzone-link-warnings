@@ -11,6 +11,11 @@
 
 namespace WebberZone\Better_External_Links\Admin;
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WebberZone\Better_External_Links\Util\Hook_Registry;
 
 /**
@@ -135,6 +140,6 @@ class Activator {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'wz_bel_activate' );
+		do_action( 'wz_bel_activate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 }

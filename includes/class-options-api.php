@@ -69,7 +69,7 @@ class Options_API {
 		 * @since 1.0.0
 		 * @param array $settings Settings array
 		 */
-		return apply_filters( self::FILTER_PREFIX . '_get_settings', $settings );
+		return apply_filters( self::FILTER_PREFIX . '_get_settings', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -106,7 +106,7 @@ class Options_API {
 		 * @param mixed $key           Name of the option.
 		 * @param mixed $default_value Default value.
 		 */
-		$value = apply_filters( self::FILTER_PREFIX . '_get_option', $value, $key, $default_value );
+		$value = apply_filters( self::FILTER_PREFIX . '_get_option', $value, $key, $default_value ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 
 		/**
 		 * Key specific filter for the value of the option being fetched.
@@ -117,7 +117,7 @@ class Options_API {
 		 * @param mixed $key           Name of the option.
 		 * @param mixed $default_value Default value.
 		 */
-		return apply_filters( self::FILTER_PREFIX . "_get_option_{$key}", $value, $key, $default_value );
+		return apply_filters( self::FILTER_PREFIX . "_get_option_{$key}", $value, $key, $default_value ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Options_API {
 		$options = get_option( self::SETTINGS_OPTION, array() );
 
 		// Let's let devs alter that value coming in.
-		$value = apply_filters( self::FILTER_PREFIX . '_update_option', $value, $key );
+		$value = apply_filters( self::FILTER_PREFIX . '_update_option', $value, $key ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 
 		// Next let's try to update the value.
 		$options[ $key ] = $value;

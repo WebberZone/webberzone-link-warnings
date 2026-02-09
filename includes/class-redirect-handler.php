@@ -75,7 +75,7 @@ class Redirect_Handler {
 		$settings = wzbel_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
-		if ( 'redirect' !== $method ) {
+		if ( ! in_array( $method, array( 'redirect', 'inline_redirect' ), true ) ) {
 			return;
 		}
 
@@ -106,7 +106,7 @@ class Redirect_Handler {
 	 * @param string $url URL to validate.
 	 * @return bool True if valid.
 	 */
-	private function is_valid_url( $url ) {
+	protected function is_valid_url( $url ) {
 		// Basic validation.
 		if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
 			return false;
@@ -120,71 +120,50 @@ class Redirect_Handler {
 	}
 
 	/**
+	 * Get redirect template path.
+	 *
+	 * Checks the child theme / parent theme first, then falls back to the plugin template.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string Template file path.
+	 */
+	public function get_redirect_template_path() {
+		$theme_template = locate_template(
+			array(
+				'better-external-links/redirect-screen.php',
+				'better-external-links/redirect.php',
+			)
+		);
+
+		if ( ! empty( $theme_template ) ) {
+			return $theme_template;
+		}
+
+		return trailingslashit( WZ_BEL_PLUGIN_DIR ) . 'includes/templates/redirect-screen.php';
+	}
+
+	/**
 	 * Render redirect template.
 	 *
 	 * @since 1.0.0
 	 * @param string $destination Destination URL.
 	 */
-	private function render_redirect_template( $destination ) {
-		$settings = wzbel_get_settings();
-		$message  = isset( $settings['redirect_message'] ) ? $settings['redirect_message'] : __( 'You are being redirected to an external site.', 'better-external-links' );
+	protected function render_redirect_template( $destination ) {
+		$message   = (string) wzbel_get_option( 'redirect_message', __( 'You are being redirected to an external site.', 'better-external-links' ) );
+		$countdown = absint( wzbel_get_option( 'redirect_countdown', 5 ) );
 
 		// Parse destination for display.
 		$parsed_url = wp_parse_url( $destination );
-		$domain     = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
+		$domain     = isset( $parsed_url['host'] ) ? (string) $parsed_url['host'] : '';
 
-		get_header();
-		?>
-		<div class="wz-ela-redirect-container">
-			<div class="wz-ela-redirect-content">
-				<div class="wz-ela-redirect-icon">
-					<svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-						<polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-						<line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-					</svg>
-				</div>
-				
-				<h1 class="wz-ela-redirect-title">
-					<?php esc_html_e( 'Leaving this site', 'better-external-links' ); ?>
-				</h1>
-				
-				<p class="wz-ela-redirect-message">
-					<?php echo esc_html( $message ); ?>
-				</p>
-				
-				<div class="wz-ela-redirect-url-container">
-					<p class="wz-ela-redirect-url-label">
-						<?php esc_html_e( 'Destination:', 'better-external-links' ); ?>
-					</p>
-					<p class="wz-ela-redirect-url">
-						<strong><?php echo esc_html( $domain ); ?></strong>
-					</p>
-					<p class="wz-ela-redirect-url-full">
-						<?php echo esc_html( $destination ); ?>
-					</p>
-				</div>
-				
-				<div class="wz-ela-redirect-actions">
-					<a href="<?php echo esc_url( $destination ); ?>" class="wz-ela-redirect-button wz-ela-redirect-continue" rel="noopener noreferrer">
-						<?php esc_html_e( 'Continue to site', 'better-external-links' ); ?>
-						<span aria-hidden="true">→</span>
-					</a>
-					<a href="<?php echo esc_url( wp_get_referer() ? wp_get_referer() : home_url() ); ?>" class="wz-ela-redirect-button wz-ela-redirect-back">
-						<?php esc_html_e( 'Go back', 'better-external-links' ); ?>
-					</a>
-				</div>
-				
-				<p class="wz-ela-redirect-countdown" data-countdown="5">
-					<?php
-					/* translators: %s: countdown number */
-					printf( esc_html__( 'Redirecting automatically in %s seconds...', 'better-external-links' ), '<span class="wz-ela-countdown-number">5</span>' );
-					?>
-				</p>
-			</div>
-		</div>
-		<?php
-		get_footer();
+		$template = $this->get_redirect_template_path();
+		if ( ! empty( $template ) && file_exists( $template ) ) {
+			include $template;
+			return;
+		}
+
+		echo esc_html( $destination );
 	}
 
 	/**
@@ -218,12 +197,15 @@ class Redirect_Handler {
 		// Pass destination URL to script.
 		$destination = isset( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
+		$settings  = wzbel_get_settings();
+		$countdown = isset( $settings['redirect_countdown'] ) ? absint( $settings['redirect_countdown'] ) : 5;
+
 		wp_localize_script(
 			'wz-bel-redirect',
 			'wzElaRedirect',
 			array(
 				'destination' => $destination,
-				'countdown'   => 5,
+				'countdown'   => $countdown,
 			)
 		);
 	}

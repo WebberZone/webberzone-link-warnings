@@ -209,7 +209,7 @@ class Settings {
 			'type'          => 'submenu',
 			'parent_slug'   => 'options-general.php',
 			'page_title'    => esc_html__( 'Better External Links Settings', 'better-external-links' ),
-			'menu_title'    => esc_html__( 'Link Warnings', 'better-external-links' ),
+			'menu_title'    => esc_html__( 'Better External Links', 'better-external-links' ),
 			'menu_slug'     => $this->menu_slug,
 		);
 
@@ -226,9 +226,7 @@ class Settings {
 	public static function get_settings_sections() {
 		$settings_sections = array(
 			'general'  => esc_html__( 'General', 'better-external-links' ),
-			'inline'   => esc_html__( 'Inline Indicators', 'better-external-links' ),
-			'modal'    => esc_html__( 'Modal Dialog', 'better-external-links' ),
-			'redirect' => esc_html__( 'Redirect Screen', 'better-external-links' ),
+			'display'  => esc_html__( 'Display', 'better-external-links' ),
 			'advanced' => esc_html__( 'Advanced', 'better-external-links' ),
 		);
 
@@ -245,9 +243,7 @@ class Settings {
 	public static function get_registered_settings() {
 		$settings = array(
 			'general'  => self::settings_general(),
-			'inline'   => self::settings_inline(),
-			'modal'    => self::settings_modal(),
-			'redirect' => self::settings_redirect(),
+			'display'  => self::settings_display(),
 			'advanced' => self::settings_advanced(),
 		);
 
@@ -268,12 +264,13 @@ class Settings {
 				'name'    => esc_html__( 'Warning Method', 'better-external-links' ),
 				'desc'    => esc_html__( 'Choose how to warn users about external links.', 'better-external-links' ),
 				'type'    => 'radio',
-				'default' => 'inline',
+				'default' => 'inline_modal',
 				'options' => array(
-					'inline'       => esc_html__( 'Inline indicators only', 'better-external-links' ),
-					'modal'        => esc_html__( 'Modal dialog', 'better-external-links' ),
-					'redirect'     => esc_html__( 'Redirect screen', 'better-external-links' ),
-					'inline_modal' => esc_html__( 'Inline + modal (for external only)', 'better-external-links' ),
+					'inline'          => esc_html__( 'Inline indicators only', 'better-external-links' ),
+					'modal'           => esc_html__( 'Modal dialog', 'better-external-links' ),
+					'redirect'        => esc_html__( 'Redirect screen', 'better-external-links' ),
+					'inline_modal'    => esc_html__( 'Inline indicators + Modal dialog', 'better-external-links' ),
+					'inline_redirect' => esc_html__( 'Inline indicators + Redirect screen', 'better-external-links' ),
 				),
 			),
 			'scope'              => array(
@@ -283,9 +280,8 @@ class Settings {
 				'type'    => 'radio',
 				'default' => 'external',
 				'options' => array(
-					'external'     => esc_html__( 'External links only', 'better-external-links' ),
-					'target_blank' => esc_html__( 'All target="_blank" links', 'better-external-links' ),
-					'both'         => esc_html__( 'Both (with different treatments)', 'better-external-links' ),
+					'external' => esc_html__( 'External links only', 'better-external-links' ),
+					'both'     => esc_html__( 'External links and all target="_blank" links', 'better-external-links' ),
 				),
 			),
 			'enabled_post_types' => array(
@@ -293,7 +289,7 @@ class Settings {
 				'name'    => esc_html__( 'Enabled Post Types', 'better-external-links' ),
 				'desc'    => esc_html__( 'Select post types where link warnings should be enabled.', 'better-external-links' ),
 				'type'    => 'posttypes',
-				'default' => array( 'post', 'page' ),
+				'default' => 'post,page',
 				'options' => 'public',
 			),
 		);
@@ -302,15 +298,22 @@ class Settings {
 	}
 
 	/**
-	 * Inline indicator settings.
+	 * Display settings (inline indicators, modal dialog, redirect screen).
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array Inline indicator settings.
+	 * @return array Display settings.
 	 */
-	public static function settings_inline() {
+	public static function settings_display() {
 		$settings = array(
-			'visual_indicator'   => array(
+			// Inline Indicators section.
+			'inline_header'       => array(
+				'id'   => 'inline_header',
+				'name' => '<h3>' . esc_html__( 'Inline Indicators', 'better-external-links' ) . '</h3>',
+				'desc' => '',
+				'type' => 'header',
+			),
+			'visual_indicator'    => array(
 				'id'      => 'visual_indicator',
 				'name'    => esc_html__( 'Visual Indicator', 'better-external-links' ),
 				'desc'    => esc_html__( 'Choose what visual indicator to display.', 'better-external-links' ),
@@ -323,34 +326,28 @@ class Settings {
 					'none' => esc_html__( 'None (screen reader only)', 'better-external-links' ),
 				),
 			),
-			'indicator_text'     => array(
+			'indicator_text'      => array(
 				'id'      => 'indicator_text',
 				'name'    => esc_html__( 'Indicator Text', 'better-external-links' ),
 				'desc'    => esc_html__( 'Text displayed next to links (when text indicator is enabled).', 'better-external-links' ),
 				'type'    => 'text',
 				'default' => __( '(opens in new window)', 'better-external-links' ),
 			),
-			'screen_reader_text' => array(
+			'screen_reader_text'  => array(
 				'id'      => 'screen_reader_text',
 				'name'    => esc_html__( 'Screen Reader Text', 'better-external-links' ),
 				'desc'    => esc_html__( 'Hidden text for screen readers.', 'better-external-links' ),
 				'type'    => 'text',
 				'default' => __( 'Opens in a new window', 'better-external-links' ),
 			),
-		);
 
-		return apply_filters( self::$prefix . '_settings_inline', $settings );
-	}
-
-	/**
-	 * Modal dialog settings.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return array Modal dialog settings.
-	 */
-	public static function settings_modal() {
-		$settings = array(
+			// Modal Dialog section.
+			'modal_header'        => array(
+				'id'   => 'modal_header',
+				'name' => '<h3>' . esc_html__( 'Modal Dialog', 'better-external-links' ) . '</h3>',
+				'desc' => '',
+				'type' => 'header',
+			),
 			'modal_title'         => array(
 				'id'      => 'modal_title',
 				'name'    => esc_html__( 'Modal Title', 'better-external-links' ),
@@ -379,30 +376,41 @@ class Settings {
 				'type'    => 'text',
 				'default' => __( 'Cancel', 'better-external-links' ),
 			),
-		);
 
-		return apply_filters( self::$prefix . '_settings_modal', $settings );
-	}
-
-	/**
-	 * Redirect screen settings.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return array Redirect screen settings.
-	 */
-	public static function settings_redirect() {
-		$settings = array(
-			'redirect_message' => array(
+			// Redirect Screen section.
+			'redirect_header'     => array(
+				'id'   => 'redirect_header',
+				'name' => '<h3>' . esc_html__( 'Redirect Screen', 'better-external-links' ) . '</h3>',
+				'desc' => '',
+				'type' => 'header',
+			),
+			'redirect_message'    => array(
 				'id'      => 'redirect_message',
 				'name'    => esc_html__( 'Redirect Message', 'better-external-links' ),
 				'desc'    => esc_html__( 'Message shown on the redirect page.', 'better-external-links' ),
 				'type'    => 'textarea',
 				'default' => __( 'You are being redirected to an external site.', 'better-external-links' ),
 			),
+			'redirect_countdown'  => array(
+				'id'      => 'redirect_countdown',
+				'name'    => esc_html__( 'Redirect Countdown', 'better-external-links' ),
+				'desc'    => esc_html__( 'Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect.', 'better-external-links' ),
+				'type'    => 'number',
+				'default' => 5,
+				'min'     => 0,
+				'max'     => 60,
+				'step'    => 1,
+			),
 		);
 
-		return apply_filters( self::$prefix . '_settings_redirect', $settings );
+		/**
+		 * Filter the display settings.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $settings Display settings.
+		 */
+		return apply_filters( self::$prefix . '_settings_display', $settings );
 	}
 
 	/**
@@ -418,7 +426,7 @@ class Settings {
 				'id'      => 'excluded_domains',
 				'name'    => esc_html__( 'Excluded Domains', 'better-external-links' ),
 				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'better-external-links' ),
-				'type'    => 'csv',
+				'type'    => 'textarea',
 				'default' => '',
 			),
 		);
@@ -435,6 +443,9 @@ class Settings {
 	 * @return array Modified settings array.
 	 */
 	public function change_settings_on_save( $settings ) {
+		// Flush rewrite rules so the redirect endpoint is registered.
+		flush_rewrite_rules();
+
 		return $settings;
 	}
 

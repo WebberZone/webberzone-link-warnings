@@ -5,6 +5,27 @@
  * @since 1.0.0
  */
 
+:root {
+	--wz-ela-color-text: #1a1a1a;
+	--wz-ela-color-text-muted: #4a4a4a;
+	--wz-ela-color-indicator: #595959;
+	--wz-ela-color-surface: #fff;
+	--wz-ela-color-on-primary: #fff;
+	--wz-ela-color-surface-muted: #f5f5f5;
+	--wz-ela-color-border: #c3c4c7;
+	--wz-ela-color-border-strong: #8c8f94;
+	--wz-ela-color-button-muted: #f0f0f0;
+	--wz-ela-color-button-muted-hover: #d5d5d5;
+	--wz-ela-color-link: #2271b1;
+	--wz-ela-color-link-hover: #135e96;
+	--wz-ela-color-focus: #2271b1;
+	--wz-ela-modal-overlay-bg: rgba(0, 0, 0, 0.7);
+	--wz-ela-shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.3);
+	--wz-ela-radius-sm: 4px;
+	--wz-ela-radius-md: 8px;
+	--wz-ela-transition: all 0.2s ease;
+}
+
 /* Screen reader only text. */
 .screen-reader-text {
 	border: 0;
@@ -24,14 +45,14 @@
 	display: inline-block;
 	margin-left: 0.25em;
 	font-size: 0.875em;
-	opacity: 0.7;
+	color: var(--wz-ela-color-indicator);
 }
 
 .wz-ela-text {
 	display: inline-block;
 	margin-left: 0.25em;
 	font-size: 0.875em;
-	opacity: 0.7;
+	color: var(--wz-ela-color-indicator);
 }
 
 /* Modal styles. */
@@ -57,7 +78,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.7);
+	background-color: var(--wz-ela-modal-overlay-bg);
 	cursor: pointer;
 }
 
@@ -67,23 +88,60 @@
 	width: 500px;
 	max-height: 90vh;
 	overflow-y: auto;
-	background-color: #fff;
-	border-radius: 8px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+	background-color: var(--wz-ela-color-surface);
+	border-radius: var(--wz-ela-radius-md);
+	box-shadow: var(--wz-ela-shadow-modal);
 	animation: wz-ela-modal-slide-up 0.3s ease-out;
 }
 
 @keyframes wz-ela-modal-slide-up {
 	from {
-	opacity: 0;
-	transform: translateY(20px);
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
-to {
-	opacity: 1;
-	transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+	.wz-ela-modal-container {
+		animation: none;
+	}
+
+	.wz-ela-modal-close-btn,
+	.wz-ela-modal-button {
+		transition: none;
+	}
 }
 
+.wz-ela-modal-close-btn {
+	position: absolute;
+	top: 0.75rem;
+	right: 0.75rem;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: none;
+	background: none;
+	font-size: 1.5rem;
+	line-height: 1;
+	color: var(--wz-ela-color-indicator);
+	cursor: pointer;
+	border-radius: var(--wz-ela-radius-sm);
+	transition: var(--wz-ela-transition);
+}
+
+.wz-ela-modal-close-btn:hover {
+	background-color: var(--wz-ela-color-button-muted);
+	color: var(--wz-ela-color-text);
+}
+
+.wz-ela-modal-close-btn:focus {
+	outline: 2px solid var(--wz-ela-color-focus);
+	outline-offset: 2px;
 }
 
 .wz-ela-modal-content {
@@ -94,24 +152,24 @@ to {
 	margin: 0 0 1rem;
 	font-size: 1.5rem;
 	font-weight: 600;
-	color: #1a1a1a;
+	color: var(--wz-ela-color-text);
 }
 
 .wz-ela-modal-message {
 	margin: 0 0 1rem;
 	line-height: 1.6;
-	color: #4a4a4a;
+	color: var(--wz-ela-color-text-muted);
 }
 
 .wz-ela-modal-url {
 	margin: 0 0 1.5rem;
 	padding: 0.75rem;
-	background-color: #f5f5f5;
-	border-radius: 4px;
+	background-color: var(--wz-ela-color-surface-muted);
+	border-radius: var(--wz-ela-radius-sm);
 	font-family: monospace;
 	font-size: 0.875rem;
 	word-break: break-all;
-	color: #2271b1;
+	color: var(--wz-ela-color-link);
 }
 
 .wz-ela-modal-actions {
@@ -123,34 +181,76 @@ to {
 .wz-ela-modal-button {
 	padding: 0.625rem 1.25rem;
 	border: none;
-	border-radius: 4px;
+	border-radius: var(--wz-ela-radius-sm);
 	font-size: 1rem;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: var(--wz-ela-transition);
+}
+
+/*
+ * Buttons are theme-controlled in many setups. Pin our modal button colors for all states.
+ * (Scoped selectors + minimal !important to keep accessible contrast.)
+ */
+.wz-ela-modal button.wz-ela-modal-button,
+.wz-ela-modal button.wz-ela-modal-button:hover,
+.wz-ela-modal button.wz-ela-modal-button:focus,
+.wz-ela-modal button.wz-ela-modal-button:focus-visible,
+.wz-ela-modal button.wz-ela-modal-button:active {
+	text-decoration: none !important;
 }
 
 .wz-ela-modal-button:focus {
-	outline: 2px solid #2271b1;
+	outline: 2px solid var(--wz-ela-color-focus);
 	outline-offset: 2px;
 }
 
 .wz-ela-modal-cancel {
-	background-color: #f0f0f0;
-	color: #1a1a1a;
+	background-color: var(--wz-ela-color-button-muted);
+	color: var(--wz-ela-color-text);
+	border: 1px solid var(--wz-ela-color-border);
 }
 
 .wz-ela-modal-cancel:hover {
-	background-color: #e0e0e0;
+	background-color: var(--wz-ela-color-button-muted-hover);
+	border-color: var(--wz-ela-color-border-strong);
+}
+
+.wz-ela-modal button.wz-ela-modal-cancel,
+.wz-ela-modal button.wz-ela-modal-cancel:focus,
+.wz-ela-modal button.wz-ela-modal-cancel:focus-visible,
+.wz-ela-modal button.wz-ela-modal-cancel:active {
+	background-color: var(--wz-ela-color-button-muted) !important;
+	color: var(--wz-ela-color-text) !important;
+	border-color: var(--wz-ela-color-border) !important;
+}
+
+.wz-ela-modal button.wz-ela-modal-cancel:hover {
+	background-color: var(--wz-ela-color-button-muted-hover) !important;
+	color: var(--wz-ela-color-text) !important;
+	border-color: var(--wz-ela-color-border-strong) !important;
 }
 
 .wz-ela-modal-continue {
-	background-color: #2271b1;
-	color: #fff;
+	background-color: var(--wz-ela-color-link);
+	color: var(--wz-ela-color-on-primary);
 }
 
 .wz-ela-modal-continue:hover {
-	background-color: #135e96;
+	background-color: var(--wz-ela-color-link-hover);
+}
+
+.wz-ela-modal button.wz-ela-modal-continue,
+.wz-ela-modal button.wz-ela-modal-continue:focus,
+.wz-ela-modal button.wz-ela-modal-continue:focus-visible,
+.wz-ela-modal button.wz-ela-modal-continue:active {
+	background-color: var(--wz-ela-color-link) !important;
+	color: var(--wz-ela-color-on-primary) !important;
+}
+
+.wz-ela-modal button.wz-ela-modal-continue:hover {
+	background-color: var(--wz-ela-color-link-hover) !important;
+	color: var(--wz-ela-color-on-primary) !important;
 }
 
 /* Focus trap for accessibility. */
@@ -161,24 +261,23 @@ to {
 /* Responsive adjustments. */
 @media (max-width: 600px) {
 	.wz-ela-modal-container {
-	width: 95%;
-	max-width: none;
-}
+		width: 95%;
+		max-width: none;
+	}
 
-.wz-ela-modal-content {
-	padding: 1.5rem;
-}
+	.wz-ela-modal-content {
+		padding: 1.5rem;
+	}
 
-.wz-ela-modal-title {
-	font-size: 1.25rem;
-}
+	.wz-ela-modal-title {
+		font-size: 1.25rem;
+	}
 
-.wz-ela-modal-actions {
-	flex-direction: column-reverse;
-}
+	.wz-ela-modal-actions {
+		flex-direction: column-reverse;
+	}
 
-.wz-ela-modal-button {
-	width: 100%;
-}
-
+	.wz-ela-modal-button {
+		width: 100%;
+	}
 }

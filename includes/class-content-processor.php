@@ -93,7 +93,7 @@ class Content_Processor {
 			}
 
 			// Add data attributes for JavaScript handling.
-			if ( in_array( $this->settings['warning_method'], array( 'modal', 'inline_modal', 'redirect' ), true ) ) {
+			if ( in_array( $this->settings['warning_method'], array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wz-ela-external', 'true' );
 					$processor->set_attribute( 'data-wz-ela-url', esc_url( $href ) );
@@ -119,7 +119,7 @@ class Content_Processor {
 		$processed_content = $processor->get_updated_html();
 
 		// Add visual indicators if inline method is used.
-		if ( in_array( $this->settings['warning_method'], array( 'inline', 'inline_modal' ), true ) ) {
+		if ( in_array( $this->settings['warning_method'], array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
 			$processed_content = $this->add_visual_indicators( $processed_content );
 		}
 
@@ -254,7 +254,21 @@ class Content_Processor {
 		}
 
 		// Check excluded domains.
-		$excluded_domains = isset( $this->settings['excluded_domains'] ) ? $this->settings['excluded_domains'] : array();
+		$excluded_domains = $this->settings['excluded_domains'] ?? '';
+
+		if ( is_string( $excluded_domains ) ) {
+			$excluded_domains = array_filter( array_map( 'trim', explode( "\n", $excluded_domains ) ) );
+		}
+
+		/**
+		 * Filter the excluded domains.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array  $excluded_domains Array of excluded domains.
+		 * @param string $link_host        The link host being checked.
+		 */
+		$excluded_domains = apply_filters( 'wz_bel_excluded_domains', $excluded_domains, $link_host );
 
 		foreach ( $excluded_domains as $domain ) {
 			if ( false !== strpos( $link_host, $domain ) ) {
@@ -280,14 +294,11 @@ class Content_Processor {
 			case 'external':
 				return $is_external;
 
-			case 'target_blank':
-				return $has_target;
-
 			case 'both':
 				return $is_external || $has_target;
 
 			default:
-				return false;
+				return $is_external;
 		}
 	}
 
@@ -302,8 +313,12 @@ class Content_Processor {
 			return false;
 		}
 
-		$settings     = wzbel_get_settings();
-		$enabled      = isset( $settings['enabled_post_types'] ) ? $settings['enabled_post_types'] : array( 'post', 'page' );
+		$settings = wzbel_get_settings();
+		$enabled  = $settings['enabled_post_types'] ?? array( 'post', 'page' );
+
+		if ( is_string( $enabled ) ) {
+			$enabled = array_filter( array_map( 'trim', explode( ',', $enabled ) ) );
+		}
 		$current_type = get_post_type();
 
 		return in_array( $current_type, $enabled, true );

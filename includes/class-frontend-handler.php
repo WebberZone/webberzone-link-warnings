@@ -55,7 +55,7 @@ class Frontend_Handler {
 		);
 
 		// Enqueue JavaScript for modal and redirect methods.
-		if ( in_array( $method, array( 'modal', 'inline_modal', 'redirect' ), true ) ) {
+		if ( in_array( $method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 			wp_enqueue_script(
 				'wz-bel-modal',
 				WZ_BEL_PLUGIN_URL . 'includes/admin/js/modal' . $min_suffix . '.js',
@@ -96,6 +96,9 @@ class Frontend_Handler {
 		<div id="wz-ela-modal" class="wz-ela-modal" role="dialog" aria-modal="true" aria-labelledby="wz-ela-modal-title" aria-describedby="wz-ela-modal-message" hidden>
 			<div class="wz-ela-modal-overlay" data-wz-ela-close></div>
 			<div class="wz-ela-modal-container">
+				<button type="button" class="wz-ela-modal-close-btn" data-wz-ela-close aria-label="<?php esc_attr_e( 'Close dialog', 'better-external-links' ); ?>">
+					<span aria-hidden="true">&times;</span>
+				</button>
 				<div class="wz-ela-modal-content">
 					<h2 id="wz-ela-modal-title" class="wz-ela-modal-title"></h2>
 					<div id="wz-ela-modal-message" class="wz-ela-modal-message"></div>

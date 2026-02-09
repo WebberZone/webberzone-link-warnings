@@ -23,6 +23,9 @@
 	 * Initialize modal functionality.
 	 */
 	function init() {
+		// Always add click delegation for redirect and modal methods.
+		document.addEventListener('click', handleLinkClick);
+
 		// Get modal elements.
 		modal = document.getElementById('wz-ela-modal');
 		if (!modal) {
@@ -33,7 +36,7 @@
 		modalMessage = modal.querySelector('#wz-ela-modal-message');
 		modalUrl = modal.querySelector('.wz-ela-modal-url');
 		modalContinue = modal.querySelector('[data-wz-ela-continue]');
-		modalCancel = modal.querySelector('[data-wz-ela-close]');
+		modalCancel = modal.querySelector('.wz-ela-modal-cancel');
 		// Set button text from settings.
 		if (typeof wzElaSettings !== 'undefined') {
 			modalTitle.textContent = wzElaSettings.modalTitle;
@@ -42,8 +45,6 @@
 			modalCancel.textContent = wzElaSettings.cancelText;
 		}
 
-		// Add event listeners using delegation.
-		document.addEventListener('click', handleLinkClick);
 		// Modal close handlers.
 		modal.querySelectorAll('[data-wz-ela-close]').forEach(function (element) {
 			element.addEventListener('click', closeModal);
@@ -66,7 +67,7 @@
 		}
 
 		const method = typeof wzElaSettings !== 'undefined' ? wzElaSettings.warningMethod : 'inline';
-		if ('redirect' === method) {
+		if ('redirect' === method || 'inline_redirect' === method) {
 			const redirectUrl = link.getAttribute('data-wz-ela-redirect-url');
 			if (redirectUrl) {
 				e.preventDefault();
@@ -96,7 +97,6 @@
 		modalUrl.textContent = url;
 		// Show modal.
 		modal.removeAttribute('hidden');
-		modal.setAttribute('aria-hidden', 'false');
 		// Lock body scroll.
 		document.body.classList.add('wz-ela-modal-active');
 		// Set up focus trap.
@@ -112,7 +112,6 @@
 	 */
 	function closeModal() {
 		modal.setAttribute('hidden', '');
-		modal.setAttribute('aria-hidden', 'true');
 		// Unlock body scroll.
 		document.body.classList.remove('wz-ela-modal-active');
 		// Return focus to link.

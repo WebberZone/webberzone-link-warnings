@@ -116,6 +116,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 
 		$redirect_keys = array(
 			'redirect_message',
+			'redirect_countdown',
 		);
 
 		$steps = array(

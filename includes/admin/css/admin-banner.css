@@ -117,7 +117,7 @@
 .wz-admin-banner__link--current:focus,
 .wz-admin-banner__link--current:focus-visible,
 .wz-admin-banner__link--current:active {
-	background-color: #e04841;
+	background-color: #d43b39;
 	color: #ffffff;
 	outline: 2px solid #ffffff;
 	outline-offset: 2px;
@@ -126,43 +126,43 @@
 
 @media screen and (max-width: 782px) {
 	.wz-admin-banner {
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 18px;
-	margin: -16px -16px 12px -16px;
-	padding: 20px 20px;
-}
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 18px;
+		margin: -16px -16px 12px -16px;
+		padding: 20px 20px;
+	}
 
-.wz-admin-banner__title {
-	font-size: 1.125rem;
-}
+	.wz-admin-banner__title {
+		font-size: 1.125rem;
+	}
 
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.wz-admin-banner__link {
-	transition: none;
-}
+		transition: none;
+	}
 
 }
 
 @media screen and (max-width: 600px) {
 	body.wp-admin #wpbody {
-	padding-top: 0;
-}
+		padding-top: 0;
+	}
 
-body.wp-admin .wz-admin-banner {
-	margin: 0px -16px 0 -16px;
-	padding: 48px 20px 28px 20px;
-}
+	body.wp-admin .wz-admin-banner {
+		margin: 0px -16px 0 -16px;
+		padding: 48px 20px 28px 20px;
+	}
 
-.wz-admin-banner__link {
-	font-size: 0.875rem;
-}
+	.wz-admin-banner__link {
+		font-size: 0.875rem;
+	}
 
-body.wp-admin .wz-admin-banner__title,
-    body.wp-admin .wz-admin-banner__text {
-	display: none;
-}
+	body.wp-admin .wz-admin-banner__title,
+	body.wp-admin .wz-admin-banner__text {
+		display: none;
+	}
 
 }

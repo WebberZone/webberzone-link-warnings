@@ -105,7 +105,7 @@ class Activator {
 	public static function single_activate() {
 		// Set default options using Options API.
 		$defaults = array(
-			'warning_method'      => 'inline',
+			'warning_method'      => 'inline_modal',
 			'scope'               => 'external',
 			'visual_indicator'    => 'icon',
 			'indicator_text'      => __( '(opens in new window)', 'better-external-links' ),
@@ -115,8 +115,8 @@ class Activator {
 			'modal_continue_text' => __( 'Continue', 'better-external-links' ),
 			'modal_cancel_text'   => __( 'Cancel', 'better-external-links' ),
 			'redirect_message'    => __( 'You are being redirected to an external site.', 'better-external-links' ),
-			'excluded_domains'    => array(),
-			'enabled_post_types'  => array( 'post', 'page' ),
+			'excluded_domains'    => '',
+			'enabled_post_types'  => 'post,page',
 		);
 
 		// Use Options API to set defaults (merge=true preserves existing user settings on reactivation).

@@ -67,7 +67,7 @@ class Frontend_Handler {
 			// Pass settings to JavaScript.
 			wp_localize_script(
 				'wz-bel-modal',
-				'wzElaSettings',
+				'wzBelSettings',
 				array(
 					'modalTitle'    => isset( $settings['modal_title'] ) ? $settings['modal_title'] : __( 'You are leaving this site', 'better-external-links' ),
 					'modalMessage'  => isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
@@ -93,19 +93,19 @@ class Frontend_Handler {
 		}
 
 		?>
-		<div id="wz-ela-modal" class="wz-ela-modal" role="dialog" aria-modal="true" aria-labelledby="wz-ela-modal-title" aria-describedby="wz-ela-modal-message" hidden>
-			<div class="wz-ela-modal-overlay" data-wz-ela-close role="presentation"></div>
-			<div class="wz-ela-modal-container">
-				<button type="button" class="wz-ela-modal-close-btn" data-wz-ela-close aria-label="<?php esc_attr_e( 'Close dialog', 'better-external-links' ); ?>">
+		<div id="wz-bel-modal" class="wz-bel-modal" role="dialog" aria-modal="true" aria-labelledby="wz-bel-modal-title" aria-describedby="wz-bel-modal-message" hidden>
+			<div class="wz-bel-modal-overlay" data-wz-bel-close role="presentation"></div>
+			<div class="wz-bel-modal-container">
+				<button type="button" class="wz-bel-modal-close-btn" data-wz-bel-close aria-label="<?php esc_attr_e( 'Close dialog', 'better-external-links' ); ?>">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<div class="wz-ela-modal-content">
-					<h2 id="wz-ela-modal-title" class="wz-ela-modal-title"></h2>
-					<div id="wz-ela-modal-message" class="wz-ela-modal-message"></div>
-					<div class="wz-ela-modal-url"></div>
-					<div class="wz-ela-modal-actions">
-						<button type="button" class="wz-ela-modal-button wz-ela-modal-cancel" data-wz-ela-close></button>
-						<button type="button" class="wz-ela-modal-button wz-ela-modal-continue" data-wz-ela-continue></button>
+				<div class="wz-bel-modal-content">
+					<h2 id="wz-bel-modal-title" class="wz-bel-modal-title"></h2>
+					<div id="wz-bel-modal-message" class="wz-bel-modal-message"></div>
+					<div class="wz-bel-modal-url"></div>
+					<div class="wz-bel-modal-actions">
+						<button type="button" class="wz-bel-modal-button wz-bel-modal-cancel" data-wz-bel-close></button>
+						<button type="button" class="wz-bel-modal-button wz-bel-modal-continue" data-wz-bel-continue></button>
 					</div>
 				</div>
 			</div>

@@ -27,26 +27,26 @@
 		document.addEventListener('click', handleLinkClick);
 
 		// Get modal elements.
-		modal = document.getElementById('wz-ela-modal');
+		modal = document.getElementById('wz-bel-modal');
 		if (!modal) {
 			return;
 		}
 
-		modalTitle = modal.querySelector('#wz-ela-modal-title');
-		modalMessage = modal.querySelector('#wz-ela-modal-message');
-		modalUrl = modal.querySelector('.wz-ela-modal-url');
-		modalContinue = modal.querySelector('[data-wz-ela-continue]');
-		modalCancel = modal.querySelector('.wz-ela-modal-cancel');
+		modalTitle = modal.querySelector('#wz-bel-modal-title');
+		modalMessage = modal.querySelector('#wz-bel-modal-message');
+		modalUrl = modal.querySelector('.wz-bel-modal-url');
+		modalContinue = modal.querySelector('[data-wz-bel-continue]');
+		modalCancel = modal.querySelector('.wz-bel-modal-cancel');
 		// Set button text from settings.
-		if (typeof wzElaSettings !== 'undefined') {
-			modalTitle.textContent = wzElaSettings.modalTitle;
-			modalMessage.textContent = wzElaSettings.modalMessage;
-			modalContinue.textContent = wzElaSettings.continueText;
-			modalCancel.textContent = wzElaSettings.cancelText;
+		if (typeof wzBelSettings !== 'undefined') {
+			modalTitle.textContent = wzBelSettings.modalTitle;
+			modalMessage.textContent = wzBelSettings.modalMessage;
+			modalContinue.textContent = wzBelSettings.continueText;
+			modalCancel.textContent = wzBelSettings.cancelText;
 		}
 
 		// Modal close handlers.
-		modal.querySelectorAll('[data-wz-ela-close]').forEach(function (element) {
+		modal.querySelectorAll('[data-wz-bel-close]').forEach(function (element) {
 			element.addEventListener('click', closeModal);
 		});
 		// Continue button handler.
@@ -61,14 +61,14 @@
 	 * @param {Event} e Click event.
 	 */
 	function handleLinkClick(e) {
-		const link = e.target.closest('a[data-wz-ela-external]');
+		const link = e.target.closest('a[data-wz-bel-external]');
 		if (!link) {
 			return;
 		}
 
-		const method = typeof wzElaSettings !== 'undefined' ? wzElaSettings.warningMethod : 'inline';
+		const method = typeof wzBelSettings !== 'undefined' ? wzBelSettings.warningMethod : 'inline';
 		if ('redirect' === method || 'inline_redirect' === method) {
-			const redirectUrl = link.getAttribute('data-wz-ela-redirect-url');
+			const redirectUrl = link.getAttribute('data-wz-bel-redirect-url');
 			if (redirectUrl) {
 				e.preventDefault();
 				window.location.href = redirectUrl;
@@ -92,13 +92,13 @@
 	 * @param {HTMLElement} link Link element.
 	 */
 	function showModal(link) {
-		const url = link.getAttribute('data-wz-ela-url');
+		const url = link.getAttribute('data-wz-bel-url');
 		// Update modal content.
 		modalUrl.textContent = url;
 		// Show modal.
 		modal.removeAttribute('hidden');
 		// Lock body scroll.
-		document.body.classList.add('wz-ela-modal-active');
+		document.body.classList.add('wz-bel-modal-active');
 		// Set up focus trap.
 		setupFocusTrap();
 		// Focus first element.
@@ -113,7 +113,7 @@
 	function closeModal() {
 		modal.setAttribute('hidden', '');
 		// Unlock body scroll.
-		document.body.classList.remove('wz-ela-modal-active');
+		document.body.classList.remove('wz-bel-modal-active');
 		// Return focus to link.
 		if (currentLink) {
 			currentLink.focus();
@@ -129,7 +129,7 @@
 			return;
 		}
 
-		const url = currentLink.getAttribute('data-wz-ela-url');
+		const url = currentLink.getAttribute('data-wz-bel-url');
 		// Navigate to external URL.
 		window.open(url, '_blank', 'noopener,noreferrer');
 		// Close modal.

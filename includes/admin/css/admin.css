@@ -6,34 +6,34 @@
  */
 
 /* Settings page styles. */
-.wz-ela-settings-page {
+.wz-bel-settings-page {
 	max-width: 1200px;
 }
 
-.wz-ela-settings-page fieldset {
+.wz-bel-settings-page fieldset {
 	margin-top: 0.5rem;
 }
 
-.wz-ela-settings-page fieldset label {
+.wz-bel-settings-page fieldset label {
 	display: block;
 	margin-bottom: 0.5rem;
 }
 
-.wz-ela-settings-page .description {
+.wz-bel-settings-page .description {
 	margin-top: 0.5rem;
 	color: #646970;
 	font-style: italic;
 }
 
 /* Section headings. */
-.wz-ela-settings-page h2 {
+.wz-bel-settings-page h2 {
 	border-bottom: 2px solid #2271b1;
 	padding-bottom: 0.5rem;
 	margin-top: 2rem;
 }
 
 /* Preview box. */
-.wz-ela-preview-box {
+.wz-bel-preview-box {
 	margin-top: 1rem;
 	padding: 1rem;
 	background-color: #f6f7f7;
@@ -41,12 +41,12 @@
 	border-radius: 4px;
 }
 
-.wz-ela-preview-box h4 {
+.wz-bel-preview-box h4 {
 	margin-top: 0;
 	margin-bottom: 0.5rem;
 }
 
-.wz-ela-preview-link {
+.wz-bel-preview-link {
 	color: #2271b1;
 	text-decoration: underline;
 }

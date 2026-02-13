@@ -44,7 +44,7 @@ class Redirect_Handler {
 	public function add_rewrite_rules() {
 		add_rewrite_rule(
 			'^external-redirect/?',
-			'index.php?wz_ela_redirect=1',
+			'index.php?wz_bel_redirect=1',
 			'top'
 		);
 	}
@@ -57,8 +57,8 @@ class Redirect_Handler {
 	 * @return array Modified query vars.
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = 'wz_ela_redirect';
-		$vars[] = 'wz_ela_url';
+		$vars[] = 'wz_bel_redirect';
+		$vars[] = 'wz_bel_url';
 		return $vars;
 	}
 
@@ -68,7 +68,7 @@ class Redirect_Handler {
 	 * @since 1.0.0
 	 */
 	public function handle_redirect() {
-		if ( ! get_query_var( 'wz_ela_redirect' ) ) {
+		if ( ! get_query_var( 'wz_bel_redirect' ) ) {
 			return;
 		}
 
@@ -88,7 +88,7 @@ class Redirect_Handler {
 		}
 
 		// Verify that the destination matches the one used in the redirect URL generation to prevent open redirect bypass.
-		$expected_url = get_query_var( 'wz_ela_url' );
+		$expected_url = get_query_var( 'wz_bel_url' );
 		if ( ! empty( $expected_url ) && esc_url_raw( $expected_url ) !== $destination ) {
 			wp_safe_redirect( home_url() );
 			exit;
@@ -172,7 +172,7 @@ class Redirect_Handler {
 	 * @since 1.0.0
 	 */
 	public function enqueue_redirect_assets() {
-		if ( ! get_query_var( 'wz_ela_redirect' ) ) {
+		if ( ! get_query_var( 'wz_bel_redirect' ) ) {
 			return;
 		}
 
@@ -202,7 +202,7 @@ class Redirect_Handler {
 
 		wp_localize_script(
 			'wz-bel-redirect',
-			'wzElaRedirect',
+			'wzBelRedirect',
 			array(
 				'destination' => $destination,
 				'countdown'   => $countdown,

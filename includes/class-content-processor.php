@@ -95,9 +95,9 @@ class Content_Processor {
 			// Add data attributes for JavaScript handling.
 			if ( in_array( $this->settings['warning_method'], array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
-					$processor->set_attribute( 'data-wz-ela-external', 'true' );
-					$processor->set_attribute( 'data-wz-ela-url', esc_url( $href ) );
-					$processor->set_attribute( 'data-wz-ela-redirect-url', esc_url( Redirect_Handler::get_redirect_url( $href ) ) );
+					$processor->set_attribute( 'data-wz-bel-external', 'true' );
+					$processor->set_attribute( 'data-wz-bel-url', esc_url( $href ) );
+					$processor->set_attribute( 'data-wz-bel-redirect-url', esc_url( Redirect_Handler::get_redirect_url( $href ) ) );
 				}
 			}
 
@@ -109,9 +109,9 @@ class Content_Processor {
 
 			// Add class for styling.
 			$existing_class = $processor->get_attribute( 'class' );
-			$new_class      = trim( $existing_class . ' wz-ela-processed' );
+			$new_class      = trim( $existing_class . ' wz-bel-processed' );
 			if ( $is_external ) {
-				$new_class .= ' wz-ela-external';
+				$new_class .= ' wz-bel-external';
 			}
 			$processor->set_attribute( 'class', $new_class );
 		}
@@ -135,7 +135,7 @@ class Content_Processor {
 	 */
 	private function add_visual_indicators( $content ) {
 		// Use regex to find processed links and add indicators before closing tag.
-		$pattern = '/<a\s+[^>]*class="[^"]*wz-ela-processed[^"]*"[^>]*>(.*?)<\/a>/is';
+		$pattern = '/<a\s+[^>]*class="[^"]*wz-bel-processed[^"]*"[^>]*>(.*?)<\/a>/is';
 
 		$content = preg_replace_callback(
 			$pattern,
@@ -187,12 +187,12 @@ class Content_Processor {
 
 		// Add visual elements.
 		if ( 'icon' === $visual || 'both' === $visual ) {
-			$indicator .= '<span class="wz-ela-icon" aria-hidden="true">↗</span>';
+			$indicator .= '<span class="wz-bel-icon" aria-hidden="true">↗</span>';
 		}
 
 		if ( 'text' === $visual || 'both' === $visual ) {
 			$text       = isset( $this->settings['indicator_text'] ) ? $this->settings['indicator_text'] : __( '(opens in new window)', 'better-external-links' );
-			$indicator .= '<span class="wz-ela-text" aria-hidden="true">' . esc_html( $text ) . '</span>';
+			$indicator .= '<span class="wz-bel-text" aria-hidden="true">' . esc_html( $text ) . '</span>';
 		}
 
 		return $indicator;

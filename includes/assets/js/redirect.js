@@ -17,18 +17,18 @@
 	 */
 	function init() {
 		// Check if we have redirect data.
-		if (typeof wzElaRedirect === 'undefined' || !wzElaRedirect.destination) {
+		if (typeof wzBelRedirect === 'undefined' || !wzBelRedirect.destination) {
 			return;
 		}
 
 		// Get countdown element.
-		countdownElement = document.querySelector('.wz-ela-countdown-number');
+		countdownElement = document.querySelector('.wz-bel-countdown-number');
 		if (!countdownElement) {
 			return;
 		}
 
 		// Start countdown.
-		countdown = wzElaRedirect.countdown || 5;
+		countdown = wzBelRedirect.countdown || 5;
 		startCountdown();
 	}
 
@@ -65,8 +65,8 @@
 	 * Redirect to destination.
 	 */
 	function redirect() {
-		if (wzElaRedirect.destination) {
-			window.location.href = wzElaRedirect.destination;
+		if (wzBelRedirect.destination) {
+			window.location.href = wzBelRedirect.destination;
 		}
 	}
 
@@ -82,7 +82,7 @@
 	// Cancel redirect if user interacts with page.
 	document.addEventListener('click', function (e) {
 		// Don't cancel if clicking the continue button.
-		if (e.target.closest('.wz-ela-redirect-continue')) {
+		if (e.target.closest('.wz-bel-redirect-continue')) {
 			return;
 		}
 		cancelRedirect();

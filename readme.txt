@@ -1,6 +1,7 @@
 === Better External Links ===
 Contributors: webberzone, ajay
-Tags: accessibility, external links, wcag, new window, a11y
+Tags: accessibility, external links, wcag, target blank, compliance
+Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
@@ -8,172 +9,163 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Enhance accessibility by warning users when links open in new windows or navigate to external sites.
+Add accessible warnings for external links and `target="_blank"` links in WordPress — using icons, modals, or redirect screens.
 
 == Description ==
 
-Better External Links helps improve your website's accessibility by providing visual and screen reader indicators for external links and links that open in new windows. This plugin supports WCAG 2.1 compliance by ensuring users are properly informed when they're about to leave your site or when a link will open in a new window.
+Better External Links helps you warn users when links open in a new window or take them to external websites. It adds accessible indicators, confirmation dialogs, or redirect screens — helping you align with accessibility best practices without rewriting your content.
 
-= Key Features =
+Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to parse and modify external and `target="_blank"` links in your content efficiently. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration. The plugin processes content during the `the_content` and `the_excerpt` filters, making it compatible with most themes and page builders. Your stored content remains untouched — the plugin only alters rendered output and does not interfere with REST API responses or admin editing screens.
 
-* **Multiple Warning Methods**: Choose from inline indicators, modal dialogs, or redirect screens
-* **Flexible Scope**: Target external links only, all target="_blank" links, or both
-* **Customizable Indicators**: Configure visual icons, text, or screen reader-only warnings
-* **Modal Dialog**: Show a confirmation dialog before users navigate to external sites
-* **Redirect Screen**: Display an intermediate page with a countdown before external navigation
-* **Domain Exclusions**: Whitelist trusted domains to treat them as internal links
-* **Post Type Control**: Enable warnings on specific post types only
-* **WCAG Compliant**: Follows Web Content Accessibility Guidelines for proper link handling
-* **Fully Customizable**: Modify all text, messages, and visual elements to match your brand
+### Why warn users about external links?
 
-= Use Cases =
+* `target="_blank"` can disorient screen reader users
+* Sudden context changes impact usability
+* Accessibility audits often recommend user warnings
+* Agencies and site owners often need documented user warnings during accessibility reviews
 
-* **Accessibility Compliance**: Meet WCAG 2.1 guidelines for warning users about new windows
-* **User Experience**: Inform visitors when they're leaving your site
-* **Educational Sites**: Help users understand when content is external
-* **Corporate Websites**: Warn users before navigating to third-party resources
-* **Membership Sites**: Alert members when leaving your protected content area
+### Key features
 
-= How It Works =
+* __Multiple Warning Methods__: Choose from inline indicators, modal dialogs, or redirect screens — or combine them
+* __Flexible Scope__: Target external links only, or external links plus all `target="_blank"` links
+* __Customizable Indicators__: Configure visual icons, text, or screen reader-only warnings
+* __Modal Dialog__: Show a confirmation dialog before users navigate to external sites with keyboard navigation and focus management
+* __Redirect Screen__: Display an intermediate page with a configurable countdown before external navigation
+* __Domain Exclusions__: Allow trusted domains to treat them as internal links
+* __Post Type Control__: Enable warnings on specific post types only
+* __Built to support accessibility best practices for external link behaviour in WordPress__: Adds screen reader text, ARIA attributes, and keyboard-friendly modal confirmations
+* __Setup Wizard__: Get started quickly with a guided setup wizard on first activation
+* __Template Override__: Override the redirect screen template in your theme for full design control
+* __RTL Support__: Full right-to-left language support for all frontend and admin styles
+* __Multisite Compatible__: Network activate and configure per-site settings
+* __Privacy Focused__: Does not collect personal data or send link data to third-party services
+* __Performance Optimized__: Uses WordPress's native `WP_HTML_Tag_Processor` class to process links at display time
+* __Developer-Friendly__: Filters and actions allow developers to customize behavior, exclude domains, and output
 
-Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to efficiently parse and modify links in your content. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration.
+> This plugin assists with user awareness of external navigation. It does not automatically make your website fully accessible or legally compliant.
 
-The plugin processes content during the `the_content` and `the_excerpt` filters, ensuring compatibility with most themes and page builders.
+### How it works
 
-= Configuration Options =
+After activation, the setup wizard guides you through the initial configuration. You can also configure the plugin at __Settings > Better External Links__.
 
-**Warning Methods:**
+__Warning Methods:__
+
 * Inline indicators only (visual and/or screen reader text)
 * Modal dialog (JavaScript-based confirmation)
 * Redirect screen (intermediate page with countdown)
-* Combined approach (inline + modal for external links)
+* Combined approach (inline + modal)
+* Combined approach (inline + redirect)
 
-**Link Scope:**
+__Link Scope:__
+
 * External links only
-* All target="_blank" links
-* Both external and target="_blank" links
+* External links and all `target="_blank"` links
 
-**Visual Indicators:**
+__Visual Indicators:__
+
 * Icon only (↗)
 * Text only (customizable)
 * Icon + text
 * None (screen reader only)
 
-**Advanced Settings:**
+__Advanced Settings:__
+
 * Custom modal messages and button text
-* Custom redirect page content
+* Custom redirect page content and countdown duration
 * Domain exclusion list
 * Post type selection
 
-= Privacy & Data =
+### GDPR
 
-Better External Links does not collect, store, or transmit any user data. All processing happens on your server, and no external services are contacted. The plugin is fully GDPR compliant.
+Better External Links doesn't collect personal data or send information to external services — making it GDPR-friendly by default.
 
-= Compatibility =
+You remain responsible for your site's overall GDPR compliance.
 
-* Works with Classic Editor and Block Editor (Gutenberg)
-* Compatible with popular page builders
-* Multisite compatible
-* Translation ready
+### Contribute
+
+Better External Links is also available on [Github](https://github.com/WebberZone/better-external-links).
+So, if you've got a cool feature you'd like to implement in the plugin or a bug you've fixed, consider forking the project and sending me a pull request.
+
+Bug reports are [welcomed on GitHub](https://github.com/WebberZone/better-external-links/issues). Please note that GitHub is _not_ a support forum, and issues that aren't suitably qualified as bugs will be closed.
+
+### Translations
+
+Better External Links is available for [translation directly on WordPress.org](https://translate.wordpress.org/projects/wp-plugins/better-external-links). Check out the official [Translator Handbook](https://make.wordpress.org/polyglots/handbook/plugin-theme-authors-guide/) to contribute.
+
+### Other Plugins by WebberZone
+
+Better External Links is one of the many plugins developed by WebberZone. Check out our other plugins:
+
+* [Contextual Related Posts](https://wordpress.org/plugins/contextual-related-posts/) - Display related posts on your WordPress blog and feed
+* [Top 10](https://wordpress.org/plugins/top-10/) - Track daily and total visits to your blog posts and display the popular and trending posts
+* [WebberZone Snippetz](https://wordpress.org/plugins/add-to-all/) - The ultimate snippet manager for WordPress to create and manage custom HTML, CSS or JS code snippets
+* [Knowledge Base](https://wordpress.org/plugins/knowledgebase/) - Create a knowledge base or FAQ section on your WordPress site
+* [Better Search](https://wordpress.org/plugins/better-search/) - Enhance the default WordPress search with contextual results sorted by relevance
+* [Auto-Close](https://wordpress.org/plugins/autoclose/) - Automatically close comments, pingbacks and trackbacks and manage revisions
+* [Popular Authors](https://wordpress.org/plugins/popular-authors/) - Display popular authors in your WordPress widget
+* [Followed Posts](https://wordpress.org/plugins/where-did-they-go-from-here/) - Show a list of related posts based on what your users have read
 
 == Installation ==
 
-= From WordPress Dashboard =
+= WordPress install (the easy way) =
 
 1. Navigate to Plugins > Add New
 2. Search for "Better External Links"
 3. Click "Install Now" and then "Activate"
-4. Go to Settings > Link Warnings to configure
 
-= Manual Installation =
+= Manual install =
 
 1. Upload the `better-external-links` folder to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Settings > Link Warnings to configure
-
-= After Activation =
-
-1. Visit Settings > Link Warnings
-2. Choose your preferred warning method
-3. Configure visual indicators and messages
-4. Select which post types should show warnings
-5. Save your settings
+3. Go to Settings > Better External Links to configure
 
 == Frequently Asked Questions ==
 
 = Does this plugin affect SEO? =
 
-No. Better External Links only modifies how links are displayed to users. It doesn't change the href attribute or add nofollow tags. Search engines see your links exactly as you created them.
-
-= Will this slow down my site? =
-
-No. The plugin uses WordPress's efficient `WP_HTML_Tag_Processor` class and only processes content when it's displayed. The performance impact is negligible.
-
-= Can I exclude specific domains? =
-
-Yes! In the Advanced Settings, you can add a list of domains that should be treated as internal links. This is useful for sister sites or trusted partners.
-
-= Does it work with page builders? =
-
-Yes! Better External Links works with Elementor, Beaver Builder, Divi, and other popular page builders. It processes the final rendered content regardless of how it was created.
-
-= Can I customize the appearance? =
-
-Yes! All visual elements use CSS classes prefixed with `wz-bel-`, making it easy to add custom styles. You can also customize all text strings through the settings page.
+No. Better External Links only modifies how links are displayed to users. It does not alter the href attribute, link structure, or indexing behaviour. Search engines see your links exactly as you created them.
 
 = Is it accessible? =
 
-Absolutely! The plugin was built with accessibility as the primary goal. It includes proper ARIA attributes, keyboard navigation support, focus management, and screen reader text.
+Yes. The plugin adds screen reader text, ARIA attributes, and (for modal mode) keyboard navigation and focus management.
 
 = Does it work with multilingual sites? =
 
-Yes! Better External Links is translation-ready and compatible with WPML, Polylang, and other translation plugins. All strings can be translated through standard WordPress methods.
+Yes. Better External Links is translation-ready. It uses standard WordPress translation functions and works with popular multilingual plugins such as WPML and Polylang.
+
+= Does this work with page builders? =
+
+Yes. The plugin processes content through standard WordPress filters (`the_content` and `the_excerpt`), making it compatible with most themes, page builders, and the block editor.
+
+= Can I customize the redirect screen template? =
+
+Yes. Copy the template file to `your-theme/better-external-links/redirect-screen.php` to override the default redirect screen with your own design.
+
+= Does this modify my database content? =
+
+No. The plugin only alters rendered output. Your stored content remains unchanged.
 
 = What happens if I deactivate the plugin? =
 
-Your links return to their original state. The plugin doesn't modify your content in the database—it only changes how links are displayed.
+Your links return to their original state. The plugin doesn't modify your content in the database — it only changes how links are displayed.
 
-= Can I use this on WooCommerce product pages? =
+= How can I report security bugs? =
 
-Yes! Simply enable the "product" post type in the plugin settings, and warnings will appear on product descriptions and content.
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/wordpress/plugin/better-external-links/vdp)
 
 == Screenshots ==
 
-1. Plugin settings page - General options
-2. Inline indicator with icon
-3. Modal dialog warning
+1. Better External Links settings page
+2. External link with icon indicator
+3. Modal dialog warning before navigation
 4. Redirect screen with countdown
-5. Settings for modal customization
-6. Advanced settings and domain exclusions
 
 == Changelog ==
 
-= 1.0.0 - 2025-01-01 =
-* Initial release
-* Multiple warning methods (inline, modal, redirect)
-* Customizable visual and screen reader indicators
-* Domain exclusion support
-* Post type selection
-* Full WCAG 2.1 compliance
-* Translation ready
+= 1.0.0 =
+* Initial release.
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of Better External Links.
-
-== Support ==
-
-For support, feature requests, or bug reports, please visit:
-
-* Plugin Support: https://wordpress.org/support/plugin/better-external-links/
-* Documentation: https://webberzone.com/support/better-external-links/
-* GitHub: https://github.com/WebberZone/better-external-links
-
-== Credits ==
-
-Better External Links is developed and maintained by [WebberZone](https://webberzone.com/).
-
-== Translations ==
-
-Better External Links is translation-ready. If you'd like to contribute a translation, please visit our [GitHub repository](https://github.com/WebberZone/better-external-links).
+Initial release.

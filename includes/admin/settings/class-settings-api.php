@@ -946,7 +946,14 @@ class Settings_API {
 				<h1><?php echo esc_html( $this->translation_strings['page_header'] ); ?></h1>
 				<?php do_action( $this->prefix . '_settings_page_header' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound ?>
 
-				<?php settings_errors( $this->prefix . '-notices' ); ?>
+				<?php
+				// WordPress automatically calls settings_errors() on Options pages (parent_slug = 'options-general.php').
+				// Only call it manually on custom menu pages to prevent duplicates.
+				$current_screen = get_current_screen();
+				if ( $current_screen && 'options-general' !== $current_screen->parent_base ) {
+					settings_errors( $this->prefix . '-notices' );
+				}
+				?>
 
 				<div id="poststuff">
 				<div id="post-body" class="metabox-holder columns-2">

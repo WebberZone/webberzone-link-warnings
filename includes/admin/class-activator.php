@@ -53,10 +53,10 @@ class Activator {
 		}
 
 		// Check WordPress version.
-		if ( version_compare( $GLOBALS['wp_version'], '5.0', '<' ) ) {
+		if ( version_compare( $GLOBALS['wp_version'], '6.6', '<' ) ) {
 			deactivate_plugins( plugin_basename( WZ_BEL_PLUGIN_FILE ) );
 			/* translators: %s: Current WordPress version */
-			wp_die( wp_kses_post( sprintf( __( 'Better External Links requires WordPress 5.0 or higher. You are running WordPress %s', 'better-external-links' ), esc_html( $GLOBALS['wp_version'] ) ) ) );
+			wp_die( wp_kses_post( sprintf( __( 'Better External Links requires WordPress 6.6 or higher. You are running WordPress %s', 'better-external-links' ), esc_html( $GLOBALS['wp_version'] ) ) ) );
 		}
 
 		if ( is_multisite() && $network_wide ) {

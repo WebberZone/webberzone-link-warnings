@@ -6,7 +6,7 @@
 [![Required PHP](https://img.shields.io/wordpress/plugin/required-php/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
 [![Active installs](https://img.shields.io/wordpress/plugin/installs/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
 
-__Requires:__ 6.0
+__Requires:__ 6.6
 
 __Tested up to:__ 6.9
 

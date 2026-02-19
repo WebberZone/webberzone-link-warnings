@@ -2,7 +2,7 @@
 Contributors: webberzone, ajay
 Tags: accessibility, external links, wcag, target blank, compliance
 Donate link: https://ajaydsouza.com/donate/
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.0.0

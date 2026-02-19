@@ -47,7 +47,6 @@ class Content_Processor {
 	 */
 	public function __construct() {
 		$this->site_host = wp_parse_url( home_url(), PHP_URL_HOST );
-		$this->settings  = wzbel_get_settings();
 
 		Hook_Registry::add_filter( 'the_content', array( $this, 'process_content' ), 999 );
 		Hook_Registry::add_filter( 'the_excerpt', array( $this, 'process_content' ), 999 );
@@ -69,6 +68,9 @@ class Content_Processor {
 		if ( ! $this->is_post_type_enabled() ) {
 			return $content;
 		}
+
+		// Load fresh settings on each content processing.
+		$this->settings = wzbel_get_settings();
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor = new \WP_HTML_Tag_Processor( $content );

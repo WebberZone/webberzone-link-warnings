@@ -47,6 +47,7 @@ class Content_Processor {
 	 */
 	public function __construct() {
 		$this->site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+		$this->settings  = wzbel_get_settings();
 
 		Hook_Registry::add_filter( 'the_content', array( $this, 'process_content' ), 999 );
 		Hook_Registry::add_filter( 'the_excerpt', array( $this, 'process_content' ), 999 );
@@ -68,8 +69,6 @@ class Content_Processor {
 		if ( ! $this->is_post_type_enabled() ) {
 			return $content;
 		}
-
-		$this->settings = wzbel_get_settings();
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor = new \WP_HTML_Tag_Processor( $content );
@@ -93,7 +92,7 @@ class Content_Processor {
 			}
 
 			// Add data attributes for JavaScript handling.
-			if ( in_array( $this->settings['warning_method'], array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
+			if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wz-bel-external', 'true' );
 					$processor->set_attribute( 'data-wz-bel-url', esc_url( $href ) );
@@ -119,7 +118,7 @@ class Content_Processor {
 		$processed_content = $processor->get_updated_html();
 
 		// Add visual indicators if inline method is used.
-		if ( in_array( $this->settings['warning_method'], array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
+		if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
 			$processed_content = $this->add_visual_indicators( $processed_content );
 		}
 

@@ -51,11 +51,6 @@ Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to p
 
 > This plugin assists with user awareness of external navigation. It does not automatically make your website fully accessible or legally compliant.
 
-## Requirements
-
-- WordPress 6.0+
-- PHP 7.4+
-
 ## Installation
 
 ### WordPress install (the easy way)

@@ -947,10 +947,10 @@ class Settings_API {
 				<?php do_action( $this->prefix . '_settings_page_header' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound ?>
 
 				<?php
-				// WordPress automatically calls settings_errors() on Options pages (parent_slug = 'options-general.php').
+				// WordPress automatically calls settings_errors() on Settings pages.
 				// Only call it manually on custom menu pages to prevent duplicates.
 				$current_screen = get_current_screen();
-				if ( $current_screen && 'options-general' !== $current_screen->parent_base ) {
+				if ( $current_screen && 0 !== strpos( $current_screen->base, 'settings_page_' ) ) {
 					settings_errors( $this->prefix . '-notices' );
 				}
 				?>

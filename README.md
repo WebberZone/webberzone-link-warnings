@@ -6,7 +6,7 @@
 [![Required PHP](https://img.shields.io/wordpress/plugin/required-php/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
 [![Active installs](https://img.shields.io/wordpress/plugin/installs/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
 
-__Requires:__ 6.6
+__Requires at least:__ 6.6
 
 __Tested up to:__ 6.9
 
@@ -127,10 +127,6 @@ Bug reports are [welcomed on GitHub](https://github.com/WebberZone/better-extern
 - __Documentation__: [webberzone.com/support/better-external-links/](https://webberzone.com/support/better-external-links/)
 - __WordPress Support Forum__: [wordpress.org/support/plugin/better-external-links/](https://wordpress.org/support/plugin/better-external-links/)
 - __GitHub Issues__: [github.com/WebberZone/better-external-links/issues](https://github.com/WebberZone/better-external-links/issues)
-
-## How can I report security bugs?
-
-You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/wordpress/plugin/better-external-links/vdp)
 
 ## Translations
 

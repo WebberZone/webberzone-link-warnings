@@ -155,10 +155,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Screenshots ==
 
-1. Better External Links settings page
-2. External link with icon indicator
-3. Modal dialog warning before navigation
-4. Redirect screen with countdown
+1. External link with icon indicator
+2. Modal dialog warning before navigation
 
 == Changelog ==
 

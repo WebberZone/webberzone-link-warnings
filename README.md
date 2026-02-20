@@ -97,7 +97,7 @@ After activation, the setup wizard guides you through the initial configuration.
 
 ## Screenshots
 
-![Better External Links Settings](https://raw.githubusercontent.com/WebberZone/better-external-links/master/wporg-assets/screenshot-1.png)
+![Better External Links Settings](https://github.com/WebberZone/better-external-links/blob/main/wporg-assets/screenshot-2.png)
 *Better External Links Settings Page*
 
 For more screenshots, visit the [WordPress plugin page](https://wordpress.org/plugins/better-external-links/screenshots/).

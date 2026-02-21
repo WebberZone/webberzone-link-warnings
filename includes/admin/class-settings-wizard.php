@@ -49,6 +49,8 @@ class Settings_Wizard extends Settings_Wizard_API {
 			'steps'               => $this->get_wizard_steps(),
 			'translation_strings' => $this->get_translation_strings(),
 			'page_slug'           => 'wz_bel_wizard',
+			'hide_when_completed' => true,
+			'show_in_menu'        => false,
 			'menu_args'           => array(
 				'parent'     => 'options-general.php',
 				'capability' => 'manage_options',
@@ -239,7 +241,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 				<div class="notice notice-info is-dismissible">
 					<p><?php esc_html_e( 'Welcome to Better External Links! Would you like to run the setup wizard to configure the plugin?', 'better-external-links' ); ?></p>
 					<p>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wz_bel_wizard' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Run Setup Wizard', 'better-external-links' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=wz_bel_wizard' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Run Setup Wizard', 'better-external-links' ); ?></a>
 						<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wz_bel_dismiss_wizard', '1' ), 'wz_bel_dismiss_wizard' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Skip Setup', 'better-external-links' ); ?></a>
 					</p>
 				</div>

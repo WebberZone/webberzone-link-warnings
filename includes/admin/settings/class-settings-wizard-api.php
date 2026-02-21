@@ -237,6 +237,12 @@ class Settings_Wizard_API {
 		if ( $hide_when_completed && $this->is_wizard_completed() ) {
 			add_action( 'admin_head', array( $this, 'hide_completed_wizard_submenu' ) );
 		}
+
+		// Hide wizard if show_in_menu is false.
+		$show_in_menu = isset( $this->args['show_in_menu'] ) ? (bool) $this->args['show_in_menu'] : true;
+		if ( ! $show_in_menu ) {
+			add_action( 'admin_head', array( $this, 'hide_wizard_submenu' ) );
+		}
 	}
 
 	/**
@@ -248,6 +254,15 @@ class Settings_Wizard_API {
 		if ( ! $this->is_wizard_completed() ) {
 			return;
 		}
+		$this->hide_wizard_submenu();
+	}
+
+	/**
+	 * Hide wizard submenu item.
+	 *
+	 * @return void
+	 */
+	public function hide_wizard_submenu() {
 		$slug = sanitize_key( $this->page_slug );
 		?>
 		<style>

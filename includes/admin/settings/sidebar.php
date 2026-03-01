@@ -5,11 +5,6 @@
  * @package WebberZone\Better_External_Links
  */
 
-// Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 ?>
 <div class="postbox-container">
 	<div id="qlinksdiv" class="postbox meta-box-sortables">

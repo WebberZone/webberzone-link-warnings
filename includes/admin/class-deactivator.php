@@ -2,19 +2,19 @@
 /**
  * Deactivator class.
  *
- * Handles deactivation tasks for the Better External Links plugin.
+ * Handles deactivation tasks for the WebberZone Link Warnings plugin.
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links\Admin
+ * @package WebberZone\Link_Warnings\Admin
  */
 
-namespace WebberZone\Better_External_Links\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
 /**
  * Class Deactivator
  *
- * Handles deactivation tasks for the Better External Links plugin.
+ * Handles deactivation tasks for the WebberZone Link Warnings plugin.
  */
 class Deactivator {
 
@@ -52,7 +52,7 @@ class Deactivator {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'wz_bel_deactivate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'wzlw_deactivate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -62,7 +62,7 @@ class Deactivator {
 	 */
 	public static function single_deactivate() {
 		// Clean up transients.
-		delete_transient( 'wz_bel_activation_redirect' );
+		delete_transient( 'wzlw_activation_redirect' );
 
 		// Clear any cached data.
 		wp_cache_flush();

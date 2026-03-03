@@ -2,26 +2,26 @@
 /**
  * Activator class.
  *
- * Handles activation tasks for the Better External Links plugin.
+ * Handles activation tasks for the WebberZone Link Warnings plugin.
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links\Admin
+ * @package WebberZone\Link_Warnings\Admin
  */
 
-namespace WebberZone\Better_External_Links\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 /**
  * Class Activator
  *
- * Handles activation tasks for the Better External Links plugin.
+ * Handles activation tasks for the WebberZone Link Warnings plugin.
  */
 class Activator {
 
@@ -47,16 +47,16 @@ class Activator {
 	public static function activate( $network_wide ) {
 		// Check PHP version.
 		if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
-			deactivate_plugins( plugin_basename( WZ_BEL_PLUGIN_FILE ) );
+			deactivate_plugins( plugin_basename( WZLW_PLUGIN_FILE ) );
 			/* translators: %s: Current PHP version */
-			wp_die( wp_kses_post( sprintf( __( 'Better External Links requires PHP 7.4 or higher. You are running PHP %s', 'better-external-links' ), esc_html( PHP_VERSION ) ) ) );
+			wp_die( wp_kses_post( sprintf( __( 'WebberZone Link Warnings requires PHP 7.4 or higher. You are running PHP %s', 'webberzone-link-warnings' ), esc_html( PHP_VERSION ) ) ) );
 		}
 
 		// Check WordPress version.
 		if ( version_compare( $GLOBALS['wp_version'], '6.6', '<' ) ) {
-			deactivate_plugins( plugin_basename( WZ_BEL_PLUGIN_FILE ) );
+			deactivate_plugins( plugin_basename( WZLW_PLUGIN_FILE ) );
 			/* translators: %s: Current WordPress version */
-			wp_die( wp_kses_post( sprintf( __( 'Better External Links requires WordPress 6.6 or higher. You are running WordPress %s', 'better-external-links' ), esc_html( $GLOBALS['wp_version'] ) ) ) );
+			wp_die( wp_kses_post( sprintf( __( 'WebberZone Link Warnings requires WordPress 6.6 or higher. You are running WordPress %s', 'webberzone-link-warnings' ), esc_html( $GLOBALS['wp_version'] ) ) ) );
 		}
 
 		if ( is_multisite() && $network_wide ) {
@@ -89,7 +89,7 @@ class Activator {
 	 * @param int|\WP_Site $blog The blog ID.
 	 */
 	public function activate_new_site( $blog ) {
-		if ( ! is_plugin_active_for_network( plugin_basename( WZ_BEL_PLUGIN_FILE ) ) ) {
+		if ( ! is_plugin_active_for_network( plugin_basename( WZLW_PLUGIN_FILE ) ) ) {
 			return;
 		}
 
@@ -113,19 +113,19 @@ class Activator {
 			'warning_method'      => 'inline_modal',
 			'scope'               => 'external',
 			'visual_indicator'    => 'icon',
-			'indicator_text'      => __( '(opens in new window)', 'better-external-links' ),
-			'screen_reader_text'  => __( 'Opens in a new window', 'better-external-links' ),
-			'modal_title'         => __( 'You are leaving this site', 'better-external-links' ),
-			'modal_message'       => __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
-			'modal_continue_text' => __( 'Continue', 'better-external-links' ),
-			'modal_cancel_text'   => __( 'Cancel', 'better-external-links' ),
-			'redirect_message'    => __( 'You are being redirected to an external site.', 'better-external-links' ),
+			'indicator_text'      => __( '(opens in new window)', 'webberzone-link-warnings' ),
+			'screen_reader_text'  => __( 'Opens in a new window', 'webberzone-link-warnings' ),
+			'modal_title'         => __( 'You are leaving this site', 'webberzone-link-warnings' ),
+			'modal_message'       => __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
+			'modal_continue_text' => __( 'Continue', 'webberzone-link-warnings' ),
+			'modal_cancel_text'   => __( 'Cancel', 'webberzone-link-warnings' ),
+			'redirect_message'    => __( 'You are being redirected to an external site.', 'webberzone-link-warnings' ),
 			'excluded_domains'    => '',
 			'enabled_post_types'  => 'post,page',
 		);
 
 		// Use Options API to set defaults (merge=true preserves existing user settings on reactivation).
-		\WebberZone\Better_External_Links\Options_API::update_settings( $defaults, true );
+		\WebberZone\Link_Warnings\Options_API::update_settings( $defaults, true );
 
 		// Flush rewrite rules.
 		global $wp_rewrite;
@@ -133,13 +133,13 @@ class Activator {
 		flush_rewrite_rules();
 
 		// Set a transient to trigger potential future wizard redirect (30-second expiry).
-		set_transient( 'wz_bel_activation_redirect', true, 30 );
+		set_transient( 'wzlw_activation_redirect', true, 30 );
 
 		/**
 		 * Fires after plugin activation.
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'wz_bel_activate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'wzlw_activate' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 }

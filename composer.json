@@ -1,5 +1,5 @@
 {
-    "name": "webberzone/better-external-links",
+    "name": "webberzone/webberzone-link-warnings",
     "description": "Enhances accessibility by warning users when links open in new windows or navigate to external sites.",
     "version": "1.0.0",
     "type": "wordpress-plugin",
@@ -12,7 +12,7 @@
         "redirect"
     ],
     "license": "gpl-2.0-or-later",
-    "homepage": "https://webberzone.com/plugins/better-external-links/",
+    "homepage": "https://webberzone.com/plugins/webberzone-link-warnings/",
     "authors": [
         {
             "name": "WebberZone",

@@ -4,18 +4,18 @@
  *
  * Handles redirect screen functionality.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 /**
  * Redirect Handler class.
@@ -44,7 +44,7 @@ class Redirect_Handler {
 	public function add_rewrite_rules() {
 		add_rewrite_rule(
 			'^external-redirect/?',
-			'index.php?wz_bel_redirect=1',
+			'index.php?wzlw_redirect=1',
 			'top'
 		);
 	}
@@ -57,8 +57,8 @@ class Redirect_Handler {
 	 * @return array Modified query vars.
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = 'wz_bel_redirect';
-		$vars[] = 'wz_bel_url';
+		$vars[] = 'wzlw_redirect';
+		$vars[] = 'wzlw_url';
 		return $vars;
 	}
 
@@ -68,11 +68,11 @@ class Redirect_Handler {
 	 * @since 1.0.0
 	 */
 	public function handle_redirect() {
-		if ( ! get_query_var( 'wz_bel_redirect' ) ) {
+		if ( ! get_query_var( 'wzlw_redirect' ) ) {
 			return;
 		}
 
-		$settings = wzbel_get_settings();
+		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
 		if ( ! in_array( $method, array( 'redirect', 'inline_redirect' ), true ) ) {
@@ -88,7 +88,7 @@ class Redirect_Handler {
 		}
 
 		// Verify that the destination matches the one used in the redirect URL generation to prevent open redirect bypass.
-		$expected_url = get_query_var( 'wz_bel_url' );
+		$expected_url = get_query_var( 'wzlw_url' );
 		if ( ! empty( $expected_url ) && esc_url_raw( $expected_url ) !== $destination ) {
 			wp_safe_redirect( home_url() );
 			exit;
@@ -131,8 +131,8 @@ class Redirect_Handler {
 	public function get_redirect_template_path() {
 		$theme_template = locate_template(
 			array(
-				'better-external-links/redirect-screen.php',
-				'better-external-links/redirect.php',
+				'webberzone-link-warnings/redirect-screen.php',
+				'webberzone-link-warnings/redirect.php',
 			)
 		);
 
@@ -140,7 +140,7 @@ class Redirect_Handler {
 			return $theme_template;
 		}
 
-		return trailingslashit( WZ_BEL_PLUGIN_DIR ) . 'includes/templates/redirect-screen.php';
+		return trailingslashit( WZLW_PLUGIN_DIR ) . 'includes/templates/redirect-screen.php';
 	}
 
 	/**
@@ -150,8 +150,8 @@ class Redirect_Handler {
 	 * @param string $destination Destination URL.
 	 */
 	protected function render_redirect_template( $destination ) {
-		$message   = (string) wzbel_get_option( 'redirect_message', __( 'You are being redirected to an external site.', 'better-external-links' ) );
-		$countdown = absint( wzbel_get_option( 'redirect_countdown', 5 ) );
+		$message   = (string) wzlw_get_option( 'redirect_message', __( 'You are being redirected to an external site.', 'webberzone-link-warnings' ) );
+		$countdown = absint( wzlw_get_option( 'redirect_countdown', 5 ) );
 
 		// Parse destination for display.
 		$parsed_url = wp_parse_url( $destination );
@@ -172,7 +172,7 @@ class Redirect_Handler {
 	 * @since 1.0.0
 	 */
 	public function enqueue_redirect_assets() {
-		if ( ! get_query_var( 'wz_bel_redirect' ) ) {
+		if ( ! get_query_var( 'wzlw_redirect' ) ) {
 			return;
 		}
 
@@ -180,29 +180,29 @@ class Redirect_Handler {
 		$min_suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 		wp_enqueue_style(
-			'wz-bel-redirect',
-			WZ_BEL_PLUGIN_URL . 'includes/assets/css/redirect' . $rtl_suffix . $min_suffix . '.css',
+			'wzlw-redirect',
+			WZLW_PLUGIN_URL . 'includes/assets/css/redirect' . $rtl_suffix . $min_suffix . '.css',
 			array(),
-			WZ_BEL_VERSION
+			WZLW_VERSION
 		);
 
 		wp_enqueue_script(
-			'wz-bel-redirect',
-			WZ_BEL_PLUGIN_URL . 'includes/assets/js/redirect' . $min_suffix . '.js',
+			'wzlw-redirect',
+			WZLW_PLUGIN_URL . 'includes/assets/js/redirect' . $min_suffix . '.js',
 			array(),
-			WZ_BEL_VERSION,
+			WZLW_VERSION,
 			true
 		);
 
 		// Pass destination URL to script.
 		$destination = isset( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$settings  = wzbel_get_settings();
+		$settings  = wzlw_get_settings();
 		$countdown = isset( $settings['redirect_countdown'] ) ? absint( $settings['redirect_countdown'] ) : 5;
 
 		wp_localize_script(
-			'wz-bel-redirect',
-			'wzBelRedirect',
+			'wzlw-redirect',
+			'wzlwRedirect',
 			array(
 				'destination' => $destination,
 				'countdown'   => $countdown,

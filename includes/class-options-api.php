@@ -1,13 +1,13 @@
 <?php
 /**
- * Better External Links Options API.
+ * WebberZone Link Warnings Options API.
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -26,7 +26,7 @@ class Options_API {
 	 * @since 1.0.0
 	 * @var string
 	 */
-	const SETTINGS_OPTION = 'wz_bel_settings';
+	const SETTINGS_OPTION = 'wzlw_settings';
 
 	/**
 	 * Filter prefix.
@@ -34,7 +34,7 @@ class Options_API {
 	 * @since 1.0.0
 	 * @var string
 	 */
-	const FILTER_PREFIX = 'wz_bel';
+	const FILTER_PREFIX = 'wzlw';
 
 	/**
 	 * Settings array.
@@ -50,7 +50,7 @@ class Options_API {
 	 * Retrieves all plugin settings
 	 *
 	 * @since 1.0.0
-	 * @return array Better External Links settings
+	 * @return array WebberZone Link Warnings settings
 	 */
 	public static function get_settings() {
 		$settings = get_option( self::SETTINGS_OPTION, array() );
@@ -183,7 +183,7 @@ class Options_API {
 	/**
 	 * Remove an option
 	 *
-	 * Removes a Better External Links setting value in both the db and the static variable.
+	 * Removes a WebberZone Link Warnings setting value in both the db and the static variable.
 	 *
 	 * @since 1.0.0
 	 *

@@ -1,8 +1,8 @@
 <?php
 /**
- * Better External Links Options API.
+ * WebberZone Link Warnings Options API.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
 // If this file is called directly, abort.
@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // Include the Options_API class if not already loaded.
-if ( ! class_exists( '\WebberZone\Better_External_Links\Options_API' ) ) {
+if ( ! class_exists( '\WebberZone\Link_Warnings\Options_API' ) ) {
 	require_once __DIR__ . '/class-options-api.php';
 }
 
@@ -23,8 +23,8 @@ if ( ! class_exists( '\WebberZone\Better_External_Links\Options_API' ) ) {
  * @since 1.0.0
  * @return array Settings
  */
-function wzbel_get_settings() {
-	return \WebberZone\Better_External_Links\Options_API::get_settings();
+function wzlw_get_settings() {
+	return \WebberZone\Link_Warnings\Options_API::get_settings();
 }
 
 /**
@@ -39,8 +39,8 @@ function wzbel_get_settings() {
  *
  * @return mixed The option value or the default value if the option does not exist.
  */
-function wzbel_get_option( $key = '', $default_value = null ) {
-	return \WebberZone\Better_External_Links\Options_API::get_option( $key, $default_value );
+function wzlw_get_option( $key = '', $default_value = null ) {
+	return \WebberZone\Link_Warnings\Options_API::get_option( $key, $default_value );
 }
 
 /**
@@ -48,7 +48,7 @@ function wzbel_get_option( $key = '', $default_value = null ) {
  *
  * Updates a setting value in both the db and the global variable.
  * Warning: Passing in an empty, false or null string value will remove
- *        the key from the wz_bel_settings array.
+ *        the key from the wzlw_settings array.
  *
  * @since 1.0.0
  *
@@ -56,8 +56,8 @@ function wzbel_get_option( $key = '', $default_value = null ) {
  * @param  string|bool|int $value The value to set the key to.
  * @return boolean   True if updated, false if not.
  */
-function wzbel_update_option( $key = '', $value = false ) {
-	return \WebberZone\Better_External_Links\Options_API::update_option( $key, $value );
+function wzlw_update_option( $key = '', $value = false ) {
+	return \WebberZone\Link_Warnings\Options_API::update_option( $key, $value );
 }
 
 /**
@@ -70,8 +70,8 @@ function wzbel_update_option( $key = '', $value = false ) {
  * @param  string $key The Key to update.
  * @return boolean   True if updated, false if not.
  */
-function wzbel_delete_option( $key = '' ) {
-	return \WebberZone\Better_External_Links\Options_API::delete_option( $key );
+function wzlw_delete_option( $key = '' ) {
+	return \WebberZone\Link_Warnings\Options_API::delete_option( $key );
 }
 
 /**
@@ -81,8 +81,8 @@ function wzbel_delete_option( $key = '' ) {
  *
  * @return array Default settings
  */
-function wzbel_settings_defaults() {
-	return \WebberZone\Better_External_Links\Options_API::get_settings_defaults();
+function wzlw_settings_defaults() {
+	return \WebberZone\Link_Warnings\Options_API::get_settings_defaults();
 }
 
 /**
@@ -93,8 +93,8 @@ function wzbel_settings_defaults() {
  * @param string $key Key of the option to fetch.
  * @return mixed
  */
-function wzbel_get_default_option( $key = '' ) {
-	return \WebberZone\Better_External_Links\Options_API::get_default_option( $key );
+function wzlw_get_default_option( $key = '' ) {
+	return \WebberZone\Link_Warnings\Options_API::get_default_option( $key );
 }
 
 /**
@@ -103,8 +103,8 @@ function wzbel_get_default_option( $key = '' ) {
  * @since 1.0.0
  * @return bool Success status.
  */
-function wzbel_settings_reset() {
-	return \WebberZone\Better_External_Links\Options_API::reset_settings();
+function wzlw_settings_reset() {
+	return \WebberZone\Link_Warnings\Options_API::reset_settings();
 }
 
 /**
@@ -117,6 +117,6 @@ function wzbel_settings_reset() {
  * @param bool  $autoload Whether to autoload the option. Default true.
  * @return bool True if settings were updated, false otherwise.
  */
-function wzbel_update_settings( array $settings, bool $merge = true, bool $autoload = true ) {
-	return \WebberZone\Better_External_Links\Options_API::update_settings( $settings, $merge, $autoload );
+function wzlw_update_settings( array $settings, bool $merge = true, bool $autoload = true ) {
+	return \WebberZone\Link_Warnings\Options_API::update_settings( $settings, $merge, $autoload );
 }

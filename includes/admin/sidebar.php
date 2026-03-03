@@ -2,7 +2,7 @@
 /**
  * Sidebar
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
 // Exit if accessed directly.
@@ -13,33 +13,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="postbox-container">
 	<div id="qlinksdiv" class="postbox meta-box-sortables">
-		<h2 class="metabox-holder"><span><?php esc_html_e( 'Quick links', 'better-external-links' ); ?></span></h2>
+		<h2 class="metabox-holder"><span><?php esc_html_e( 'Quick links', 'webberzone-link-warnings' ); ?></span></h2>
 
 		<div class="inside">
 			<div id="quick-links">
 				<ul class="subsub">
 					<li>
-						<a href="https://webberzone.com/plugins/better-external-links/" target="_blank"><?php esc_html_e( 'Better External Links homepage', 'better-external-links' ); ?></a>
+						<a href="https://webberzone.com/plugins/webberzone-link-warnings/" target="_blank"><?php esc_html_e( 'WebberZone Link Warnings homepage', 'webberzone-link-warnings' ); ?></a>
 					</li>
 
 					<li>
-						<a href="https://webberzone.com/support/product/better-external-links/" target="_blank"><?php esc_html_e( 'Knowledge Base', 'better-external-links' ); ?></a>
+						<a href="https://webberzone.com/support/product/webberzone-link-warnings/" target="_blank"><?php esc_html_e( 'Knowledge Base', 'webberzone-link-warnings' ); ?></a>
 					</li>
 
 					<li>
-						<a href="https://wordpress.org/support/plugin/better-external-links/" target="_blank"><?php esc_html_e( 'Support', 'better-external-links' ); ?></a>
+						<a href="https://wordpress.org/support/plugin/webberzone-link-warnings/" target="_blank"><?php esc_html_e( 'Support', 'webberzone-link-warnings' ); ?></a>
 					</li>
 
 					<li>
-						<a href="https://wordpress.org/support/plugin/better-external-links/reviews/" target="_blank"><?php esc_html_e( 'Reviews', 'better-external-links' ); ?></a>
+						<a href="https://wordpress.org/support/plugin/webberzone-link-warnings/reviews/" target="_blank"><?php esc_html_e( 'Reviews', 'webberzone-link-warnings' ); ?></a>
 					</li>
 
 					<li>
-						<a href="https://github.com/webberzone/better-external-links" target="_blank"><?php esc_html_e( 'Github repository', 'better-external-links' ); ?></a>
+						<a href="https://github.com/WebberZone/webberzone-link-warnings" target="_blank"><?php esc_html_e( 'Github repository', 'webberzone-link-warnings' ); ?></a>
 					</li>
 
 					<li>
-						<a href="https://ajaydsouza.com/" target="_blank"><?php esc_html_e( "Ajay's blog", 'better-external-links' ); ?></a>
+						<a href="https://ajaydsouza.com/" target="_blank"><?php esc_html_e( "Ajay's blog", 'webberzone-link-warnings' ); ?></a>
 					</li>
 				</ul>
 			</div>
@@ -47,19 +47,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div><!-- /.postbox -->
 
 	<div id="pluginsdiv" class="postbox meta-box-sortables">
-		<h2 class="metabox-holder"><span><?php esc_html_e( 'WebberZone plugins', 'better-external-links' ); ?></span></h2>
+		<h2 class="metabox-holder"><span><?php esc_html_e( 'WebberZone plugins', 'webberzone-link-warnings' ); ?></span></h2>
 
 		<div class="inside">
 			<div id="quick-links">
 				<ul class="subsub">
-					<li><a href="https://webberzone.com/plugins/top-10/" target="_blank"><?php esc_html_e( 'Top 10', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/contextual-related-posts/" target="_blank"><?php esc_html_e( 'Contextual Related Posts', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/better-search/" target="_blank"><?php esc_html_e( 'Better Search', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/knowledgebase/" target="_blank"><?php esc_html_e( 'Knowledge Base', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/add-to-all/" target="_blank"><?php esc_html_e( 'Snippetz', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/webberzone-followed-posts/" target="_blank"><?php esc_html_e( 'Followed Posts', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/popular-authors/" target="_blank"><?php esc_html_e( 'Popular Authors', 'better-external-links' ); ?></a></li>
-					<li><a href="https://webberzone.com/plugins/autoclose/" target="_blank"><?php esc_html_e( 'Auto Close', 'better-external-links' ); ?></a></li>
+					<li><a href="https://webberzone.com/plugins/top-10/" target="_blank">Top 10</a></li>
+					<li><a href="https://webberzone.com/plugins/contextual-related-posts/" target="_blank">Contextual Related Posts</a></li>
+					<li><a href="https://webberzone.com/plugins/better-search/" target="_blank">Better Search</a></li>
+					<li><a href="https://webberzone.com/plugins/knowledgebase/" target="_blank">Knowledge Base</a></li>
+					<li><a href="https://webberzone.com/plugins/add-to-all/" target="_blank">WebberZone Snippetz</a></li>
+					<li><a href="https://webberzone.com/webberzone-followed-posts/" target="_blank">Followed Posts</a></li>
+					<li><a href="https://webberzone.com/plugins/popular-authors/" target="_blank">Popular Authors</a></li>
+					<li><a href="https://webberzone.com/plugins/autoclose/" target="_blank">Auto-Close</a></li>
 				</ul>
 			</div>
 		</div><!-- /.inside -->
@@ -69,11 +69,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="postbox-container">
 	<div id="followdiv" class="postbox meta-box-sortables">
-		<h2 class="metabox-holder"><span><?php esc_html_e( 'Follow us', 'better-external-links' ); ?></span></h2>
+		<h2 class="metabox-holder"><span><?php esc_html_e( 'Follow us', 'webberzone-link-warnings' ); ?></span></h2>
 
 		<div class="inside" style="text-align: center">
-			<a href="https://x.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZ_BEL_PLUGIN_URL . 'includes/admin/images/x.png' ); ?>" width="100" height="100" alt="X (Twitter)"></a>
-			<a href="https://facebook.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZ_BEL_PLUGIN_URL . 'includes/admin/images/fb.png' ); ?>" width="100" height="100" alt="Facebook"></a>
+			<a href="https://x.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/x.png' ); ?>" width="100" height="100" alt="X (Twitter)"></a>
+			<a href="https://facebook.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/fb.png' ); ?>" width="100" height="100" alt="Facebook"></a>
 		</div><!-- /.inside -->
 	</div><!-- /.postbox -->
 </div>

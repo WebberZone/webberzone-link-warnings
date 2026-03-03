@@ -4,18 +4,18 @@
  *
  * Processes content to add accessibility features to links.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 /**
  * Content Processor class.
@@ -70,7 +70,7 @@ class Content_Processor {
 		}
 
 		// Load fresh settings on each content processing.
-		$this->settings = wzbel_get_settings();
+		$this->settings = wzlw_get_settings();
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor = new \WP_HTML_Tag_Processor( $content );
@@ -96,9 +96,9 @@ class Content_Processor {
 			// Add data attributes for JavaScript handling.
 			if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
-					$processor->set_attribute( 'data-wz-bel-external', 'true' );
-					$processor->set_attribute( 'data-wz-bel-url', esc_url( $href ) );
-					$processor->set_attribute( 'data-wz-bel-redirect-url', esc_url( Redirect_Handler::get_redirect_url( $href ) ) );
+					$processor->set_attribute( 'data-wzlw-external', 'true' );
+					$processor->set_attribute( 'data-wzlw-url', esc_url( $href ) );
+					$processor->set_attribute( 'data-wzlw-redirect-url', esc_url( Redirect_Handler::get_redirect_url( $href ) ) );
 				}
 			}
 
@@ -110,9 +110,9 @@ class Content_Processor {
 
 			// Add class for styling.
 			$existing_class = $processor->get_attribute( 'class' );
-			$new_class      = trim( $existing_class . ' wz-bel-processed' );
+			$new_class      = trim( $existing_class . ' wzlw-processed' );
 			if ( $is_external ) {
-				$new_class .= ' wz-bel-external';
+				$new_class .= ' wzlw-external';
 			}
 			$processor->set_attribute( 'class', $new_class );
 		}
@@ -136,7 +136,7 @@ class Content_Processor {
 	 */
 	private function add_visual_indicators( $content ) {
 		// Use regex to find processed links and add indicators before closing tag.
-		$pattern = '/<a\s+[^>]*class="[^"]*wz-bel-processed[^"]*"[^>]*>(.*?)<\/a>/is';
+		$pattern = '/<a\s+[^>]*class="[^"]*wzlw-processed[^"]*"[^>]*>(.*?)<\/a>/is';
 
 		$content = preg_replace_callback(
 			$pattern,
@@ -188,12 +188,12 @@ class Content_Processor {
 
 		// Add visual elements.
 		if ( 'icon' === $visual || 'both' === $visual ) {
-			$indicator .= '<span class="wz-bel-icon" aria-hidden="true">↗</span>';
+			$indicator .= '<span class="wzlw-icon" aria-hidden="true">↗</span>';
 		}
 
 		if ( 'text' === $visual || 'both' === $visual ) {
-			$text       = isset( $this->settings['indicator_text'] ) ? $this->settings['indicator_text'] : __( '(opens in new window)', 'better-external-links' );
-			$indicator .= '<span class="wz-bel-text" aria-hidden="true">' . esc_html( $text ) . '</span>';
+			$text       = isset( $this->settings['indicator_text'] ) ? $this->settings['indicator_text'] : __( '(opens in new window)', 'webberzone-link-warnings' );
+			$indicator .= '<span class="wzlw-text" aria-hidden="true">' . esc_html( $text ) . '</span>';
 		}
 
 		return $indicator;
@@ -206,7 +206,7 @@ class Content_Processor {
 	 * @return string Screen reader HTML.
 	 */
 	private function get_screen_reader_text() {
-		$text = isset( $this->settings['screen_reader_text'] ) ? $this->settings['screen_reader_text'] : __( 'Opens in a new window', 'better-external-links' );
+		$text = isset( $this->settings['screen_reader_text'] ) ? $this->settings['screen_reader_text'] : __( 'Opens in a new window', 'webberzone-link-warnings' );
 		return '<span class="screen-reader-text">' . esc_html( $text ) . '</span>';
 	}
 
@@ -218,7 +218,7 @@ class Content_Processor {
 	 * @return string|null ARIA label.
 	 */
 	private function get_aria_label( $existing_label ) {
-		$screen_reader_text = $this->settings['screen_reader_text'] ?? __( 'Opens in a new window', 'better-external-links' );
+		$screen_reader_text = $this->settings['screen_reader_text'] ?? __( 'Opens in a new window', 'webberzone-link-warnings' );
 
 		if ( $existing_label ) {
 			return $existing_label . ', ' . $screen_reader_text;
@@ -269,7 +269,7 @@ class Content_Processor {
 		 * @param array  $excluded_domains Array of excluded domains.
 		 * @param string $link_host        The link host being checked.
 		 */
-		$excluded_domains = apply_filters( 'wz_bel_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$excluded_domains = apply_filters( 'wzlw_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		foreach ( $excluded_domains as $domain ) {
 			if ( false !== strpos( $link_host, $domain ) ) {
@@ -314,7 +314,7 @@ class Content_Processor {
 			return false;
 		}
 
-		$settings = wzbel_get_settings();
+		$settings = wzlw_get_settings();
 		$enabled  = $settings['enabled_post_types'] ?? array( 'post', 'page' );
 
 		if ( is_string( $enabled ) ) {

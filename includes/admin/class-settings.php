@@ -4,12 +4,12 @@
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -74,13 +74,13 @@ class Settings {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->settings_key = 'wz_bel_settings';
-		self::$prefix       = 'wz_bel';
-		$this->menu_slug    = 'wz-bel-settings';
+		$this->settings_key = 'wzlw_settings';
+		self::$prefix       = 'wzlw';
+		$this->menu_slug    = 'wzlw-settings';
 
 		Hook_Registry::add_action( 'admin_menu', array( $this, 'initialise_settings' ) );
 		Hook_Registry::add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 11, 2 );
-		Hook_Registry::add_filter( 'plugin_action_links_' . plugin_basename( WZ_BEL_PLUGIN_FILE ), array( $this, 'plugin_actions_links' ) );
+		Hook_Registry::add_filter( 'plugin_action_links_' . plugin_basename( WZLW_PLUGIN_FILE ), array( $this, 'plugin_actions_links' ) );
 
 		Hook_Registry::add_filter( self::$prefix . '_settings_sanitize', array( $this, 'change_settings_on_save' ), 99 );
 	}
@@ -178,17 +178,17 @@ class Settings {
 	 */
 	public function get_translation_strings() {
 		$strings = array(
-			'page_title'           => esc_html__( 'Better External Links Settings', 'better-external-links' ),
-			'menu_title'           => esc_html__( 'Settings', 'better-external-links' ),
-			'page_header'          => esc_html__( 'Better External Links Settings', 'better-external-links' ),
-			'reset_message'        => esc_html__( 'Settings have been reset to their default values. Reload this page to view the updated settings.', 'better-external-links' ),
-			'success_message'      => esc_html__( 'Settings updated.', 'better-external-links' ),
-			'save_changes'         => esc_html__( 'Save Changes', 'better-external-links' ),
-			'reset_settings'       => esc_html__( 'Reset all settings', 'better-external-links' ),
-			'reset_button_confirm' => esc_html__( 'Do you really want to reset all these settings to their default values?', 'better-external-links' ),
-			'checkbox_modified'    => esc_html__( 'Modified from default setting', 'better-external-links' ),
-			'button_label'         => esc_html__( 'Choose File', 'better-external-links' ),
-			'previous_saved'       => esc_html__( 'Previously saved', 'better-external-links' ),
+			'page_title'           => esc_html__( 'WebberZone Link Warnings Settings', 'webberzone-link-warnings' ),
+			'menu_title'           => esc_html__( 'Settings', 'webberzone-link-warnings' ),
+			'page_header'          => esc_html__( 'WebberZone Link Warnings Settings', 'webberzone-link-warnings' ),
+			'reset_message'        => esc_html__( 'Settings have been reset to their default values. Reload this page to view the updated settings.', 'webberzone-link-warnings' ),
+			'success_message'      => esc_html__( 'Settings updated.', 'webberzone-link-warnings' ),
+			'save_changes'         => esc_html__( 'Save Changes', 'webberzone-link-warnings' ),
+			'reset_settings'       => esc_html__( 'Reset all settings', 'webberzone-link-warnings' ),
+			'reset_button_confirm' => esc_html__( 'Do you really want to reset all these settings to their default values?', 'webberzone-link-warnings' ),
+			'checkbox_modified'    => esc_html__( 'Modified from default setting', 'webberzone-link-warnings' ),
+			'button_label'         => esc_html__( 'Choose File', 'webberzone-link-warnings' ),
+			'previous_saved'       => esc_html__( 'Previously saved', 'webberzone-link-warnings' ),
 		);
 
 		return apply_filters( self::$prefix . '_translation_strings', $strings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
@@ -206,8 +206,8 @@ class Settings {
 			'settings_page' => true,
 			'type'          => 'submenu',
 			'parent_slug'   => 'options-general.php',
-			'page_title'    => esc_html__( 'Better External Links Settings', 'better-external-links' ),
-			'menu_title'    => esc_html__( 'Better External Links', 'better-external-links' ),
+			'page_title'    => esc_html__( 'WebberZone Link Warnings Settings', 'webberzone-link-warnings' ),
+			'menu_title'    => esc_html__( 'WebberZone Link Warnings', 'webberzone-link-warnings' ),
 			'menu_slug'     => $this->menu_slug,
 		);
 
@@ -223,9 +223,9 @@ class Settings {
 	 */
 	public static function get_settings_sections() {
 		$settings_sections = array(
-			'general'  => esc_html__( 'General', 'better-external-links' ),
-			'display'  => esc_html__( 'Display', 'better-external-links' ),
-			'advanced' => esc_html__( 'Advanced', 'better-external-links' ),
+			'general'  => esc_html__( 'General', 'webberzone-link-warnings' ),
+			'display'  => esc_html__( 'Display', 'webberzone-link-warnings' ),
+			'advanced' => esc_html__( 'Advanced', 'webberzone-link-warnings' ),
 		);
 
 		return apply_filters( self::$prefix . '_settings_sections', $settings_sections ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
@@ -259,33 +259,33 @@ class Settings {
 		$settings = array(
 			'warning_method'     => array(
 				'id'      => 'warning_method',
-				'name'    => esc_html__( 'Warning Method', 'better-external-links' ),
-				'desc'    => esc_html__( 'Choose how to warn users about external links.', 'better-external-links' ),
+				'name'    => esc_html__( 'Warning Method', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose how to warn users about external links.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => 'inline_modal',
 				'options' => array(
-					'inline'          => esc_html__( 'Inline indicators only', 'better-external-links' ),
-					'modal'           => esc_html__( 'Modal dialog', 'better-external-links' ),
-					'redirect'        => esc_html__( 'Redirect screen', 'better-external-links' ),
-					'inline_modal'    => esc_html__( 'Inline indicators + Modal dialog', 'better-external-links' ),
-					'inline_redirect' => esc_html__( 'Inline indicators + Redirect screen', 'better-external-links' ),
+					'inline'          => esc_html__( 'Inline indicators only', 'webberzone-link-warnings' ),
+					'modal'           => esc_html__( 'Modal dialog', 'webberzone-link-warnings' ),
+					'redirect'        => esc_html__( 'Redirect screen', 'webberzone-link-warnings' ),
+					'inline_modal'    => esc_html__( 'Inline indicators + Modal dialog', 'webberzone-link-warnings' ),
+					'inline_redirect' => esc_html__( 'Inline indicators + Redirect screen', 'webberzone-link-warnings' ),
 				),
 			),
 			'scope'              => array(
 				'id'      => 'scope',
-				'name'    => esc_html__( 'Link Scope', 'better-external-links' ),
-				'desc'    => esc_html__( 'Which links should be processed.', 'better-external-links' ),
+				'name'    => esc_html__( 'Link Scope', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Which links should be processed.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => 'external',
 				'options' => array(
-					'external' => esc_html__( 'External links only', 'better-external-links' ),
-					'both'     => esc_html__( 'External links and all target="_blank" links', 'better-external-links' ),
+					'external' => esc_html__( 'External links only', 'webberzone-link-warnings' ),
+					'both'     => esc_html__( 'External links and all target="_blank" links', 'webberzone-link-warnings' ),
 				),
 			),
 			'enabled_post_types' => array(
 				'id'      => 'enabled_post_types',
-				'name'    => esc_html__( 'Enabled Post Types', 'better-external-links' ),
-				'desc'    => esc_html__( 'Select post types where link warnings should be enabled.', 'better-external-links' ),
+				'name'    => esc_html__( 'Enabled Post Types', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Select post types where link warnings should be enabled.', 'webberzone-link-warnings' ),
 				'type'    => 'posttypes',
 				'default' => 'post,page',
 				'options' => 'public',
@@ -307,92 +307,92 @@ class Settings {
 			// Inline Indicators section.
 			'inline_header'       => array(
 				'id'   => 'inline_header',
-				'name' => '<h3>' . esc_html__( 'Inline Indicators', 'better-external-links' ) . '</h3>',
+				'name' => '<h3>' . esc_html__( 'Inline Indicators', 'webberzone-link-warnings' ) . '</h3>',
 				'desc' => '',
 				'type' => 'header',
 			),
 			'visual_indicator'    => array(
 				'id'      => 'visual_indicator',
-				'name'    => esc_html__( 'Visual Indicator', 'better-external-links' ),
-				'desc'    => esc_html__( 'Choose what visual indicator to display.', 'better-external-links' ),
+				'name'    => esc_html__( 'Visual Indicator', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose what visual indicator to display.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => 'icon',
 				'options' => array(
-					'icon' => esc_html__( 'Icon (↗)', 'better-external-links' ),
-					'text' => esc_html__( 'Text', 'better-external-links' ),
-					'both' => esc_html__( 'Icon + text', 'better-external-links' ),
-					'none' => esc_html__( 'None (screen reader only)', 'better-external-links' ),
+					'icon' => esc_html__( 'Icon (↗)', 'webberzone-link-warnings' ),
+					'text' => esc_html__( 'Text', 'webberzone-link-warnings' ),
+					'both' => esc_html__( 'Icon + text', 'webberzone-link-warnings' ),
+					'none' => esc_html__( 'None (screen reader only)', 'webberzone-link-warnings' ),
 				),
 			),
 			'indicator_text'      => array(
 				'id'      => 'indicator_text',
-				'name'    => esc_html__( 'Indicator Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Text displayed next to links (when text indicator is enabled).', 'better-external-links' ),
+				'name'    => esc_html__( 'Indicator Text', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Text displayed next to links (when text indicator is enabled).', 'webberzone-link-warnings' ),
 				'type'    => 'text',
-				'default' => __( '(opens in new window)', 'better-external-links' ),
+				'default' => __( '(opens in new window)', 'webberzone-link-warnings' ),
 			),
 			'screen_reader_text'  => array(
 				'id'      => 'screen_reader_text',
-				'name'    => esc_html__( 'Screen Reader Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Hidden text for screen readers.', 'better-external-links' ),
+				'name'    => esc_html__( 'Screen Reader Text', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Hidden text for screen readers.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
-				'default' => __( 'Opens in a new window', 'better-external-links' ),
+				'default' => __( 'Opens in a new window', 'webberzone-link-warnings' ),
 			),
 
 			// Modal Dialog section.
 			'modal_header'        => array(
 				'id'   => 'modal_header',
-				'name' => '<h3>' . esc_html__( 'Modal Dialog', 'better-external-links' ) . '</h3>',
+				'name' => '<h3>' . esc_html__( 'Modal Dialog', 'webberzone-link-warnings' ) . '</h3>',
 				'desc' => '',
 				'type' => 'header',
 			),
 			'modal_title'         => array(
 				'id'      => 'modal_title',
-				'name'    => esc_html__( 'Modal Title', 'better-external-links' ),
-				'desc'    => esc_html__( 'Title shown in the modal dialog.', 'better-external-links' ),
+				'name'    => esc_html__( 'Modal Title', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Title shown in the modal dialog.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
-				'default' => __( 'You are leaving this site', 'better-external-links' ),
+				'default' => __( 'You are leaving this site', 'webberzone-link-warnings' ),
 			),
 			'modal_message'       => array(
 				'id'      => 'modal_message',
-				'name'    => esc_html__( 'Modal Message', 'better-external-links' ),
-				'desc'    => esc_html__( 'Message shown in the modal dialog.', 'better-external-links' ),
+				'name'    => esc_html__( 'Modal Message', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Message shown in the modal dialog.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
-				'default' => __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
+				'default' => __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
 			),
 			'modal_continue_text' => array(
 				'id'      => 'modal_continue_text',
-				'name'    => esc_html__( 'Continue Button Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Text for the continue button.', 'better-external-links' ),
+				'name'    => esc_html__( 'Continue Button Text', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Text for the continue button.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
-				'default' => __( 'Continue', 'better-external-links' ),
+				'default' => __( 'Continue', 'webberzone-link-warnings' ),
 			),
 			'modal_cancel_text'   => array(
 				'id'      => 'modal_cancel_text',
-				'name'    => esc_html__( 'Cancel Button Text', 'better-external-links' ),
-				'desc'    => esc_html__( 'Text for the cancel button.', 'better-external-links' ),
+				'name'    => esc_html__( 'Cancel Button Text', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Text for the cancel button.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
-				'default' => __( 'Cancel', 'better-external-links' ),
+				'default' => __( 'Cancel', 'webberzone-link-warnings' ),
 			),
 
 			// Redirect Screen section.
 			'redirect_header'     => array(
 				'id'   => 'redirect_header',
-				'name' => '<h3>' . esc_html__( 'Redirect Screen', 'better-external-links' ) . '</h3>',
+				'name' => '<h3>' . esc_html__( 'Redirect Screen', 'webberzone-link-warnings' ) . '</h3>',
 				'desc' => '',
 				'type' => 'header',
 			),
 			'redirect_message'    => array(
 				'id'      => 'redirect_message',
-				'name'    => esc_html__( 'Redirect Message', 'better-external-links' ),
-				'desc'    => esc_html__( 'Message shown on the redirect page.', 'better-external-links' ),
+				'name'    => esc_html__( 'Redirect Message', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Message shown on the redirect page.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
-				'default' => __( 'You are being redirected to an external site.', 'better-external-links' ),
+				'default' => __( 'You are being redirected to an external site.', 'webberzone-link-warnings' ),
 			),
 			'redirect_countdown'  => array(
 				'id'      => 'redirect_countdown',
-				'name'    => esc_html__( 'Redirect Countdown', 'better-external-links' ),
-				'desc'    => esc_html__( 'Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect.', 'better-external-links' ),
+				'name'    => esc_html__( 'Redirect Countdown', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect.', 'webberzone-link-warnings' ),
 				'type'    => 'number',
 				'default' => 5,
 				'min'     => 0,
@@ -422,8 +422,8 @@ class Settings {
 		$settings = array(
 			'excluded_domains' => array(
 				'id'      => 'excluded_domains',
-				'name'    => esc_html__( 'Excluded Domains', 'better-external-links' ),
-				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'better-external-links' ),
+				'name'    => esc_html__( 'Excluded Domains', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
 				'default' => '',
 			),
@@ -456,9 +456,9 @@ class Settings {
 	 */
 	public function get_help_sidebar() {
 		$help_sidebar =
-			'<p><strong>' . esc_html__( 'For more information:', 'better-external-links' ) . '</strong></p>' .
-			'<p><a href="https://webberzone.com/plugins/better-external-links/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Plugin Homepage', 'better-external-links' ) . '</a></p>' .
-			'<p><a href="https://webberzone.com/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'better-external-links' ) . '</a></p>';
+			'<p><strong>' . esc_html__( 'For more information:', 'webberzone-link-warnings' ) . '</strong></p>' .
+			'<p><a href="https://webberzone.com/plugins/webberzone-link-warnings/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Plugin Homepage', 'webberzone-link-warnings' ) . '</a></p>' .
+			'<p><a href="https://webberzone.com/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'webberzone-link-warnings' ) . '</a></p>';
 
 		return apply_filters( self::$prefix . '_settings_help_sidebar', $help_sidebar ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	}
@@ -473,11 +473,11 @@ class Settings {
 	public function get_help_tabs() {
 		$help_tabs = array(
 			array(
-				'id'      => 'wz-bel-settings-general',
-				'title'   => esc_html__( 'General', 'better-external-links' ),
+				'id'      => 'wzlw-settings-general',
+				'title'   => esc_html__( 'General', 'webberzone-link-warnings' ),
 				'content' =>
-					'<p>' . esc_html__( 'Configure the general behavior of the plugin.', 'better-external-links' ) . '</p>' .
-					'<p>' . esc_html__( 'Choose your preferred warning method and which links should be processed.', 'better-external-links' ) . '</p>',
+					'<p>' . esc_html__( 'Configure the general behavior of the plugin.', 'webberzone-link-warnings' ) . '</p>' .
+					'<p>' . esc_html__( 'Choose your preferred warning method and which links should be processed.', 'webberzone-link-warnings' ) . '</p>',
 			),
 		);
 
@@ -493,10 +493,10 @@ class Settings {
 	 */
 	public function get_admin_footer_text() {
 		$footer_text = sprintf(
-			/* translators: 1: Better External Links link, 2: Plugin rating link */
-			__( 'Thank you for using <a href="%1$s" target="_blank" rel="noopener noreferrer">Better External Links</a>! Please <a href="%2$s" target="_blank" rel="noopener noreferrer">rate us</a> on WordPress.org', 'better-external-links' ),
-			'https://webberzone.com/plugins/better-external-links/',
-			'https://wordpress.org/support/plugin/better-external-links/reviews/#new-post'
+			/* translators: 1: WebberZone Link Warnings link, 2: Plugin rating link */
+			__( 'Thank you for using <a href="%1$s" target="_blank" rel="noopener noreferrer">WebberZone Link Warnings</a>! Please <a href="%2$s" target="_blank" rel="noopener noreferrer">rate us</a> on WordPress.org', 'webberzone-link-warnings' ),
+			'https://webberzone.com/plugins/webberzone-link-warnings/',
+			'https://wordpress.org/support/plugin/webberzone-link-warnings/reviews/#new-post'
 		);
 
 		return $footer_text;
@@ -513,7 +513,7 @@ class Settings {
 	public function plugin_actions_links( $links ) {
 		return array_merge(
 			array(
-				'settings' => '<a href="' . admin_url( 'options-general.php?page=' . $this->menu_slug ) . '">' . esc_html__( 'Settings', 'better-external-links' ) . '</a>',
+				'settings' => '<a href="' . admin_url( 'options-general.php?page=' . $this->menu_slug ) . '">' . esc_html__( 'Settings', 'webberzone-link-warnings' ) . '</a>',
 			),
 			$links
 		);
@@ -529,10 +529,10 @@ class Settings {
 	 * @return array Modified array of links.
 	 */
 	public function plugin_row_meta( $links, $file ) {
-		if ( false !== strpos( $file, 'better-external-links.php' ) ) {
+		if ( false !== strpos( $file, 'webberzone-link-warnings.php' ) ) {
 			$new_links = array(
-				'support' => '<a href="https://webberzone.com/support/" target="_blank">' . esc_html__( 'Support', 'better-external-links' ) . '</a>',
-				'donate'  => '<a href="https://webberzone.com/donate/" target="_blank">' . esc_html__( 'Donate', 'better-external-links' ) . '</a>',
+				'support' => '<a href="https://webberzone.com/support/" target="_blank">' . esc_html__( 'Support', 'webberzone-link-warnings' ) . '</a>',
+				'donate'  => '<a href="https://webberzone.com/donate/" target="_blank">' . esc_html__( 'Donate', 'webberzone-link-warnings' ) . '</a>',
 			);
 
 			$links = array_merge( $links, $new_links );

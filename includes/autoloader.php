@@ -1,16 +1,16 @@
 <?php
 /**
- * Autoloads classes from the WebberZone\Better_External_Links namespace.
+ * Autoloads classes from the WebberZone\Link_Warnings namespace.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Autoloader for WebberZone\Better_External_Links classes.
+ * Autoloader for WebberZone\Link_Warnings classes.
  *
  * @param string $class_name The name of the class to load.
  * @return void

@@ -7,7 +7,7 @@
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
 // If uninstall not called from WordPress, then exit.
@@ -20,7 +20,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  *
  * @since 1.0.0
  */
-do_action( 'wz_bel_uninstall' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+do_action( 'wzlw_uninstall' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 global $wpdb;
 
@@ -36,11 +36,11 @@ if ( is_multisite() ) {
 
 	foreach ( $sites as $site ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 		switch_to_blog( (int) $site->blog_id );
-		wz_bel_delete_data();
+		wzlw_delete_data();
 		restore_current_blog();
 	}
 } else {
-	wz_bel_delete_data();
+	wzlw_delete_data();
 }
 
 /**
@@ -48,20 +48,20 @@ if ( is_multisite() ) {
  *
  * @since 1.0.0
  */
-function wz_bel_delete_data() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+function wzlw_delete_data() { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 
 	// Delete plugin settings.
-	delete_option( 'wz_bel_settings' );
+	delete_option( 'wzlw_settings' );
 
 	// Delete wizard options.
-	delete_option( 'wz_bel_show_wizard' );
-	delete_option( 'wz_bel_wizard_completed' );
-	delete_option( 'wz_bel_wizard_completed_date' );
-	delete_option( 'wz_bel_wizard_current_step' );
+	delete_option( 'wzlw_show_wizard' );
+	delete_option( 'wzlw_wizard_completed' );
+	delete_option( 'wzlw_wizard_completed_date' );
+	delete_option( 'wzlw_wizard_current_step' );
 
 	// Delete transients.
-	delete_transient( 'wz_bel_activation_redirect' );
-	delete_transient( 'wz_bel_show_wizard_activation_redirect' );
+	delete_transient( 'wzlw_activation_redirect' );
+	delete_transient( 'wzlw_show_wizard_activation_redirect' );
 
 	// Flush rewrite rules.
 	global $wp_rewrite;

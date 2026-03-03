@@ -1,18 +1,18 @@
 <?php
 /**
- * Settings Wizard for Better External Links.
+ * Settings Wizard for WebberZone Link Warnings.
  *
  * Provides a guided setup experience for new users.
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
-use WebberZone\Better_External_Links\Admin\Settings\Settings_Wizard_API;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Admin\Settings\Settings_Wizard_API;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Settings Wizard class for Better External Links.
+ * Settings Wizard class for WebberZone Link Warnings.
  *
  * @since 1.0.0
  */
@@ -40,15 +40,15 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$settings_key = 'wz_bel_settings';
-		$prefix       = 'wz_bel';
+		$settings_key = 'wzlw_settings';
+		$prefix       = 'wzlw';
 
-		$this->settings_page_url = admin_url( 'options-general.php?page=wz-bel-settings' );
+		$this->settings_page_url = admin_url( 'options-general.php?page=wzlw-settings' );
 
 		$args = array(
 			'steps'               => $this->get_wizard_steps(),
 			'translation_strings' => $this->get_translation_strings(),
-			'page_slug'           => 'wz_bel_wizard',
+			'page_slug'           => 'wzlw_wizard',
 			'hide_when_completed' => true,
 			'show_in_menu'        => false,
 			'menu_args'           => array(
@@ -63,12 +63,12 @@ class Settings_Wizard extends Settings_Wizard_API {
 	}
 
 	/**
-	 * Additional hooks specific to Better External Links.
+	 * Additional hooks specific to WebberZone Link Warnings.
 	 *
 	 * @since 1.0.0
 	 */
 	protected function additional_hooks() {
-		Hook_Registry::add_action( 'wz_bel_activate', array( $this, 'trigger_wizard_on_activation' ) );
+		Hook_Registry::add_action( 'wzlw_activate', array( $this, 'trigger_wizard_on_activation' ) );
 		Hook_Registry::add_action( 'admin_init', array( $this, 'register_wizard_notice' ) );
 	}
 
@@ -123,28 +123,28 @@ class Settings_Wizard extends Settings_Wizard_API {
 
 		$steps = array(
 			'welcome'  => array(
-				'title'       => __( 'Welcome to Better External Links', 'better-external-links' ),
-				'description' => __( 'Thank you for installing Better External Links! This wizard will help you configure the essential settings to make your external links accessible and user-friendly.', 'better-external-links' ),
+				'title'       => __( 'Welcome to WebberZone Link Warnings', 'webberzone-link-warnings' ),
+				'description' => __( 'Thank you for installing WebberZone Link Warnings! This wizard will help you configure the essential settings to make your external links accessible and user-friendly.', 'webberzone-link-warnings' ),
 				'settings'    => array(),
 			),
 			'general'  => array(
-				'title'       => __( 'General Settings', 'better-external-links' ),
-				'description' => __( 'Choose how to warn users about external links and which links should be processed.', 'better-external-links' ),
+				'title'       => __( 'General Settings', 'webberzone-link-warnings' ),
+				'description' => __( 'Choose how to warn users about external links and which links should be processed.', 'webberzone-link-warnings' ),
 				'settings'    => $this->build_step_settings( $general_keys, $all_settings ),
 			),
 			'content'  => array(
-				'title'       => __( 'Visual Indicators', 'better-external-links' ),
-				'description' => __( 'Configure visual indicators and screen reader text for accessibility.', 'better-external-links' ),
+				'title'       => __( 'Visual Indicators', 'webberzone-link-warnings' ),
+				'description' => __( 'Configure visual indicators and screen reader text for accessibility.', 'webberzone-link-warnings' ),
 				'settings'    => $this->build_step_settings( $content_keys, $all_settings ),
 			),
 			'modal'    => array(
-				'title'       => __( 'Modal Dialog', 'better-external-links' ),
-				'description' => __( 'Customize the modal dialog text and buttons.', 'better-external-links' ),
+				'title'       => __( 'Modal Dialog', 'webberzone-link-warnings' ),
+				'description' => __( 'Customize the modal dialog text and buttons.', 'webberzone-link-warnings' ),
 				'settings'    => $this->build_step_settings( $modal_keys, $all_settings ),
 			),
 			'redirect' => array(
-				'title'       => __( 'Redirect Screen', 'better-external-links' ),
-				'description' => __( 'Configure the redirect screen message.', 'better-external-links' ),
+				'title'       => __( 'Redirect Screen', 'webberzone-link-warnings' ),
+				'description' => __( 'Configure the redirect screen message.', 'webberzone-link-warnings' ),
 				'settings'    => $this->build_step_settings( $redirect_keys, $all_settings ),
 			),
 		);
@@ -154,7 +154,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 		 *
 		 * @param array $steps Wizard steps.
 		 */
-		return apply_filters( 'wz_bel_wizard_steps', $steps ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		return apply_filters( 'wzlw_wizard_steps', $steps ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	}
 
 	/**
@@ -187,17 +187,17 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 */
 	public function get_translation_strings() {
 		return array(
-			'page_title'      => __( 'Better External Links Setup Wizard', 'better-external-links' ),
-			'menu_title'      => __( 'Setup Wizard', 'better-external-links' ),
-			'next_step'       => __( 'Next Step', 'better-external-links' ),
-			'previous_step'   => __( 'Previous Step', 'better-external-links' ),
-			'finish_setup'    => __( 'Finish Setup', 'better-external-links' ),
-			'skip_wizard'     => __( 'Skip Wizard', 'better-external-links' ),
+			'page_title'      => __( 'WebberZone Link Warnings Setup Wizard', 'webberzone-link-warnings' ),
+			'menu_title'      => __( 'Setup Wizard', 'webberzone-link-warnings' ),
+			'next_step'       => __( 'Next Step', 'webberzone-link-warnings' ),
+			'previous_step'   => __( 'Previous Step', 'webberzone-link-warnings' ),
+			'finish_setup'    => __( 'Finish Setup', 'webberzone-link-warnings' ),
+			'skip_wizard'     => __( 'Skip Wizard', 'webberzone-link-warnings' ),
 			/* translators: %1$d: Current step number, %2$d: Total number of steps */
-			'step_of'         => __( 'Step %1$d of %2$d', 'better-external-links' ),
-			'wizard_complete' => __( 'Setup Complete!', 'better-external-links' ),
-			'setup_complete'  => __( 'Your Better External Links plugin has been configured successfully. Your external links are now accessible and user-friendly!', 'better-external-links' ),
-			'go_to_settings'  => __( 'Go to Settings', 'better-external-links' ),
+			'step_of'         => __( 'Step %1$d of %2$d', 'webberzone-link-warnings' ),
+			'wizard_complete' => __( 'Setup Complete!', 'webberzone-link-warnings' ),
+			'setup_complete'  => __( 'Your WebberZone Link Warnings plugin has been configured successfully. Your external links are now accessible and user-friendly!', 'webberzone-link-warnings' ),
+			'go_to_settings'  => __( 'Go to Settings', 'webberzone-link-warnings' ),
 		);
 	}
 
@@ -208,10 +208,10 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 */
 	public function trigger_wizard_on_activation() {
 		// Set a transient that will trigger the wizard on first admin page visit.
-		set_transient( 'wz_bel_show_wizard_activation_redirect', true, HOUR_IN_SECONDS );
+		set_transient( 'wzlw_show_wizard_activation_redirect', true, HOUR_IN_SECONDS );
 
 		// Also set an option for more persistent storage in multisite environments.
-		update_option( 'wz_bel_show_wizard', true );
+		update_option( 'wzlw_show_wizard', true );
 	}
 
 	/**
@@ -221,7 +221,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 	 */
 	public function register_wizard_notice() {
 		// Check if wizard should be shown.
-		$show_wizard = get_transient( 'wz_bel_show_wizard_activation_redirect' ) || get_option( 'wz_bel_show_wizard', false );
+		$show_wizard = get_transient( 'wzlw_show_wizard_activation_redirect' ) || get_option( 'wzlw_show_wizard', false );
 
 		if ( ! $show_wizard || $this->is_wizard_completed() ) {
 			return;
@@ -229,7 +229,7 @@ class Settings_Wizard extends Settings_Wizard_API {
 
 		// Check if we're already on the wizard page.
 		$page = isset( $_GET['page'] ) ? sanitize_key( $_GET['page'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( 'wz_bel_wizard' === $page ) {
+		if ( 'wzlw_wizard' === $page ) {
 			return;
 		}
 
@@ -239,10 +239,10 @@ class Settings_Wizard extends Settings_Wizard_API {
 			function () {
 				?>
 				<div class="notice notice-info is-dismissible">
-					<p><?php esc_html_e( 'Welcome to Better External Links! Would you like to run the setup wizard to configure the plugin?', 'better-external-links' ); ?></p>
+					<p><?php esc_html_e( 'Welcome to WebberZone Link Warnings! Would you like to run the setup wizard to configure the plugin?', 'webberzone-link-warnings' ); ?></p>
 					<p>
-						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=wz_bel_wizard' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Run Setup Wizard', 'better-external-links' ); ?></a>
-						<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wz_bel_dismiss_wizard', '1' ), 'wz_bel_dismiss_wizard' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Skip Setup', 'better-external-links' ); ?></a>
+						<a href="<?php echo esc_url( admin_url( 'options-general.php?page=wzlw_wizard' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Run Setup Wizard', 'webberzone-link-warnings' ); ?></a>
+						<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wzlw_dismiss_wizard', '1' ), 'wzlw_dismiss_wizard' ) ); ?>" class="button button-secondary"><?php esc_html_e( 'Skip Setup', 'webberzone-link-warnings' ); ?></a>
 					</p>
 				</div>
 				<?php
@@ -250,10 +250,10 @@ class Settings_Wizard extends Settings_Wizard_API {
 		);
 
 		// Handle dismissal.
-		if ( isset( $_GET['wz_bel_dismiss_wizard'] ) && check_admin_referer( 'wz_bel_dismiss_wizard' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			delete_transient( 'wz_bel_show_wizard_activation_redirect' );
-			delete_option( 'wz_bel_show_wizard' );
-			wp_safe_redirect( remove_query_arg( array( 'wz_bel_dismiss_wizard', '_wpnonce' ) ) );
+		if ( isset( $_GET['wzlw_dismiss_wizard'] ) && check_admin_referer( 'wzlw_dismiss_wizard' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			delete_transient( 'wzlw_show_wizard_activation_redirect' );
+			delete_option( 'wzlw_show_wizard' );
+			wp_safe_redirect( remove_query_arg( array( 'wzlw_dismiss_wizard', '_wpnonce' ) ) );
 			exit;
 		}
 	}

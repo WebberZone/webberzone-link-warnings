@@ -1,26 +1,26 @@
 <?php
 /**
- * PHPStan bootstrap file for Better External Links.
+ * PHPStan bootstrap file for WebberZone Link Warnings.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-if ( ! defined( 'WZ_BEL_VERSION' ) ) {
-	define( 'WZ_BEL_VERSION', '0.0.0' );
+if ( ! defined( 'WZLW_VERSION' ) ) {
+	define( 'WZLW_VERSION', '0.0.0' );
 }
 
-if ( ! defined( 'WZ_BEL_PLUGIN_FILE' ) ) {
-	define( 'WZ_BEL_PLUGIN_FILE', '' );
+if ( ! defined( 'WZLW_PLUGIN_FILE' ) ) {
+	define( 'WZLW_PLUGIN_FILE', '' );
 }
 
-if ( ! defined( 'WZ_BEL_PLUGIN_DIR' ) ) {
-	define( 'WZ_BEL_PLUGIN_DIR', '' );
+if ( ! defined( 'WZLW_PLUGIN_DIR' ) ) {
+	define( 'WZLW_PLUGIN_DIR', '' );
 }
 
-if ( ! defined( 'WZ_BEL_PLUGIN_URL' ) ) {
-	define( 'WZ_BEL_PLUGIN_URL', '' );
+if ( ! defined( 'WZLW_PLUGIN_URL' ) ) {
+	define( 'WZLW_PLUGIN_URL', '' );
 }
 
-if ( ! defined( 'WZ_BEL_PLUGIN_BASENAME' ) ) {
-	define( 'WZ_BEL_PLUGIN_BASENAME', '' );
+if ( ! defined( 'WZLW_PLUGIN_BASENAME' ) ) {
+	define( 'WZLW_PLUGIN_BASENAME', '' );
 }

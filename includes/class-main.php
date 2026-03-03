@@ -4,18 +4,18 @@
  *
  * Handles plugin initialization and component loading.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 /**
  * Main plugin class.
@@ -93,7 +93,7 @@ class Main {
 	 * @since 1.0.0
 	 */
 	private function load_dependencies() {
-		require_once WZ_BEL_PLUGIN_DIR . 'includes/options-api.php';
+		require_once WZLW_PLUGIN_DIR . 'includes/options-api.php';
 	}
 
 	/**

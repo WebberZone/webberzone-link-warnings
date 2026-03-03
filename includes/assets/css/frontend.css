@@ -6,24 +6,24 @@
  */
 
 :root {
-	--wz-bel-color-text: #1a1a1a;
-	--wz-bel-color-text-muted: #4a4a4a;
-	--wz-bel-color-indicator: #595959;
-	--wz-bel-color-surface: #fff;
-	--wz-bel-color-on-primary: #fff;
-	--wz-bel-color-surface-muted: #f5f5f5;
-	--wz-bel-color-border: #c3c4c7;
-	--wz-bel-color-border-strong: #8c8f94;
-	--wz-bel-color-button-muted: #f0f0f0;
-	--wz-bel-color-button-muted-hover: #d5d5d5;
-	--wz-bel-color-link: #2271b1;
-	--wz-bel-color-link-hover: #135e96;
-	--wz-bel-color-focus: #2271b1;
-	--wz-bel-modal-overlay-bg: rgba(0, 0, 0, 0.7);
-	--wz-bel-shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.3);
-	--wz-bel-radius-sm: 4px;
-	--wz-bel-radius-md: 8px;
-	--wz-bel-transition: all 0.2s ease;
+	--wzlw-color-text: #1a1a1a;
+	--wzlw-color-text-muted: #4a4a4a;
+	--wzlw-color-indicator: #595959;
+	--wzlw-color-surface: #fff;
+	--wzlw-color-on-primary: #fff;
+	--wzlw-color-surface-muted: #f5f5f5;
+	--wzlw-color-border: #c3c4c7;
+	--wzlw-color-border-strong: #8c8f94;
+	--wzlw-color-button-muted: #f0f0f0;
+	--wzlw-color-button-muted-hover: #d5d5d5;
+	--wzlw-color-link: #2271b1;
+	--wzlw-color-link-hover: #135e96;
+	--wzlw-color-focus: #2271b1;
+	--wzlw-modal-overlay-bg: rgba(0, 0, 0, 0.7);
+	--wzlw-shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.3);
+	--wzlw-radius-sm: 4px;
+	--wzlw-radius-md: 8px;
+	--wzlw-transition: all 0.2s ease;
 }
 
 /* Screen reader only text. */
@@ -41,22 +41,22 @@
 }
 
 /* Visual indicators. */
-.wz-bel-icon {
+.wzlw-icon {
 	display: inline-block;
 	margin-left: 0.25em;
 	font-size: 0.875em;
-	color: var(--wz-bel-color-indicator);
+	color: var(--wzlw-color-indicator);
 }
 
-.wz-bel-text {
+.wzlw-text {
 	display: inline-block;
 	margin-left: 0.25em;
 	font-size: 0.875em;
-	color: var(--wz-bel-color-indicator);
+	color: var(--wzlw-color-indicator);
 }
 
 /* Modal styles. */
-.wz-bel-modal {
+.wzlw-modal {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -68,33 +68,33 @@
 	justify-content: center;
 }
 
-.wz-bel-modal[hidden] {
+.wzlw-modal[hidden] {
 	display: none;
 }
 
-.wz-bel-modal-overlay {
+.wzlw-modal-overlay {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: var(--wz-bel-modal-overlay-bg);
+	background-color: var(--wzlw-modal-overlay-bg);
 	cursor: pointer;
 }
 
-.wz-bel-modal-container {
+.wzlw-modal-container {
 	position: relative;
 	max-width: 90%;
 	width: 500px;
 	max-height: 90vh;
 	overflow-y: auto;
-	background-color: var(--wz-bel-color-surface);
-	border-radius: var(--wz-bel-radius-md);
-	box-shadow: var(--wz-bel-shadow-modal);
-	animation: wz-bel-modal-slide-up 0.3s ease-out;
+	background-color: var(--wzlw-color-surface);
+	border-radius: var(--wzlw-radius-md);
+	box-shadow: var(--wzlw-shadow-modal);
+	animation: wzlw-modal-slide-up 0.3s ease-out;
 }
 
-@keyframes wz-bel-modal-slide-up {
+@keyframes wzlw-modal-slide-up {
 	from {
 		opacity: 0;
 		transform: translateY(20px);
@@ -107,17 +107,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.wz-bel-modal-container {
+	.wzlw-modal-container {
 		animation: none;
 	}
 
-	.wz-bel-modal-close-btn,
-	.wz-bel-modal-button {
+	.wzlw-modal-close-btn,
+	.wzlw-modal-button {
 		transition: none;
 	}
 }
 
-.wz-bel-modal-close-btn {
+.wzlw-modal-close-btn {
 	position: absolute;
 	top: 0.75rem;
 	right: 0.75rem;
@@ -128,156 +128,156 @@
 	background: none;
 	font-size: 1.5rem;
 	line-height: 1;
-	color: var(--wz-bel-color-indicator);
+	color: var(--wzlw-color-indicator);
 	cursor: pointer;
-	border-radius: var(--wz-bel-radius-sm);
-	transition: var(--wz-bel-transition);
+	border-radius: var(--wzlw-radius-sm);
+	transition: var(--wzlw-transition);
 }
 
-.wz-bel-modal-close-btn:hover {
-	background-color: var(--wz-bel-color-button-muted);
-	color: var(--wz-bel-color-text);
+.wzlw-modal-close-btn:hover {
+	background-color: var(--wzlw-color-button-muted);
+	color: var(--wzlw-color-text);
 }
 
-.wz-bel-modal-close-btn:focus {
-	outline: 2px solid var(--wz-bel-color-focus);
+.wzlw-modal-close-btn:focus {
+	outline: 2px solid var(--wzlw-color-focus);
 	outline-offset: 2px;
 }
 
-.wz-bel-modal-content {
+.wzlw-modal-content {
 	padding: 2rem;
 }
 
-.wz-bel-modal-title {
+.wzlw-modal-title {
 	margin: 0 0 1rem;
 	font-size: 1.5rem;
 	font-weight: 600;
-	color: var(--wz-bel-color-text);
+	color: var(--wzlw-color-text);
 }
 
-.wz-bel-modal-message {
+.wzlw-modal-message {
 	margin: 0 0 1rem;
 	line-height: 1.6;
-	color: var(--wz-bel-color-text-muted);
+	color: var(--wzlw-color-text-muted);
 }
 
-.wz-bel-modal-url {
+.wzlw-modal-url {
 	margin: 0 0 1.5rem;
 	padding: 0.75rem;
-	background-color: var(--wz-bel-color-surface-muted);
-	border-radius: var(--wz-bel-radius-sm);
+	background-color: var(--wzlw-color-surface-muted);
+	border-radius: var(--wzlw-radius-sm);
 	font-family: monospace;
 	font-size: 0.875rem;
 	word-break: break-all;
-	color: var(--wz-bel-color-link);
+	color: var(--wzlw-color-link);
 }
 
-.wz-bel-modal-actions {
+.wzlw-modal-actions {
 	display: flex;
 	gap: 0.75rem;
 	justify-content: flex-end;
 }
 
-.wz-bel-modal-button {
+.wzlw-modal-button {
 	padding: 0.625rem 1.25rem;
 	border: none;
-	border-radius: var(--wz-bel-radius-sm);
+	border-radius: var(--wzlw-radius-sm);
 	font-size: 1rem;
 	font-weight: 500;
 	cursor: pointer;
-	transition: var(--wz-bel-transition);
+	transition: var(--wzlw-transition);
 }
 
 /*
  * Buttons are theme-controlled in many setups. Pin our modal button colors for all states.
  * (Scoped selectors + minimal !important to keep accessible contrast.)
  */
-.wz-bel-modal button.wz-bel-modal-button,
-.wz-bel-modal button.wz-bel-modal-button:hover,
-.wz-bel-modal button.wz-bel-modal-button:focus,
-.wz-bel-modal button.wz-bel-modal-button:focus-visible,
-.wz-bel-modal button.wz-bel-modal-button:active {
+.wzlw-modal button.wzlw-modal-button,
+.wzlw-modal button.wzlw-modal-button:hover,
+.wzlw-modal button.wzlw-modal-button:focus,
+.wzlw-modal button.wzlw-modal-button:focus-visible,
+.wzlw-modal button.wzlw-modal-button:active {
 	text-decoration: none !important;
 }
 
-.wz-bel-modal-button:focus {
-	outline: 2px solid var(--wz-bel-color-focus);
+.wzlw-modal-button:focus {
+	outline: 2px solid var(--wzlw-color-focus);
 	outline-offset: 2px;
 }
 
-.wz-bel-modal-cancel {
-	background-color: var(--wz-bel-color-button-muted);
-	color: var(--wz-bel-color-text);
-	border: 1px solid var(--wz-bel-color-border);
+.wzlw-modal-cancel {
+	background-color: var(--wzlw-color-button-muted);
+	color: var(--wzlw-color-text);
+	border: 1px solid var(--wzlw-color-border);
 }
 
-.wz-bel-modal-cancel:hover {
-	background-color: var(--wz-bel-color-button-muted-hover);
-	border-color: var(--wz-bel-color-border-strong);
+.wzlw-modal-cancel:hover {
+	background-color: var(--wzlw-color-button-muted-hover);
+	border-color: var(--wzlw-color-border-strong);
 }
 
-.wz-bel-modal button.wz-bel-modal-cancel,
-.wz-bel-modal button.wz-bel-modal-cancel:focus,
-.wz-bel-modal button.wz-bel-modal-cancel:focus-visible,
-.wz-bel-modal button.wz-bel-modal-cancel:active {
-	background-color: var(--wz-bel-color-button-muted) !important;
-	color: var(--wz-bel-color-text) !important;
-	border-color: var(--wz-bel-color-border) !important;
+.wzlw-modal button.wzlw-modal-cancel,
+.wzlw-modal button.wzlw-modal-cancel:focus,
+.wzlw-modal button.wzlw-modal-cancel:focus-visible,
+.wzlw-modal button.wzlw-modal-cancel:active {
+	background-color: var(--wzlw-color-button-muted) !important;
+	color: var(--wzlw-color-text) !important;
+	border-color: var(--wzlw-color-border) !important;
 }
 
-.wz-bel-modal button.wz-bel-modal-cancel:hover {
-	background-color: var(--wz-bel-color-button-muted-hover) !important;
-	color: var(--wz-bel-color-text) !important;
-	border-color: var(--wz-bel-color-border-strong) !important;
+.wzlw-modal button.wzlw-modal-cancel:hover {
+	background-color: var(--wzlw-color-button-muted-hover) !important;
+	color: var(--wzlw-color-text) !important;
+	border-color: var(--wzlw-color-border-strong) !important;
 }
 
-.wz-bel-modal-continue {
-	background-color: var(--wz-bel-color-link);
-	color: var(--wz-bel-color-on-primary);
+.wzlw-modal-continue {
+	background-color: var(--wzlw-color-link);
+	color: var(--wzlw-color-on-primary);
 }
 
-.wz-bel-modal-continue:hover {
-	background-color: var(--wz-bel-color-link-hover);
+.wzlw-modal-continue:hover {
+	background-color: var(--wzlw-color-link-hover);
 }
 
-.wz-bel-modal button.wz-bel-modal-continue,
-.wz-bel-modal button.wz-bel-modal-continue:focus,
-.wz-bel-modal button.wz-bel-modal-continue:focus-visible,
-.wz-bel-modal button.wz-bel-modal-continue:active {
-	background-color: var(--wz-bel-color-link) !important;
-	color: var(--wz-bel-color-on-primary) !important;
+.wzlw-modal button.wzlw-modal-continue,
+.wzlw-modal button.wzlw-modal-continue:focus,
+.wzlw-modal button.wzlw-modal-continue:focus-visible,
+.wzlw-modal button.wzlw-modal-continue:active {
+	background-color: var(--wzlw-color-link) !important;
+	color: var(--wzlw-color-on-primary) !important;
 }
 
-.wz-bel-modal button.wz-bel-modal-continue:hover {
-	background-color: var(--wz-bel-color-link-hover) !important;
-	color: var(--wz-bel-color-on-primary) !important;
+.wzlw-modal button.wzlw-modal-continue:hover {
+	background-color: var(--wzlw-color-link-hover) !important;
+	color: var(--wzlw-color-on-primary) !important;
 }
 
 /* Focus trap for accessibility. */
-.wz-bel-modal-active {
+.wzlw-modal-active {
 	overflow: hidden;
 }
 
 /* Responsive adjustments. */
 @media (max-width: 600px) {
-	.wz-bel-modal-container {
+	.wzlw-modal-container {
 		width: 95%;
 		max-width: none;
 	}
 
-	.wz-bel-modal-content {
+	.wzlw-modal-content {
 		padding: 1.5rem;
 	}
 
-	.wz-bel-modal-title {
+	.wzlw-modal-title {
 		font-size: 1.25rem;
 	}
 
-	.wz-bel-modal-actions {
+	.wzlw-modal-actions {
 		flex-direction: column-reverse;
 	}
 
-	.wz-bel-modal-button {
+	.wzlw-modal-button {
 		width: 100%;
 	}
 }

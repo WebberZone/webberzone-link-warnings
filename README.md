@@ -1,10 +1,10 @@
-# Better External Links
+# WebberZone Link Warnings
 
-[![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/better-external-links.svg?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
+[![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/webberzone-link-warnings.svg?style=flat-square)](https://wordpress.org/plugins/webberzone-link-warnings/)
 [![License](https://img.shields.io/badge/license-GPL_v2%2B-orange.svg?style=flat-square)](https://opensource.org/licenses/GPL-2.0)
-[![WordPress Tested](https://img.shields.io/wordpress/v/better-external-links.svg?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
-[![Required PHP](https://img.shields.io/wordpress/plugin/required-php/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
-[![Active installs](https://img.shields.io/wordpress/plugin/installs/better-external-links?style=flat-square)](https://wordpress.org/plugins/better-external-links/)
+[![WordPress Tested](https://img.shields.io/wordpress/v/webberzone-link-warnings.svg?style=flat-square)](https://wordpress.org/plugins/webberzone-link-warnings/)
+[![Required PHP](https://img.shields.io/wordpress/plugin/required-php/webberzone-link-warnings?style=flat-square)](https://wordpress.org/plugins/webberzone-link-warnings/)
+[![Active installs](https://img.shields.io/wordpress/plugin/installs/webberzone-link-warnings?style=flat-square)](https://wordpress.org/plugins/webberzone-link-warnings/)
 
 __Requires at least:__ 6.6
 
@@ -14,15 +14,15 @@ __Requires PHP:__ 7.4
 
 __License:__ [GPL-2.0+](http://www.gnu.org/licenses/gpl-2.0.html)
 
-__Plugin page:__ [Better External Links](https://webberzone.com/plugins/better-external-links/) | [WordPress.org listing](https://wordpress.org/plugins/better-external-links/)
+__Plugin page:__ [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) | [WordPress.org listing](https://wordpress.org/plugins/webberzone-link-warnings/)
 
 Add accessible warnings for external links and `target="_blank"` links in WordPress — using icons, modals, or redirect screens.
 
 ## Description
 
-Better External Links helps you warn users when links open in a new window or take them to external websites. It adds accessible indicators, confirmation dialogs, or redirect screens — helping you align with accessibility best practices without rewriting your content.
+WebberZone Link Warnings helps you warn users when links open in a new window or take them to external websites. It adds accessible indicators, confirmation dialogs, or redirect screens — helping you align with accessibility best practices without rewriting your content.
 
-Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to parse and modify external and `target="_blank"` links in your content efficiently. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration. The plugin processes content during the `the_content` and `the_excerpt` filters, making it compatible with most themes and page builders. Your stored content remains untouched — the plugin only alters rendered output and does not interfere with REST API responses or admin editing screens.
+WebberZone Link Warnings uses WordPress's native `WP_HTML_Tag_Processor` class to parse and modify external and `target="_blank"` links in your content efficiently. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration. The plugin processes content during the `the_content` and `the_excerpt` filters, making it compatible with most themes and page builders. Your stored content remains untouched — the plugin only alters rendered output and does not interfere with REST API responses or admin editing screens.
 
 ### Why warn users about external links?
 
@@ -56,19 +56,19 @@ Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to p
 ### WordPress install (the easy way)
 
 1. Navigate to __Plugins > Add New__ in your WordPress dashboard
-2. Search for "Better External Links"
+2. Search for "WebberZone Link Warnings"
 3. Click __Install Now__ and then __Activate__
 
 ### Manual install
 
-1. Download the latest release from the [releases page](https://github.com/WebberZone/better-external-links/releases)
-2. Upload the `better-external-links` folder to `/wp-content/plugins/`
+1. Download the latest release from the [releases page](https://github.com/WebberZone/webberzone-link-warnings/releases)
+2. Upload the `webberzone-link-warnings` folder to `/wp-content/plugins/`
 3. Activate the plugin through the __Plugins__ menu in WordPress
-4. Go to __Settings > Better External Links__ to configure
+4. Go to __Settings > WebberZone Link Warnings__ to configure
 
 ## Configuration
 
-After activation, the setup wizard guides you through the initial configuration. You can also configure the plugin at __Settings > Better External Links__:
+After activation, the setup wizard guides you through the initial configuration. You can also configure the plugin at __Settings > WebberZone Link Warnings__:
 
 1. __Choose Warning Method__
    - Inline indicators (visual and screen reader text)
@@ -97,14 +97,14 @@ After activation, the setup wizard guides you through the initial configuration.
 
 ## Screenshots
 
-![Better External Links Settings](https://github.com/WebberZone/better-external-links/blob/main/wporg-assets/screenshot-2.png)
-*Better External Links Settings Page*
+![WebberZone Link Warnings Settings](https://github.com/WebberZone/webberzone-link-warnings/blob/main/wporg-assets/screenshot-2.png)
+*WebberZone Link Warnings Settings Page*
 
-For more screenshots, visit the [WordPress plugin page](https://wordpress.org/plugins/better-external-links/screenshots/).
+For more screenshots, visit the [WordPress plugin page](https://wordpress.org/plugins/webberzone-link-warnings/screenshots/).
 
 ## Other plugins by WebberZone
 
-Better External Links is one of the many plugins developed by WebberZone. Check out our other plugins:
+WebberZone Link Warnings is one of the many plugins developed by WebberZone. Check out our other plugins:
 
 - [Contextual Related Posts](https://wordpress.org/plugins/contextual-related-posts/) - Display related posts on your WordPress blog and feed
 - [Top 10](https://wordpress.org/plugins/top-10/) - Track daily and total visits to your blog posts and display the popular and trending posts
@@ -117,20 +117,20 @@ Better External Links is one of the many plugins developed by WebberZone. Check 
 
 ## Contribute
 
-Better External Links is also available on [GitHub](https://github.com/WebberZone/better-external-links).
+WebberZone Link Warnings is also available on [GitHub](https://github.com/WebberZone/webberzone-link-warnings).
 So, if you've got a cool feature you'd like to implement in the plugin or a bug you've fixed, consider forking the project and sending me a pull request.
 
-Bug reports are [welcomed on GitHub](https://github.com/WebberZone/better-external-links/issues). Please note that GitHub is *not* a support forum, and issues that aren't suitably qualified as bugs will be closed.
+Bug reports are [welcomed on GitHub](https://github.com/WebberZone/webberzone-link-warnings/issues). Please note that GitHub is *not* a support forum, and issues that aren't suitably qualified as bugs will be closed.
 
 ## Support
 
-- __Documentation__: [webberzone.com/support/better-external-links/](https://webberzone.com/support/better-external-links/)
-- __WordPress Support Forum__: [wordpress.org/support/plugin/better-external-links/](https://wordpress.org/support/plugin/better-external-links/)
-- __GitHub Issues__: [github.com/WebberZone/better-external-links/issues](https://github.com/WebberZone/better-external-links/issues)
+- __Documentation__: [webberzone.com/support/webberzone-link-warnings/](https://webberzone.com/support/webberzone-link-warnings/)
+- __WordPress Support Forum__: [wordpress.org/support/plugin/webberzone-link-warnings/](https://wordpress.org/support/plugin/webberzone-link-warnings/)
+- __GitHub Issues__: [github.com/WebberZone/webberzone-link-warnings/issues](https://github.com/WebberZone/webberzone-link-warnings/issues)
 
 ## Translations
 
-Better External Links is available for [translation directly on WordPress.org](https://translate.wordpress.org/projects/wp-plugins/better-external-links). Check out the official [Translator Handbook](https://make.wordpress.org/polyglots/handbook/plugin-theme-authors-guide/) to contribute.
+WebberZone Link Warnings is available for [translation directly on WordPress.org](https://translate.wordpress.org/projects/wp-plugins/webberzone-link-warnings). Check out the official [Translator Handbook](https://make.wordpress.org/polyglots/handbook/plugin-theme-authors-guide/) to contribute.
 
 ## License
 
@@ -138,8 +138,8 @@ This plugin is licensed under the GPL-2.0+ license.
 
 ## Credits
 
-Better External Links is developed and maintained by [WebberZone](https://webberzone.com/).
+WebberZone Link Warnings is developed and maintained by [WebberZone](https://webberzone.com/).
 
 ## About this repository
 
-This GitHub repository always holds the latest development version of the plugin. If you're looking for an official WordPress release, you can find this on the [WordPress.org repository](https://wordpress.org/plugins/better-external-links/). In addition to stable releases, latest beta versions are made available under [releases](https://github.com/WebberZone/better-external-links/releases).
+This GitHub repository always holds the latest development version of the plugin. If you're looking for an official WordPress release, you can find this on the [WordPress.org repository](https://wordpress.org/plugins/webberzone-link-warnings/). In addition to stable releases, latest beta versions are made available under [releases](https://github.com/WebberZone/webberzone-link-warnings/releases).

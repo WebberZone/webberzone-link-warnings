@@ -3,10 +3,10 @@ includes:
 parameters:
     level: 5
     paths:
-        - better-external-links.php
+        - webberzone-link-warnings.php
         - includes/
     scanFiles:
-        - better-external-links.php
+        - webberzone-link-warnings.php
     scanDirectories:
         - includes
     bootstrapFiles:

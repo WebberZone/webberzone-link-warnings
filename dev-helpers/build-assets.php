@@ -5,14 +5,14 @@
  * Processes CSS and JS files: minification and RTL generation.
  * Supports passing specific files or directories as arguments.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
 // Basic setup.
-if ( ! defined( 'WZ_BEL_BUILD_DIR' ) ) {
-	define( 'WZ_BEL_BUILD_DIR', dirname( __DIR__ ) );
+if ( ! defined( 'WZLW_BUILD_DIR' ) ) {
+	define( 'WZLW_BUILD_DIR', dirname( __DIR__ ) );
 }
-require_once WZ_BEL_BUILD_DIR . '/vendor/autoload.php';
+require_once WZLW_BUILD_DIR . '/vendor/autoload.php';
 
 use MatthiasMullie\Minify;
 use Irmmr\RTLCss\Parser;
@@ -66,7 +66,7 @@ $error_count = 0;
  * @return string Normalised relative path.
  */
 function normalize_path( $path ) {
-	return str_replace( array( '\\', WZ_BEL_BUILD_DIR . '/' ), array( '/', '' ), $path );
+	return str_replace( array( '\\', WZLW_BUILD_DIR . '/' ), array( '/', '' ), $path );
 }
 
 /**
@@ -242,7 +242,7 @@ function combine_files( $output_file, $input_files, $is_js = false ) {
 	$combined_content = '';
 
 	foreach ( $input_files as $file ) {
-		$full_path = (string) WZ_BEL_BUILD_DIR . '/' . $file;
+		$full_path = (string) WZLW_BUILD_DIR . '/' . $file;
 		if ( ! file_exists( $full_path ) ) {
 			echo '  ✗ File not found: ' . $file . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			++$error_count;
@@ -321,8 +321,8 @@ if ( ! empty( $specific_paths ) ) {
 	}
 } else {
 	echo "=== Processing All Assets ===\n";
-	$all_css_files = find_files( (string) WZ_BEL_BUILD_DIR, '.css' );
-	$all_js_files  = find_files( (string) WZ_BEL_BUILD_DIR, '.js' );
+	$all_css_files = find_files( (string) WZLW_BUILD_DIR, '.css' );
+	$all_js_files  = find_files( (string) WZLW_BUILD_DIR, '.js' );
 }
 
 $all_css_files = array_unique( $all_css_files );
@@ -332,14 +332,14 @@ $all_js_files  = array_unique( $all_js_files );
 if ( ! empty( $config['combineCss'] ) ) {
 	echo "\n=== Combining CSS Files ===\n";
 	foreach ( $config['combineCss'] as $output => $inputs ) {
-		combine_files( WZ_BEL_BUILD_DIR . '/' . $output, $inputs, false );
+		combine_files( WZLW_BUILD_DIR . '/' . $output, $inputs, false );
 	}
 }
 
 if ( ! empty( $config['combineJs'] ) ) {
 	echo "\n=== Combining JS Files ===\n";
 	foreach ( $config['combineJs'] as $output => $inputs ) {
-		combine_files( WZ_BEL_BUILD_DIR . '/' . $output, $inputs, true );
+		combine_files( WZLW_BUILD_DIR . '/' . $output, $inputs, true );
 	}
 }
 

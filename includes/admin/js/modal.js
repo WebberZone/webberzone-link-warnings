@@ -1,7 +1,7 @@
 /**
  * Modal functionality for External Link Accessibility plugin.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
@@ -27,26 +27,26 @@
 		document.addEventListener('click', handleLinkClick);
 
 		// Get modal elements.
-		modal = document.getElementById('wz-bel-modal');
+		modal = document.getElementById('wzlw-modal');
 		if (!modal) {
 			return;
 		}
 
-		modalTitle = modal.querySelector('#wz-bel-modal-title');
-		modalMessage = modal.querySelector('#wz-bel-modal-message');
-		modalUrl = modal.querySelector('.wz-bel-modal-url');
-		modalContinue = modal.querySelector('[data-wz-bel-continue]');
-		modalCancel = modal.querySelector('.wz-bel-modal-cancel');
+		modalTitle = modal.querySelector('#wzlw-modal-title');
+		modalMessage = modal.querySelector('#wzlw-modal-message');
+		modalUrl = modal.querySelector('.wzlw-modal-url');
+		modalContinue = modal.querySelector('[data-wzlw-continue]');
+		modalCancel = modal.querySelector('.wzlw-modal-cancel');
 		// Set button text from settings.
-		if (typeof wzBelSettings !== 'undefined') {
-			modalTitle.textContent = wzBelSettings.modalTitle;
-			modalMessage.textContent = wzBelSettings.modalMessage;
-			modalContinue.textContent = wzBelSettings.continueText;
-			modalCancel.textContent = wzBelSettings.cancelText;
+		if (typeof wzlwSettings !== 'undefined') {
+			modalTitle.textContent = wzlwSettings.modalTitle;
+			modalMessage.textContent = wzlwSettings.modalMessage;
+			modalContinue.textContent = wzlwSettings.continueText;
+			modalCancel.textContent = wzlwSettings.cancelText;
 		}
 
 		// Modal close handlers.
-		modal.querySelectorAll('[data-wz-bel-close]').forEach(function (element) {
+		modal.querySelectorAll('[data-wzlw-close]').forEach(function (element) {
 			element.addEventListener('click', closeModal);
 		});
 		// Continue button handler.
@@ -61,14 +61,14 @@
 	 * @param {Event} e Click event.
 	 */
 	function handleLinkClick(e) {
-		const link = e.target.closest('a[data-wz-bel-external]');
+		const link = e.target.closest('a[data-wzlw-external]');
 		if (!link) {
 			return;
 		}
 
-		const method = typeof wzBelSettings !== 'undefined' ? wzBelSettings.warningMethod : 'inline';
+		const method = typeof wzlwSettings !== 'undefined' ? wzlwSettings.warningMethod : 'inline';
 		if ('redirect' === method || 'inline_redirect' === method) {
-			const redirectUrl = link.getAttribute('data-wz-bel-redirect-url');
+			const redirectUrl = link.getAttribute('data-wzlw-redirect-url');
 			if (redirectUrl) {
 				e.preventDefault();
 				window.location.href = redirectUrl;
@@ -92,13 +92,13 @@
 	 * @param {HTMLElement} link Link element.
 	 */
 	function showModal(link) {
-		const url = link.getAttribute('data-wz-bel-url');
+		const url = link.getAttribute('data-wzlw-url');
 		// Update modal content.
 		modalUrl.textContent = url;
 		// Show modal.
 		modal.removeAttribute('hidden');
 		// Lock body scroll.
-		document.body.classList.add('wz-bel-modal-active');
+		document.body.classList.add('wzlw-modal-active');
 		// Set up focus trap.
 		setupFocusTrap();
 		// Focus first element.
@@ -113,7 +113,7 @@
 	function closeModal() {
 		modal.setAttribute('hidden', '');
 		// Unlock body scroll.
-		document.body.classList.remove('wz-bel-modal-active');
+		document.body.classList.remove('wzlw-modal-active');
 		// Return focus to link.
 		if (currentLink) {
 			currentLink.focus();
@@ -129,7 +129,7 @@
 			return;
 		}
 
-		const url = currentLink.getAttribute('data-wz-bel-url');
+		const url = currentLink.getAttribute('data-wzlw-url');
 		// Navigate to external URL.
 		window.open(url, '_blank', 'noopener,noreferrer');
 		// Close modal.

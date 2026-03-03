@@ -4,18 +4,18 @@
  *
  * Handles frontend JavaScript and modal functionality.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
-namespace WebberZone\Better_External_Links;
+namespace WebberZone\Link_Warnings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use WebberZone\Better_External_Links\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 /**
  * Frontend Handler class.
@@ -40,7 +40,7 @@ class Frontend_Handler {
 	 * @since 1.0.0
 	 */
 	public function enqueue_assets() {
-		$settings = wzbel_get_settings();
+		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
 		$rtl_suffix = is_rtl() ? '-rtl' : '';
@@ -48,31 +48,31 @@ class Frontend_Handler {
 
 		// Enqueue styles for all methods.
 		wp_enqueue_style(
-			'wz-bel-frontend',
-			WZ_BEL_PLUGIN_URL . 'includes/assets/css/frontend' . $rtl_suffix . $min_suffix . '.css',
+			'wzlw-frontend',
+			WZLW_PLUGIN_URL . 'includes/assets/css/frontend' . $rtl_suffix . $min_suffix . '.css',
 			array(),
-			WZ_BEL_VERSION
+			WZLW_VERSION
 		);
 
 		// Enqueue JavaScript for modal and redirect methods.
 		if ( in_array( $method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 			wp_enqueue_script(
-				'wz-bel-modal',
-				WZ_BEL_PLUGIN_URL . 'includes/admin/js/modal' . $min_suffix . '.js',
+				'wzlw-modal',
+				WZLW_PLUGIN_URL . 'includes/admin/js/modal' . $min_suffix . '.js',
 				array(),
-				WZ_BEL_VERSION,
+				WZLW_VERSION,
 				true
 			);
 
 			// Pass settings to JavaScript.
 			wp_localize_script(
-				'wz-bel-modal',
-				'wzBelSettings',
+				'wzlw-modal',
+				'wzlwSettings',
 				array(
-					'modalTitle'    => isset( $settings['modal_title'] ) ? $settings['modal_title'] : __( 'You are leaving this site', 'better-external-links' ),
-					'modalMessage'  => isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'better-external-links' ),
-					'continueText'  => isset( $settings['modal_continue_text'] ) ? $settings['modal_continue_text'] : __( 'Continue', 'better-external-links' ),
-					'cancelText'    => isset( $settings['modal_cancel_text'] ) ? $settings['modal_cancel_text'] : __( 'Cancel', 'better-external-links' ),
+					'modalTitle'    => isset( $settings['modal_title'] ) ? $settings['modal_title'] : __( 'You are leaving this site', 'webberzone-link-warnings' ),
+					'modalMessage'  => isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
+					'continueText'  => isset( $settings['modal_continue_text'] ) ? $settings['modal_continue_text'] : __( 'Continue', 'webberzone-link-warnings' ),
+					'cancelText'    => isset( $settings['modal_cancel_text'] ) ? $settings['modal_cancel_text'] : __( 'Cancel', 'webberzone-link-warnings' ),
 					'warningMethod' => $method,
 				)
 			);
@@ -85,7 +85,7 @@ class Frontend_Handler {
 	 * @since 1.0.0
 	 */
 	public function render_modal() {
-		$settings = wzbel_get_settings();
+		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
 		if ( ! in_array( $method, array( 'modal', 'inline_modal' ), true ) ) {
@@ -93,19 +93,19 @@ class Frontend_Handler {
 		}
 
 		?>
-		<div id="wz-bel-modal" class="wz-bel-modal" role="dialog" aria-modal="true" aria-labelledby="wz-bel-modal-title" aria-describedby="wz-bel-modal-message" hidden>
-			<div class="wz-bel-modal-overlay" data-wz-bel-close role="presentation"></div>
-			<div class="wz-bel-modal-container">
-				<button type="button" class="wz-bel-modal-close-btn" data-wz-bel-close aria-label="<?php esc_attr_e( 'Close dialog', 'better-external-links' ); ?>">
+		<div id="wzlw-modal" class="wzlw-modal" role="dialog" aria-modal="true" aria-labelledby="wzlw-modal-title" aria-describedby="wzlw-modal-message" hidden>
+			<div class="wzlw-modal-overlay" data-wzlw-close role="presentation"></div>
+			<div class="wzlw-modal-container">
+				<button type="button" class="wzlw-modal-close-btn" data-wzlw-close aria-label="<?php esc_attr_e( 'Close dialog', 'webberzone-link-warnings' ); ?>">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<div class="wz-bel-modal-content">
-					<h2 id="wz-bel-modal-title" class="wz-bel-modal-title"></h2>
-					<div id="wz-bel-modal-message" class="wz-bel-modal-message"></div>
-					<div class="wz-bel-modal-url"></div>
-					<div class="wz-bel-modal-actions">
-						<button type="button" class="wz-bel-modal-button wz-bel-modal-cancel" data-wz-bel-close></button>
-						<button type="button" class="wz-bel-modal-button wz-bel-modal-continue" data-wz-bel-continue></button>
+				<div class="wzlw-modal-content">
+					<h2 id="wzlw-modal-title" class="wzlw-modal-title"></h2>
+					<div id="wzlw-modal-message" class="wzlw-modal-message"></div>
+					<div class="wzlw-modal-url"></div>
+					<div class="wzlw-modal-actions">
+						<button type="button" class="wzlw-modal-button wzlw-modal-cancel" data-wzlw-close></button>
+						<button type="button" class="wzlw-modal-button wzlw-modal-continue" data-wzlw-continue></button>
 					</div>
 				</div>
 			</div>

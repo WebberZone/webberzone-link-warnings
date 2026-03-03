@@ -1,4 +1,4 @@
-=== Better External Links ===
+=== WebberZone Link Warnings ===
 Contributors: webberzone, ajay
 Tags: accessibility, external links, wcag, target blank, compliance
 Donate link: https://ajaydsouza.com/donate/
@@ -13,9 +13,9 @@ Add accessible warnings for external links and `target="_blank"` links in WordPr
 
 == Description ==
 
-Better External Links helps you warn users when links open in a new window or take them to external websites. It adds accessible indicators, confirmation dialogs, or redirect screens — helping you align with accessibility best practices without rewriting your content.
+WebberZone Link Warnings helps you warn users when links open in a new window or take them to external websites. It adds accessible indicators, confirmation dialogs, or redirect screens — helping you align with accessibility best practices without rewriting your content.
 
-Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to parse and modify external and `target="_blank"` links in your content efficiently. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration. The plugin processes content during the `the_content` and `the_excerpt` filters, making it compatible with most themes and page builders. Your stored content remains untouched — the plugin only alters rendered output and does not interfere with REST API responses or admin editing screens.
+WebberZone Link Warnings uses WordPress's native `WP_HTML_Tag_Processor` class to parse and modify external and `target="_blank"` links in your content efficiently. It adds appropriate ARIA attributes, visual indicators, and optional JavaScript-based warnings based on your configuration. The plugin processes content during the `the_content` and `the_excerpt` filters, making it compatible with most themes and page builders. Your stored content remains untouched — the plugin only alters rendered output and does not interfere with REST API responses or admin editing screens.
 
 ### Why warn users about external links?
 
@@ -46,7 +46,7 @@ Better External Links uses WordPress's native `WP_HTML_Tag_Processor` class to p
 
 ### How it works
 
-After activation, the setup wizard guides you through the initial configuration. You can also configure the plugin at __Settings > Better External Links__.
+After activation, the setup wizard guides you through the initial configuration. You can also configure the plugin at __Settings > WebberZone Link Warnings__.
 
 __Warning Methods:__
 
@@ -77,24 +77,24 @@ __Advanced Settings:__
 
 ### GDPR
 
-Better External Links doesn't collect personal data or send information to external services — making it GDPR-friendly by default.
+WebberZone Link Warnings doesn't collect personal data or send information to external services — making it GDPR-friendly by default.
 
 You remain responsible for your site's overall GDPR compliance.
 
 ### Contribute
 
-Better External Links is also available on [Github](https://github.com/WebberZone/better-external-links).
+WebberZone Link Warnings is also available on [Github](https://github.com/WebberZone/webberzone-link-warnings).
 So, if you've got a cool feature you'd like to implement in the plugin or a bug you've fixed, consider forking the project and sending me a pull request.
 
-Bug reports are [welcomed on GitHub](https://github.com/WebberZone/better-external-links/issues). Please note that GitHub is _not_ a support forum, and issues that aren't suitably qualified as bugs will be closed.
+Bug reports are [welcomed on GitHub](https://github.com/WebberZone/webberzone-link-warnings/issues). Please note that GitHub is _not_ a support forum, and issues that aren't suitably qualified as bugs will be closed.
 
 ### Translations
 
-Better External Links is available for [translation directly on WordPress.org](https://translate.wordpress.org/projects/wp-plugins/better-external-links). Check out the official [Translator Handbook](https://make.wordpress.org/polyglots/handbook/plugin-theme-authors-guide/) to contribute.
+WebberZone Link Warnings is available for [translation directly on WordPress.org](https://translate.wordpress.org/projects/wp-plugins/webberzone-link-warnings). Check out the official [Translator Handbook](https://make.wordpress.org/polyglots/handbook/plugin-theme-authors-guide/) to contribute.
 
 ### Other Plugins by WebberZone
 
-Better External Links is one of the many plugins developed by WebberZone. Check out our other plugins:
+WebberZone Link Warnings is one of the many plugins developed by WebberZone. Check out our other plugins:
 
 * [Contextual Related Posts](https://wordpress.org/plugins/contextual-related-posts/) - Display related posts on your WordPress blog and feed
 * [Top 10](https://wordpress.org/plugins/top-10/) - Track daily and total visits to your blog posts and display the popular and trending posts
@@ -110,20 +110,20 @@ Better External Links is one of the many plugins developed by WebberZone. Check 
 = WordPress install (the easy way) =
 
 1. Navigate to Plugins > Add New
-2. Search for "Better External Links"
+2. Search for "WebberZone Link Warnings"
 3. Click "Install Now" and then "Activate"
 
 = Manual install =
 
-1. Upload the `better-external-links` folder to `/wp-content/plugins/`
+1. Upload the `webberzone-link-warnings` folder to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Settings > Better External Links to configure
+3. Go to Settings > WebberZone Link Warnings to configure
 
 == Frequently Asked Questions ==
 
 = Does this plugin affect SEO? =
 
-No. Better External Links only modifies how links are displayed to users. It does not alter the href attribute, link structure, or indexing behaviour. Search engines see your links exactly as you created them.
+No. WebberZone Link Warnings only modifies how links are displayed to users. It does not alter the href attribute, link structure, or indexing behaviour. Search engines see your links exactly as you created them.
 
 = Is it accessible? =
 
@@ -131,7 +131,7 @@ Yes. The plugin adds screen reader text, ARIA attributes, and (for modal mode) k
 
 = Does it work with multilingual sites? =
 
-Yes. Better External Links is translation-ready. It uses standard WordPress translation functions and works with popular multilingual plugins such as WPML and Polylang.
+Yes. WebberZone Link Warnings is translation-ready. It uses standard WordPress translation functions and works with popular multilingual plugins such as WPML and Polylang.
 
 = Does this work with page builders? =
 
@@ -139,7 +139,7 @@ Yes. The plugin processes content through standard WordPress filters (`the_conte
 
 = Can I customize the redirect screen template? =
 
-Yes. Copy the template file to `your-theme/better-external-links/redirect-screen.php` to override the default redirect screen with your own design.
+Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-screen.php` to override the default redirect screen with your own design.
 
 = Does this modify my database content? =
 

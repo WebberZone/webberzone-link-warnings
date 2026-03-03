@@ -2,10 +2,10 @@
 /**
  * Hook Registry class.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links\Util;
+namespace WebberZone\Link_Warnings\Util;
 
 if ( ! defined( 'WPINC' ) ) {
 	exit;

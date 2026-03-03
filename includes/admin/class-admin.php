@@ -4,13 +4,13 @@
  *
  * @since 1.0.0
  *
- * @package WebberZone\Better_External_Links\Admin
+ * @package WebberZone\Link_Warnings\Admin
  */
 
-namespace WebberZone\Better_External_Links\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
 /**
- * Class to register the Better External Links Admin Area.
+ * Class to register the WebberZone Link Warnings Admin Area.
  *
  * @since 1.0.0
  */
@@ -75,37 +75,37 @@ class Admin {
 	private function get_admin_banner_config(): array {
 		return array(
 			'capability' => 'manage_options',
-			'prefix'     => 'wz-bel',
+			'prefix'     => 'wzlw',
 			'screen_ids' => array(
-				'settings_page_wz-bel-settings',
-				'options-general_page_wz-bel-settings',
+				'settings_page_wzlw-settings',
+				'options-general_page_wzlw-settings',
 			),
 			'page_slugs' => array(
-				'wz-bel-settings',
+				'wzlw-settings',
 			),
 			'strings'    => array(
-				'region_label' => esc_html__( 'Better External Links quick links', 'better-external-links' ),
-				'nav_label'    => esc_html__( 'Better External Links admin shortcuts', 'better-external-links' ),
-				'eyebrow'      => esc_html__( 'Better External Links', 'better-external-links' ),
-				'title'        => esc_html__( 'Enhance your site’s accessibility and user experience.', 'better-external-links' ),
-				'text'         => esc_html__( 'Configure link warnings, visual indicators, and redirect screens to keep your users informed.', 'better-external-links' ),
+				'region_label' => esc_html__( 'WebberZone Link Warnings quick links', 'webberzone-link-warnings' ),
+				'nav_label'    => esc_html__( 'WebberZone Link Warnings admin shortcuts', 'webberzone-link-warnings' ),
+				'eyebrow'      => esc_html__( 'WebberZone Link Warnings', 'webberzone-link-warnings' ),
+				'title'        => esc_html__( 'Enhance your site\'s accessibility and user experience.', 'webberzone-link-warnings' ),
+				'text'         => esc_html__( 'Configure link warnings, visual indicators, and redirect screens to keep your users informed.', 'webberzone-link-warnings' ),
 			),
 			'sections'   => array(
 				'settings' => array(
-					'label'      => esc_html__( 'Settings', 'better-external-links' ),
-					'url'        => admin_url( 'options-general.php?page=wz-bel-settings' ),
-					'screen_ids' => array( 'settings_page_wz-bel-settings', 'options-general_page_wz-bel-settings' ),
-					'page_slugs' => array( 'wz-bel-settings' ),
+					'label'      => esc_html__( 'Settings', 'webberzone-link-warnings' ),
+					'url'        => admin_url( 'options-general.php?page=wzlw-settings' ),
+					'screen_ids' => array( 'settings_page_wzlw-settings', 'options-general_page_wzlw-settings' ),
+					'page_slugs' => array( 'wzlw-settings' ),
 				),
 				'support'  => array(
-					'label'  => esc_html__( 'Support', 'better-external-links' ),
+					'label'  => esc_html__( 'Support', 'webberzone-link-warnings' ),
 					'url'    => 'https://webberzone.com/support/',
 					'type'   => 'secondary',
 					'target' => '_blank',
 					'rel'    => 'noopener noreferrer',
 				),
 				'plugins'  => array(
-					'label'  => esc_html__( 'More Plugins', 'better-external-links' ),
+					'label'  => esc_html__( 'More Plugins', 'webberzone-link-warnings' ),
 					'url'    => 'https://webberzone.com/plugins/',
 					'type'   => 'secondary',
 					'target' => '_blank',

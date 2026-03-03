@@ -5,10 +5,10 @@
  * Functions to register, read, write and update settings.
  * Portions of this code have been inspired by Easy Digital Downloads, WordPress Settings Sandbox, WordPress Settings API class, etc.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links\Admin\Settings;
+namespace WebberZone\Link_Warnings\Admin\Settings;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {

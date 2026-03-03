@@ -1,7 +1,7 @@
 /**
  * Redirect page functionality for External Link Accessibility plugin.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  * @since 1.0.0
  */
 
@@ -17,18 +17,18 @@
 	 */
 	function init() {
 		// Check if we have redirect data.
-		if (typeof wzBelRedirect === 'undefined' || !wzBelRedirect.destination) {
+		if (typeof wzlwRedirect === 'undefined' || !wzlwRedirect.destination) {
 			return;
 		}
 
 		// Get countdown element.
-		countdownElement = document.querySelector('.wz-bel-countdown-number');
+		countdownElement = document.querySelector('.wzlw-countdown-number');
 		if (!countdownElement) {
 			return;
 		}
 
 		// Start countdown.
-		countdown = wzBelRedirect.countdown || 5;
+		countdown = wzlwRedirect.countdown || 5;
 		startCountdown();
 	}
 
@@ -65,8 +65,8 @@
 	 * Redirect to destination.
 	 */
 	function redirect() {
-		if (wzBelRedirect.destination) {
-			window.location.href = wzBelRedirect.destination;
+		if (wzlwRedirect.destination) {
+			window.location.href = wzlwRedirect.destination;
 		}
 	}
 
@@ -82,7 +82,7 @@
 	// Cancel redirect if user interacts with page.
 	document.addEventListener('click', function (e) {
 		// Don't cancel if clicking the continue button.
-		if (e.target.closest('.wz-bel-redirect-continue')) {
+		if (e.target.closest('.wzlw-redirect-continue')) {
 			return;
 		}
 		cancelRedirect();

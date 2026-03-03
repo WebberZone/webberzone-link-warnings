@@ -2,10 +2,10 @@
 /**
  * Class to display and save a Metabox.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\Better_External_Links\Admin\Settings;
+namespace WebberZone\Link_Warnings\Admin\Settings;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {

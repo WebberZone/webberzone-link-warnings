@@ -2,7 +2,7 @@
 /**
  * Sidebar template.
  *
- * @package WebberZone\Better_External_Links
+ * @package WebberZone\Link_Warnings
  */
 
 ?>

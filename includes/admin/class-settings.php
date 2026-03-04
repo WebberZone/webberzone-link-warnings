@@ -207,7 +207,7 @@ class Settings {
 			'type'          => 'submenu',
 			'parent_slug'   => 'options-general.php',
 			'page_title'    => esc_html__( 'WebberZone Link Warnings Settings', 'webberzone-link-warnings' ),
-			'menu_title'    => esc_html__( 'WebberZone Link Warnings', 'webberzone-link-warnings' ),
+			'menu_title'    => esc_html__( 'Link Warnings', 'webberzone-link-warnings' ),
 			'menu_slug'     => $this->menu_slug,
 		);
 

@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WebberZone\Link_Warnings\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Icon_Helper;
 
 /**
  * Content Processor class.
@@ -156,6 +157,12 @@ class Content_Processor {
 	 */
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
+
+		// Check if link has wzlw-no-icon class.
+		if ( strpos( $link_html, 'wzlw-no-icon' ) !== false ) {
+			return $link_html;
+		}
+
 		$indicator = $this->get_visual_indicator();
 
 		if ( empty( $indicator ) ) {
@@ -175,7 +182,7 @@ class Content_Processor {
 	 * @return string Indicator HTML.
 	 */
 	private function get_visual_indicator() {
-		$visual = isset( $this->settings['visual_indicator'] ) ? $this->settings['visual_indicator'] : 'icon';
+		$visual = $this->settings['visual_indicator'] ?? 'icon';
 
 		if ( 'none' === $visual ) {
 			return $this->get_screen_reader_text();
@@ -188,11 +195,12 @@ class Content_Processor {
 
 		// Add visual elements.
 		if ( 'icon' === $visual || 'both' === $visual ) {
-			$indicator .= '<span class="wzlw-icon" aria-hidden="true">↗</span>';
+			// Icon is added via CSS ::before pseudo-element using CSS variable.
+			$indicator .= '<span class="wzlw-icon" aria-hidden="true"></span>';
 		}
 
 		if ( 'text' === $visual || 'both' === $visual ) {
-			$text       = isset( $this->settings['indicator_text'] ) ? $this->settings['indicator_text'] : __( '(opens in new window)', 'webberzone-link-warnings' );
+			$text       = $this->settings['indicator_text'] ?? __( '(opens in new window)', 'webberzone-link-warnings' );
 			$indicator .= '<span class="wzlw-text" aria-hidden="true">' . esc_html( $text ) . '</span>';
 		}
 
@@ -206,7 +214,7 @@ class Content_Processor {
 	 * @return string Screen reader HTML.
 	 */
 	private function get_screen_reader_text() {
-		$text = isset( $this->settings['screen_reader_text'] ) ? $this->settings['screen_reader_text'] : __( 'Opens in a new window', 'webberzone-link-warnings' );
+		$text = $this->settings['screen_reader_text'] ?? __( 'Opens in a new window', 'webberzone-link-warnings' );
 		return '<span class="screen-reader-text">' . esc_html( $text ) . '</span>';
 	}
 

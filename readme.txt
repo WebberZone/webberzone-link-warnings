@@ -141,6 +141,29 @@ Yes. The plugin processes content through standard WordPress filters (`the_conte
 
 Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-screen.php` to override the default redirect screen with your own design.
 
+= How can I prevent icons from appearing on specific links? =
+
+Add the class `wzlw-no-icon` to any link where you don't want an icon to appear. For example:
+
+`<a href="https://example.com" class="wzlw-no-icon">Link without icon</a>`
+
+This will exclude the link from having visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+
+= Can I customize the icon that appears? =
+
+Yes. Go to Settings > WebberZone Link Warnings > Display tab and find the "Icon Style" dropdown. You can choose from several preset icons:
+
+- ↗ Arrow (North-East) - default
+- → Arrow (Right)
+- ⬈ Arrow (Up-Right)
+- ⧉ External Link Symbol
+- 🔗 Link Emoji
+- 🌐 Globe Emoji
+- * Asterisk
+- Custom (enter your own)
+
+**Using Custom Icons:** Select "Custom" and enter any Unicode symbol or emoji in the "Custom Icon" field. Examples: →, ⇗, 🔗, 🌐, *, +
+
 = Does this modify my database content? =
 
 No. The plugin only alters rendered output. Your stored content remains unchanged.

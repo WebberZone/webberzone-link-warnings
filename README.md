@@ -95,6 +95,40 @@ After activation, the setup wizard guides you through the initial configuration.
    - Excluded domains
    - Enabled post types
 
+## Excluding Icons on Specific Links
+
+To prevent icons from appearing on specific links, add the class `wzlw-no-icon` to the link:
+
+```html
+<a href="https://example.com" class="wzlw-no-icon">Link without icon</a>
+```
+
+This will exclude the link from having visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+
+## Customizing Icons
+
+You can choose from several preset icons or enter your own:
+
+1. Go to __Settings > WebberZone Link Warnings > Display tab__
+2. Find the __"Icon Style"__ dropdown
+3. Select from available options:
+   - ↗ Arrow (North-East) - default
+   - → Arrow (Right)
+   - ⬈ Arrow (Up-Right)
+   - ⧉ External Link Symbol
+   - 🔗 Link Emoji
+   - 🌐 Globe Emoji
+   - \* Asterisk
+   - Custom (enter your own)
+
+### Using Custom Icons
+
+To use a custom icon:
+
+1. Select "Custom" from the Icon Style dropdown
+2. In the "Custom Icon" field, enter any Unicode symbol or emoji
+3. Examples: `→`, `⇗`, `🔗`, `🌐`, `*`, `+`
+
 ## Screenshots
 
 ![WebberZone Link Warnings Settings](https://github.com/WebberZone/webberzone-link-warnings/blob/main/wporg-assets/screenshot-2.png)

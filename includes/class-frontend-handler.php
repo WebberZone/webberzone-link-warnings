@@ -54,6 +54,9 @@ class Frontend_Handler {
 			WZLW_VERSION
 		);
 
+		// Add inline CSS with icon variable.
+		$this->add_icon_inline_style();
+
 		// Enqueue JavaScript for modal and redirect methods.
 		if ( in_array( $method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 			wp_enqueue_script(
@@ -111,5 +114,44 @@ class Frontend_Handler {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Add inline CSS with icon variable.
+	 *
+	 * @since 1.0.0
+	 */
+	private function add_icon_inline_style() {
+		$settings    = wzlw_get_settings();
+		$icon_style  = $settings['icon_style'] ?? 'arrow_ne';
+		$custom_icon = $settings['custom_icon'] ?? '';
+		$icon_color  = $settings['icon_color'] ?? '#595959';
+		$icon_bg     = $settings['icon_background'] ?? '';
+
+		$icon = \WebberZone\Link_Warnings\Util\Icon_Helper::get_icon( $icon_style, $custom_icon );
+
+		// Escape for CSS content property.
+		$icon_escaped = addcslashes( $icon, '"\\' );
+
+		// Build inline CSS with variables.
+		// Sanitize colors and only add if valid.
+		$sanitized_icon_color = sanitize_hex_color( $icon_color );
+		$sanitized_icon_bg    = sanitize_hex_color( $icon_bg );
+
+		// Build inline CSS with variables.
+		$inline_css  = ':root {';
+		$inline_css .= ' --wzlw-icon-content: "' . $icon_escaped . '";';
+
+		if ( $sanitized_icon_color ) {
+			$inline_css .= ' --wzlw-icon-color: ' . $sanitized_icon_color . ';';
+		}
+
+		if ( $sanitized_icon_bg ) {
+			$inline_css .= ' --wzlw-icon-background: ' . $sanitized_icon_bg . ';';
+		}
+
+		$inline_css .= ' }';
+
+		wp_add_inline_style( 'wzlw-frontend', $inline_css );
 	}
 }

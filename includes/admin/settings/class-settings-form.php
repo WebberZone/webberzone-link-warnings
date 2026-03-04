@@ -238,6 +238,8 @@ class Settings_Form {
 	 * @param array $args Array of arguments.
 	 */
 	public function callback_color( $args ) {
+		// Add color-field class for wpColorPicker initialization.
+		$args['field_class'] = isset( $args['field_class'] ) ? $args['field_class'] . ' color-field' : 'color-field';
 		$this->callback_text( $args );
 	}
 

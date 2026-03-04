@@ -1,8 +1,8 @@
 # Settings Reference
 
-All plugin settings are available at **Settings > Better External Links**. The settings page is organised into three tabs: General, Display, and Advanced.
+All plugin settings are available at **Settings > WebberZone Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
 
-Settings are stored in a single WordPress option: `wz_bel_settings`.
+Settings are stored in a single WordPress option: `wzlw_settings`.
 
 ## General tab
 

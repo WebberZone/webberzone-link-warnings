@@ -1,6 +1,6 @@
 # Developer Reference
 
-This document covers the filters, actions, PHP functions, and integration points available in Better External Links. All hooks use the `wz_bel` prefix.
+This document covers the filters, actions, PHP functions, and integration points available in WebberZone Link Warnings. All hooks use the `wzlw` prefix.
 
 ## PHP wrapper functions
 
@@ -108,12 +108,12 @@ wzbel_settings_reset();
 
 ## Filter hooks
 
-### `wz_bel_get_settings`
+### `wzlw_get_settings`
 
 Filters the full settings array after it is retrieved and merged with defaults.
 
 ```php
-add_filter( 'wz_bel_get_settings', function ( array $settings ): array {
+add_filter( 'wzlw_get_settings', function ( array $settings ): array {
     // Force modal method on all sites.
     $settings['warning_method'] = 'modal';
     return $settings;
@@ -124,12 +124,12 @@ add_filter( 'wz_bel_get_settings', function ( array $settings ): array {
 
 - `$settings` *(array)* — The merged settings array.
 
-### `wz_bel_get_option`
+### `wzlw_get_option`
 
 Filters the value of any individual setting when retrieved via `wzbel_get_option()`.
 
 ```php
-add_filter( 'wz_bel_get_option', function ( $value, string $key, $default ) {
+add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
     if ( 'redirect_countdown' === $key ) {
         return 10; // Override countdown to 10 seconds.
     }
@@ -143,12 +143,12 @@ add_filter( 'wz_bel_get_option', function ( $value, string $key, $default ) {
 - `$key` *(string)* — The setting key.
 - `$default_value` *(mixed)* — The default value.
 
-### `wz_bel_get_option_{$key}`
+### `wzlw_get_option_{$key}`
 
 Key-specific variant of the above filter. Fires only for the named key.
 
 ```php
-add_filter( 'wz_bel_get_option_warning_method', function ( $value ) {
+add_filter( 'wzlw_get_option_warning_method', function ( $value ) {
     if ( wp_is_mobile() ) {
         return 'inline'; // Use inline-only on mobile devices.
     }
@@ -156,12 +156,12 @@ add_filter( 'wz_bel_get_option_warning_method', function ( $value ) {
 } );
 ```
 
-### `wz_bel_update_option`
+### `wzlw_update_option`
 
 Filters a setting value before it is saved to the database.
 
 ```php
-add_filter( 'wz_bel_update_option', function ( $value, string $key ) {
+add_filter( 'wzlw_update_option', function ( $value, string $key ) {
     if ( 'redirect_countdown' === $key ) {
         return max( 3, (int) $value ); // Enforce minimum 3 seconds.
     }
@@ -174,12 +174,12 @@ add_filter( 'wz_bel_update_option', function ( $value, string $key ) {
 - `$value` *(mixed)* — The value being saved.
 - `$key` *(string)* — The setting key.
 
-### `wz_bel_excluded_domains`
+### `wzlw_excluded_domains`
 
 Filters the list of excluded domains before the external link check runs. Use this to add domains programmatically without modifying the settings.
 
 ```php
-add_filter( 'wz_bel_excluded_domains', function ( array $domains, string $link_host ): array {
+add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_host ): array {
     $domains[] = 'cdn.example.com';
     $domains[] = 'assets.example.com';
     return $domains;
@@ -191,36 +191,36 @@ add_filter( 'wz_bel_excluded_domains', function ( array $domains, string $link_h
 - `$domains` *(array)* — Array of excluded domain strings.
 - `$link_host` *(string)* — The host of the link being evaluated.
 
-### `wz_bel_settings_defaults`
+### `wzlw_settings_defaults`
 
 Filters the default settings array. Useful for changing defaults in a must-use plugin or theme.
 
 ```php
-add_filter( 'wz_bel_settings_defaults', function ( array $defaults ): array {
+add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
     $defaults['warning_method'] = 'redirect';
     $defaults['redirect_countdown'] = 10;
     return $defaults;
 } );
 ```
 
-### `wz_bel_registered_settings`
+### `wzlw_registered_settings`
 
 Filters the registered settings array. Use this to add, remove, or modify settings fields on the admin page.
 
 ```php
-add_filter( 'wz_bel_registered_settings', function ( array $settings ): array {
+add_filter( 'wzlw_registered_settings', function ( array $settings ): array {
     // Remove the redirect countdown field.
     unset( $settings['display']['redirect_countdown'] );
     return $settings;
 } );
 ```
 
-### `wz_bel_settings_sections`
+### `wzlw_settings_sections`
 
 Filters the settings page tab definitions.
 
 ```php
-add_filter( 'wz_bel_settings_sections', function ( array $sections ): array {
+add_filter( 'wzlw_settings_sections', function ( array $sections ): array {
     $sections['custom'] = esc_html__( 'Custom', 'my-plugin' );
     return $sections;
 } );
@@ -230,12 +230,12 @@ add_filter( 'wz_bel_settings_sections', function ( array $sections ): array {
 
 Each settings section has its own filter, fired when the section's fields are defined:
 
-- `wz_bel_settings_general` — General tab fields.
-- `wz_bel_settings_display` — Display tab fields.
-- `wz_bel_settings_advanced` — Advanced tab fields.
+- `wzlw_settings_general` — General tab fields.
+- `wzlw_settings_display` — Display tab fields.
+- `wzlw_settings_advanced` — Advanced tab fields.
 
 ```php
-add_filter( 'wz_bel_settings_advanced', function ( array $settings ): array {
+add_filter( 'wzlw_settings_advanced', function ( array $settings ): array {
     $settings['my_custom_field'] = array(
         'id'      => 'my_custom_field',
         'name'    => 'My Custom Field',
@@ -247,12 +247,12 @@ add_filter( 'wz_bel_settings_advanced', function ( array $settings ): array {
 } );
 ```
 
-### `wz_bel_settings_sanitize`
+### `wzlw_settings_sanitize`
 
 Filters the settings array immediately before it is saved. Runs on every settings save.
 
 ```php
-add_filter( 'wz_bel_settings_sanitize', function ( array $settings ): array {
+add_filter( 'wzlw_settings_sanitize', function ( array $settings ): array {
     // Ensure countdown is never below 3.
     if ( isset( $settings['redirect_countdown'] ) ) {
         $settings['redirect_countdown'] = max( 3, (int) $settings['redirect_countdown'] );
@@ -263,10 +263,10 @@ add_filter( 'wz_bel_settings_sanitize', function ( array $settings ): array {
 
 ## Accessing the plugin instance
 
-The main plugin singleton is accessible via the `wz_bel()` function:
+The main plugin singleton is accessible via the `wzlw()` function:
 
 ```php
-$plugin = wz_bel();
+$plugin = wzlw();
 
 // Access sub-components.
 $plugin->content_processor;
@@ -287,9 +287,9 @@ The high priority ensures the plugin runs after most other content filters. If y
 To prevent the plugin from processing specific content, you can remove the filter temporarily:
 
 ```php
-remove_filter( 'the_content', array( wz_bel()->content_processor, 'process_content' ), 999 );
+remove_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
 echo apply_filters( 'the_content', $my_content );
-add_filter( 'the_content', array( wz_bel()->content_processor, 'process_content' ), 999 );
+add_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
 ```
 
 ## JavaScript objects

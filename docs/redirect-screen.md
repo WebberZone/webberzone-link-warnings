@@ -42,13 +42,13 @@ includes/templates/redirect-screen.php
 To override it, copy the file to your theme (or child theme):
 
 ```text
-your-theme/better-external-links/redirect-screen.php
+your-theme/webberzone-link-warnings/redirect-screen.php
 ```
 
 The plugin checks for the template in the following order:
 
-1. `your-theme/better-external-links/redirect-screen.php`
-2. `your-theme/better-external-links/redirect.php`
+1. `your-theme/webberzone-link-warnings/redirect-screen.php`
+2. `your-theme/webberzone-link-warnings/redirect.php`
 3. The plugin's built-in template.
 
 This uses WordPress's `locate_template()`, so child themes take priority over parent themes.
@@ -141,7 +141,7 @@ If you are using a fully custom template and do not need the default styles, you
 
 ```php
 add_action( 'wp_enqueue_scripts', function () {
-    if ( get_query_var( 'wz_bel_redirect' ) ) {
+    if ( get_query_var( 'wzlw_redirect' ) ) {
         wp_dequeue_style( 'wz-bel-redirect' );
     }
 }, 20 );

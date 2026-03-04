@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-03T18:33:02+00:00\n"
+"POT-Creation-Date: 2026-03-04T05:29:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webberzone-link-warnings\n"
@@ -54,44 +54,44 @@ msgid "WebberZone Link Warnings requires WordPress 6.6 or higher. You are runnin
 msgstr ""
 
 #: includes/admin/class-activator.php:116
-#: includes/admin/class-settings.php:332
-#: includes/class-content-processor.php:195
+#: includes/admin/class-settings.php:362
+#: includes/class-content-processor.php:203
 msgid "(opens in new window)"
 msgstr ""
 
 #: includes/admin/class-activator.php:117
-#: includes/admin/class-settings.php:339
-#: includes/class-content-processor.php:209
-#: includes/class-content-processor.php:221
+#: includes/admin/class-settings.php:369
+#: includes/class-content-processor.php:217
+#: includes/class-content-processor.php:229
 msgid "Opens in a new window"
 msgstr ""
 
 #: includes/admin/class-activator.php:118
-#: includes/admin/class-settings.php:354
-#: includes/class-frontend-handler.php:72
+#: includes/admin/class-settings.php:384
+#: includes/class-frontend-handler.php:75
 msgid "You are leaving this site"
 msgstr ""
 
 #: includes/admin/class-activator.php:119
-#: includes/admin/class-settings.php:361
-#: includes/class-frontend-handler.php:73
+#: includes/admin/class-settings.php:391
+#: includes/class-frontend-handler.php:76
 msgid "You are about to visit an external website. Continue?"
 msgstr ""
 
 #: includes/admin/class-activator.php:120
-#: includes/admin/class-settings.php:368
-#: includes/class-frontend-handler.php:74
+#: includes/admin/class-settings.php:398
+#: includes/class-frontend-handler.php:77
 msgid "Continue"
 msgstr ""
 
 #: includes/admin/class-activator.php:121
-#: includes/admin/class-settings.php:375
-#: includes/class-frontend-handler.php:75
+#: includes/admin/class-settings.php:405
+#: includes/class-frontend-handler.php:78
 msgid "Cancel"
 msgstr ""
 
 #: includes/admin/class-activator.php:122
-#: includes/admin/class-settings.php:390
+#: includes/admin/class-settings.php:420
 #: includes/class-redirect-handler.php:153
 msgid "You are being redirected to an external site."
 msgstr ""
@@ -114,13 +114,13 @@ msgstr ""
 
 #: includes/admin/class-admin.php:95
 #: includes/admin/class-settings.php:182
-#: includes/admin/class-settings.php:516
+#: includes/admin/class-settings.php:546
 msgid "Settings"
 msgstr ""
 
 #: includes/admin/class-admin.php:101
-#: includes/admin/class-settings.php:461
-#: includes/admin/class-settings.php:534
+#: includes/admin/class-settings.php:491
+#: includes/admin/class-settings.php:564
 #: includes/admin/sidebar.php:30
 msgid "Support"
 msgstr ""
@@ -154,7 +154,7 @@ msgid "Configure visual indicators and screen reader text for accessibility."
 msgstr ""
 
 #: includes/admin/class-settings-wizard.php:141
-#: includes/admin/class-settings.php:345
+#: includes/admin/class-settings.php:375
 msgid "Modal Dialog"
 msgstr ""
 
@@ -163,7 +163,7 @@ msgid "Customize the modal dialog text and buttons."
 msgstr ""
 
 #: includes/admin/class-settings-wizard.php:146
-#: includes/admin/class-settings.php:381
+#: includes/admin/class-settings.php:411
 msgid "Redirect Screen"
 msgstr ""
 
@@ -264,7 +264,7 @@ msgid "Previously saved"
 msgstr ""
 
 #: includes/admin/class-settings.php:226
-#: includes/admin/class-settings.php:477
+#: includes/admin/class-settings.php:507
 msgid "General"
 msgstr ""
 
@@ -357,100 +357,132 @@ msgid "None (screen reader only)"
 msgstr ""
 
 #: includes/admin/class-settings.php:329
-msgid "Indicator Text"
+msgid "Icon Style"
 msgstr ""
 
 #: includes/admin/class-settings.php:330
-msgid "Text displayed next to links (when text indicator is enabled)."
-msgstr ""
-
-#: includes/admin/class-settings.php:336
-msgid "Screen Reader Text"
+msgid "Choose which icon to display next to external links."
 msgstr ""
 
 #: includes/admin/class-settings.php:337
-msgid "Hidden text for screen readers."
+msgid "Custom Icon"
 msgstr ""
 
-#: includes/admin/class-settings.php:351
-msgid "Modal Title"
+#: includes/admin/class-settings.php:338
+msgid "Enter your custom icon (only used when \"Custom\" is selected above). You can use Unicode symbols or emojis."
+msgstr ""
+
+#: includes/admin/class-settings.php:345
+msgid "Icon Color"
+msgstr ""
+
+#: includes/admin/class-settings.php:346
+msgid "Choose the color for the icon."
 msgstr ""
 
 #: includes/admin/class-settings.php:352
-msgid "Title shown in the modal dialog."
+msgid "Icon Background Color"
 msgstr ""
 
-#: includes/admin/class-settings.php:358
-msgid "Modal Message"
+#: includes/admin/class-settings.php:353
+msgid "Choose the background color for the icon. Leave empty for transparent."
 msgstr ""
 
 #: includes/admin/class-settings.php:359
-msgid "Message shown in the modal dialog."
+msgid "Indicator Text"
 msgstr ""
 
-#: includes/admin/class-settings.php:365
-msgid "Continue Button Text"
+#: includes/admin/class-settings.php:360
+msgid "Text displayed next to links (when text indicator is enabled)."
 msgstr ""
 
 #: includes/admin/class-settings.php:366
-msgid "Text for the continue button."
+msgid "Screen Reader Text"
 msgstr ""
 
-#: includes/admin/class-settings.php:372
-msgid "Cancel Button Text"
+#: includes/admin/class-settings.php:367
+msgid "Hidden text for screen readers."
 msgstr ""
 
-#: includes/admin/class-settings.php:373
-msgid "Text for the cancel button."
+#: includes/admin/class-settings.php:381
+msgid "Modal Title"
 msgstr ""
 
-#: includes/admin/class-settings.php:387
-msgid "Redirect Message"
+#: includes/admin/class-settings.php:382
+msgid "Title shown in the modal dialog."
 msgstr ""
 
 #: includes/admin/class-settings.php:388
-msgid "Message shown on the redirect page."
+msgid "Modal Message"
 msgstr ""
 
-#: includes/admin/class-settings.php:394
-msgid "Redirect Countdown"
+#: includes/admin/class-settings.php:389
+msgid "Message shown in the modal dialog."
 msgstr ""
 
 #: includes/admin/class-settings.php:395
-msgid "Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect."
+msgid "Continue Button Text"
+msgstr ""
+
+#: includes/admin/class-settings.php:396
+msgid "Text for the continue button."
+msgstr ""
+
+#: includes/admin/class-settings.php:402
+msgid "Cancel Button Text"
+msgstr ""
+
+#: includes/admin/class-settings.php:403
+msgid "Text for the cancel button."
+msgstr ""
+
+#: includes/admin/class-settings.php:417
+msgid "Redirect Message"
+msgstr ""
+
+#: includes/admin/class-settings.php:418
+msgid "Message shown on the redirect page."
+msgstr ""
+
+#: includes/admin/class-settings.php:424
+msgid "Redirect Countdown"
 msgstr ""
 
 #: includes/admin/class-settings.php:425
+msgid "Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect."
+msgstr ""
+
+#: includes/admin/class-settings.php:455
 msgid "Excluded Domains"
 msgstr ""
 
-#: includes/admin/class-settings.php:426
+#: includes/admin/class-settings.php:456
 msgid "Enter one domain per line (e.g., example.com). These domains will be treated as internal."
 msgstr ""
 
-#: includes/admin/class-settings.php:459
+#: includes/admin/class-settings.php:489
 msgid "For more information:"
 msgstr ""
 
-#: includes/admin/class-settings.php:460
+#: includes/admin/class-settings.php:490
 msgid "Plugin Homepage"
 msgstr ""
 
-#: includes/admin/class-settings.php:479
+#: includes/admin/class-settings.php:509
 msgid "Configure the general behavior of the plugin."
 msgstr ""
 
-#: includes/admin/class-settings.php:480
+#: includes/admin/class-settings.php:510
 msgid "Choose your preferred warning method and which links should be processed."
 msgstr ""
 
 #. translators: 1: WebberZone Link Warnings link, 2: Plugin rating link
-#: includes/admin/class-settings.php:497
+#: includes/admin/class-settings.php:527
 #, php-format
 msgid "Thank you for using <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WebberZone Link Warnings</a>! Please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">rate us</a> on WordPress.org"
 msgstr ""
 
-#: includes/admin/class-settings.php:535
+#: includes/admin/class-settings.php:565
 msgid "Donate"
 msgstr ""
 
@@ -463,7 +495,6 @@ msgid "WebberZone Link Warnings homepage"
 msgstr ""
 
 #: includes/admin/sidebar.php:26
-#: includes/admin/sidebar.php:58
 msgid "Knowledge Base"
 msgstr ""
 
@@ -483,39 +514,11 @@ msgstr ""
 msgid "WebberZone plugins"
 msgstr ""
 
-#: includes/admin/sidebar.php:55
-msgid "Top 10"
-msgstr ""
-
-#: includes/admin/sidebar.php:56
-msgid "Contextual Related Posts"
-msgstr ""
-
-#: includes/admin/sidebar.php:57
-msgid "Better Search"
-msgstr ""
-
-#: includes/admin/sidebar.php:59
-msgid "Snippetz"
-msgstr ""
-
-#: includes/admin/sidebar.php:60
-msgid "Followed Posts"
-msgstr ""
-
-#: includes/admin/sidebar.php:61
-msgid "Popular Authors"
-msgstr ""
-
-#: includes/admin/sidebar.php:62
-msgid "Auto Close"
-msgstr ""
-
 #: includes/admin/sidebar.php:72
 msgid "Follow us"
 msgstr ""
 
-#: includes/class-frontend-handler.php:99
+#: includes/class-frontend-handler.php:102
 msgid "Close dialog"
 msgstr ""
 
@@ -539,4 +542,36 @@ msgstr ""
 #: includes/templates/redirect-screen.php:65
 #, php-format
 msgid "Redirecting automatically in %s seconds..."
+msgstr ""
+
+#: includes/util/class-icon-helper.php:33
+msgid "Arrow (North-East) ↗"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:34
+msgid "Arrow (Right) →"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:35
+msgid "Arrow (Up-Right) ⬈"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:36
+msgid "External Link Symbol ⧉"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:37
+msgid "Link Emoji 🔗"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:38
+msgid "Globe Emoji 🌐"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:39
+msgid "Asterisk *"
+msgstr ""
+
+#: includes/util/class-icon-helper.php:40
+msgid "Custom (enter below)"
 msgstr ""

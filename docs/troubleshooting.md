@@ -1,20 +1,20 @@
 # Troubleshooting
 
-This guide covers common issues, diagnostics, and frequently asked questions for Better External Links.
+This guide covers common issues, diagnostics, and frequently asked questions for WebberZone Link Warnings.
 
 ## Links are not being processed
 
-**Check the post type.** The plugin only processes content on singular views of enabled post types. Archive pages, search results, and custom loops are not affected. Verify that the current post type is listed under **Settings > Better External Links > General > Enabled Post Types**.
+**Check the post type.** The plugin only processes content on singular views of enabled post types. Archive pages, search results, and custom loops are not affected. Verify that the current post type is listed under **Settings > WebberZone Link Warnings > General > Enabled Post Types**.
 
 **Check the link scope.** If the scope is set to "External links only", internal links with `target="_blank"` are not processed. Switch to "External links and all target='_blank' links" if you need those covered.
 
 **Check excluded domains.** If a domain appears in the excluded domains list (under the Advanced tab), links to that domain are treated as internal and skipped.
 
-**Check for filter conflicts.** Another plugin or theme may be removing or overriding the `the_content` filter at a priority that interferes. Better External Links runs at priority 999. If another filter runs later and strips data attributes or classes, the plugin's output may be lost.
+**Check for filter conflicts.** Another plugin or theme may be removing or overriding the `the_content` filter at a priority that interferes. WebberZone Link Warnings runs at priority 999. If another filter runs later and strips data attributes or classes, the plugin's output may be lost.
 
 ## The modal does not appear
 
-**Verify the warning method.** The modal only renders when the warning method is set to "Modal dialog" or "Inline indicators + Modal dialog". Check **Settings > Better External Links > General > Warning Method**.
+**Verify the warning method.** The modal only renders when the warning method is set to "Modal dialog" or "Inline indicators + Modal dialog". Check **Settings > WebberZone Link Warnings > General > Warning Method**.
 
 **Check for JavaScript errors.** Open the browser console (F12 > Console) and look for errors. A JavaScript error from another plugin or theme can prevent the modal script from initialising.
 
@@ -52,7 +52,7 @@ The plugin includes scoped selectors with minimal `!important` declarations for 
 
 ## The plugin does not work with my page builder
 
-Better External Links processes content through the standard `the_content` and `the_excerpt` WordPress filters. Most page builders pass their output through these filters, so the plugin should work without additional configuration.
+WebberZone Link Warnings processes content through the standard `the_content` and `the_excerpt` WordPress filters. Most page builders pass their output through these filters, so the plugin should work without additional configuration.
 
 If your page builder renders content outside these filters (e.g. via custom shortcodes or AJAX calls that bypass the main query), the plugin will not process that content. There is no workaround for this within the plugin itself — the page builder would need to apply `the_content` filter to its output.
 
@@ -66,7 +66,7 @@ To process arbitrary HTML, you can apply the content filter manually:
 $processed = apply_filters( 'the_content', $my_html );
 ```
 
-Be aware that this runs all content filters, not just Better External Links.
+Be aware that this runs all content filters, not just WebberZone Link Warnings.
 
 ## The plugin affects REST API responses
 
@@ -80,7 +80,7 @@ For most sites, the processing overhead is negligible. If you have pages with an
 
 ## Multisite considerations
 
-The plugin can be network-activated. Settings are stored per-site in the `wz_bel_settings` option, so each site in the network can have its own configuration. There is no network-wide settings page.
+The plugin can be network-activated. Settings are stored per-site in the `wzlw_settings` option, so each site in the network can have its own configuration. There is no network-wide settings page.
 
 On network activation, the activator runs on each site in the network to set default settings and flush rewrite rules.
 
@@ -90,12 +90,12 @@ The plugin does not collect personal data, set cookies, or send information to e
 
 ## Uninstallation
 
-The `uninstall.php` file runs when the plugin is deleted from the WordPress dashboard. It removes the `wz_bel_settings` option, wizard-related options, and transients from the database. On multisite, it runs cleanup on every site in the network. Deactivation alone does not remove settings — they are preserved in case you reactivate the plugin later.
+The `uninstall.php` file runs when the plugin is deleted from the WordPress dashboard. It removes the `wzlw_settings` option, wizard-related options, and transients from the database. On multisite, it runs cleanup on every site in the network. Deactivation alone does not remove settings — they are preserved in case you reactivate the plugin later.
 
 ## Getting help
 
-- **Documentation:** [webberzone.com/support/better-external-links/](https://webberzone.com/support/better-external-links/)
-- **WordPress support forum:** [wordpress.org/support/plugin/better-external-links/](https://wordpress.org/support/plugin/better-external-links/)
-- **GitHub issues:** [github.com/WebberZone/better-external-links/issues](https://github.com/WebberZone/better-external-links/issues)
+- **Documentation:** [webberzone.com/support/webberzone-link-warnings/](https://webberzone.com/support/webberzone-link-warnings/)
+- **WordPress support forum:** [wordpress.org/support/plugin/webberzone-link-warnings/](https://wordpress.org/support/plugin/webberzone-link-warnings/)
+- **GitHub issues:** [github.com/WebberZone/webberzone-link-warnings/issues](https://github.com/WebberZone/webberzone-link-warnings/issues)
 
 GitHub is for bug reports only. For general support questions, use the WordPress.org forum.

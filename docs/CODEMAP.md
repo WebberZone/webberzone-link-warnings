@@ -1,11 +1,11 @@
-# Better External Links - Codemap
+# WebberZone Link Warnings - Codemap
 
 ## Plugin Overview
 
-**Name**: Better External Links  
+**Name**: WebberZone Link Warnings  
 **Version**: 1.0.0  
-**Namespace**: `WebberZone\Better_External_Links`  
-**Text Domain**: `better-external-links`  
+**Namespace**: `WebberZone\Link_Warnings`  
+**Text Domain**: `webberzone-link-warnings`  
 **Minimum PHP**: 7.4  
 **Minimum WordPress**: 6.0  
 
@@ -25,8 +25,8 @@ Enhances accessibility by warning users when links open in new windows or naviga
 ### File Structure
 
 ```
-better-external-links/
-├── better-external-links.php          # Bootstrap file
+webberzone-link-warnings/
+├── webberzone-link-warnings.php          # Bootstrap file
 ├── includes/
 │   ├── class-autoloader.php           # PSR-4 autoloader (needs update)
 │   ├── class-main.php                 # Main singleton class
@@ -49,7 +49,7 @@ better-external-links/
 
 ### 1. Main (`class-main.php`)
 
-**Namespace**: `WebberZone\Better_External_Links\Main`  
+**Namespace**: `WebberZone\Link_Warnings\Main`  
 **Pattern**: Singleton  
 **Purpose**: Plugin initialization and component loading
 
@@ -230,7 +230,7 @@ array(
 
 ### 6. Autoloader (`class-autoloader.php`)
 
-**Namespace**: `WebberZone\Better_External_Links\Autoloader`  
+**Namespace**: `WebberZone\Link_Warnings\Autoloader`  
 **Purpose**: PSR-4 style autoloader
 
 **Methods**:
@@ -247,18 +247,18 @@ array(
 ## Constants
 
 ```php
-WZ_BEL_VERSION         // Plugin version
-WZ_BEL_PLUGIN_FILE     // Main plugin file path
-WZ_BEL_PLUGIN_DIR      // Plugin directory path
-WZ_BEL_PLUGIN_URL      // Plugin URL
-WZ_BEL_PLUGIN_BASENAME // Plugin basename
+WZLW_VERSION         // Plugin version
+WZLW_PLUGIN_FILE     // Main plugin file path
+WZLW_PLUGIN_DIR      // Plugin directory path
+WZLW_PLUGIN_URL      // Plugin URL
+WZLW_PLUGIN_BASENAME // Plugin basename
 ```
 
 ## Database
 
 ### Options
 
-- `wz_bel_settings` - Main settings array
+- `wzlw_settings` - Main settings array
 
 ## CSS Classes
 
@@ -310,8 +310,8 @@ WZ_BEL_PLUGIN_BASENAME // Plugin basename
 
 **Events**:
 
-- `wz_bel_modal_opened` - Fired when modal opens
-- `wz_bel_modal_closed` - Fired when modal closes
+- `wzlw_modal_opened` - Fired when modal opens
+- `wzlw_modal_closed` - Fired when modal closes
 
 **Functions**:
 
@@ -335,24 +335,24 @@ WZ_BEL_PLUGIN_BASENAME // Plugin basename
 ### Actions
 
 ```php
-do_action( 'wz_bel_before_init' );
-do_action( 'wz_bel_after_init' );
+do_action( 'wzlw_before_init' );
+do_action( 'wzlw_after_init' );
 ```
 
 ### Filters
 
 ```php
-apply_filters( 'wz_bel_settings', $settings );
-apply_filters( 'wz_bel_processed_content', $content, $original_content );
-apply_filters( 'wz_bel_indicator_html', $html, $link_url, $is_external );
-apply_filters( 'wz_bel_excluded_domains', $domains );
+apply_filters( 'wzlw_settings', $settings );
+apply_filters( 'wzlw_processed_content', $content, $original_content );
+apply_filters( 'wzlw_indicator_html', $html, $link_url, $is_external );
+apply_filters( 'wzlw_excluded_domains', $domains );
 ```
 
 ## Issues to Fix
 
 ### Critical
 
-1. **Namespace Inconsistency**: Multiple classes use `WebberZone\External_Link_Accessibility` instead of `WebberZone\Better_External_Links`
+1. **Namespace Inconsistency**: Multiple classes use `WebberZone\External_Link_Accessibility` instead of `WebberZone\Link_Warnings`
 2. **No composer.json**: Missing dependency management
 3. **Basic Autoloader**: Needs modernization
 4. **Old Settings API**: Not using WebberZone Settings API pattern

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <wpml-config>
 	<admin-texts>
-		<key name="wz_bel_settings">
+		<key name="wzlw_settings">
 			<key name="indicator_text" />
 			<key name="screen_reader_text" />
 			<key name="modal_title" />

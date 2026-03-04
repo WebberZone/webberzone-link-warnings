@@ -1,8 +1,8 @@
-# Better External Links - Detailed Improvement Plan
+# WebberZone Link Warnings - Detailed Improvement Plan
 
 ## Executive Summary
 
-This document outlines a comprehensive improvement plan for the Better External Links plugin. The plan is organized into phases, prioritized by impact and dependencies, and designed to modernize the plugin to match the architecture and quality standards of other WebberZone plugins like Knowledge Base Pro and Top 10 Pro.
+This document outlines a comprehensive improvement plan for the WebberZone Link Warnings plugin. The plan is organized into phases, prioritized by impact and dependencies, and designed to modernize the plugin to match the architecture and quality standards of other WebberZone plugins like Knowledge Base Pro and Top 10 Pro.
 
 ## Current State Assessment
 
@@ -11,7 +11,7 @@ This document outlines a comprehensive improvement plan for the Better External 
 - Modern PSR-4 autoloader
 - WebberZone Settings API integration
 - Hook Registry for centralized hook management
-- Consistent namespace structure (`WebberZone\Better_External_Links`)
+- Consistent namespace structure (`WebberZone\Link_Warnings`)
 - Composer support with dev dependencies
 - PHPStan, PHPCS, and PHPUnit configurations
 - Comprehensive documentation (CODEMAP.md, MODERNIZATION-SUMMARY.md)
@@ -20,7 +20,7 @@ This document outlines a comprehensive improvement plan for the Better External 
 
 1. **Architecture**: Missing Options API class for centralized settings access
 2. **Code Quality**: Some unused parameters, missing type hints
-3. **Text Domain**: Inconsistent text domain usage (mix of `better-external-links` and `external-link-accessibility`)
+3. **Text Domain**: Inconsistent text domain usage (mix of `webberzone-link-warnings` and `external-link-accessibility`)
 4. **Assets**: No minification or build process
 5. **Admin**: No activator/deactivator classes
 6. **Testing**: No actual unit tests written
@@ -45,8 +45,8 @@ This document outlines a comprehensive improvement plan for the Better External 
 
 - [ ] Create `includes/class-options-api.php`
 - [ ] Define constants:
-  - `SETTINGS_OPTION` = 'wz_bel_settings'
-  - `FILTER_PREFIX` = 'wz_bel'
+  - `SETTINGS_OPTION` = 'wzlw_settings'
+  - `FILTER_PREFIX` = 'wzlw'
 - [ ] Implement methods:
   - `get_settings()` - Get all settings with defaults
   - `get_option()` - Get single option with default
@@ -92,7 +92,7 @@ This document outlines a comprehensive improvement plan for the Better External 
   - Flush rewrite rules
   - Clear transients/cache
   - Log deactivation (optional)
-- [ ] Update `better-external-links.php` to use these classes
+- [ ] Update `webberzone-link-warnings.php` to use these classes
 - [ ] Remove activation logic from main plugin file
 
 **Files to Create**:
@@ -102,7 +102,7 @@ This document outlines a comprehensive improvement plan for the Better External 
 
 **Files to Update**:
 
-- `better-external-links.php`
+- `webberzone-link-warnings.php`
 
 **Benefits**:
 
@@ -158,7 +158,7 @@ This document outlines a comprehensive improvement plan for the Better External 
 
 **Tasks**:
 
-- [ ] Search and replace `external-link-accessibility` with `better-external-links`
+- [ ] Search and replace `external-link-accessibility` with `webberzone-link-warnings`
 - [ ] Audit all `__()`, `_e()`, `_n()`, `_x()`, `esc_html__()`, `esc_html_e()`, `esc_attr__()`, `esc_attr_e()` calls
 - [ ] Update text domain in:
   - `includes/class-content-processor.php`
@@ -319,26 +319,26 @@ public function process_content( string $content ): string {
 **Tasks**:
 
 - [ ] Add filters for settings:
-  - `wz_bel_settings` - Filter all settings
-  - `wz_bel_default_settings` - Filter default settings
-  - `wz_bel_settings_{$section}` - Filter section settings
+  - `wzlw_settings` - Filter all settings
+  - `wzlw_default_settings` - Filter default settings
+  - `wzlw_settings_{$section}` - Filter section settings
 - [ ] Add filters for content processing:
-  - `wz_bel_process_content` - Filter before processing
-  - `wz_bel_processed_content` - Filter after processing
-  - `wz_bel_should_process_link` - Filter link processing decision
-  - `wz_bel_link_attributes` - Filter link attributes
-  - `wz_bel_indicator_html` - Filter indicator HTML
+  - `wzlw_process_content` - Filter before processing
+  - `wzlw_processed_content` - Filter after processing
+  - `wzlw_should_process_link` - Filter link processing decision
+  - `wzlw_link_attributes` - Filter link attributes
+  - `wzlw_indicator_html` - Filter indicator HTML
 - [ ] Add filters for modal:
-  - `wz_bel_modal_settings` - Filter modal settings
-  - `wz_bel_modal_html` - Filter modal HTML
+  - `wzlw_modal_settings` - Filter modal settings
+  - `wzlw_modal_html` - Filter modal HTML
 - [ ] Add filters for redirect:
-  - `wz_bel_redirect_url` - Filter redirect URL
-  - `wz_bel_redirect_template` - Filter redirect template
+  - `wzlw_redirect_url` - Filter redirect URL
+  - `wzlw_redirect_template` - Filter redirect template
 - [ ] Add actions:
-  - `wz_bel_before_init` - Before plugin initialization
-  - `wz_bel_after_init` - After plugin initialization
-  - `wz_bel_settings_saved` - After settings saved
-  - `wz_bel_link_processed` - After link processed
+  - `wzlw_before_init` - Before plugin initialization
+  - `wzlw_after_init` - After plugin initialization
+  - `wzlw_settings_saved` - After settings saved
+  - `wzlw_link_processed` - After link processed
 - [ ] Document all hooks in README.md
 
 **Files to Update**:
@@ -1329,7 +1329,7 @@ public function process_content( string $content ): string {
 
 ## Conclusion
 
-This improvement plan provides a comprehensive roadmap for modernizing the Better External Links plugin. By following this plan, the plugin will achieve:
+This improvement plan provides a comprehensive roadmap for modernizing the WebberZone Link Warnings plugin. By following this plan, the plugin will achieve:
 
 1. **Professional Quality**: PHPStan level 8, PHPCS compliance, comprehensive testing
 2. **Modern Architecture**: Options API, proper class structure, extensibility hooks

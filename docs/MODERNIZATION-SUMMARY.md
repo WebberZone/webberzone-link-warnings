@@ -1,8 +1,8 @@
-# Better External Links - Modernization Summary
+# WebberZone Link Warnings - Modernization Summary
 
 ## Overview
 
-Successfully modernized the Better External Links plugin to match the architecture patterns from Knowledge Base Pro and other WebberZone plugins.
+Successfully modernized the WebberZone Link Warnings plugin to match the architecture patterns from Knowledge Base Pro and other WebberZone plugins.
 
 ## Completed Tasks
 
@@ -101,9 +101,9 @@ Successfully modernized the Better External Links plugin to match the architectu
 
 ### 9. ✅ Updated Main Plugin File
 
-- Updated `better-external-links.php`:
+- Updated `webberzone-link-warnings.php`:
   - Now loads autoloader instead of individual files
-  - Fixed `wz_bel()` function to return proper namespaced class
+  - Fixed `wzlw()` function to return proper namespaced class
   - Maintains backward compatibility
 
 ### 10. ✅ Updated Main Class
@@ -115,8 +115,8 @@ Successfully modernized the Better External Links plugin to match the architectu
 
 ### 11. ✅ Fixed Function Calls & Constants
 
-- Replaced all `wz_ela()` calls with `wz_bel()`
-- Replaced all `WZ_ELA_*` constants with `WZ_BEL_*`
+- Replaced all `wz_ela()` calls with `wzlw()`
+- Replaced all `WZ_ELA_*` constants with `WZLW_*`
 - Updated in:
   - `class-content-processor.php`
   - `class-frontend-handler.php`
@@ -157,7 +157,7 @@ includes/class-settings-old.php.bak  # Old settings file (backup)
 ### Files Updated
 
 ```
-better-external-links.php            # Updated to use autoloader
+webberzone-link-warnings.php            # Updated to use autoloader
 includes/class-main.php              # Simplified, uses autoloader
 includes/class-content-processor.php # Fixed namespace & function calls
 includes/class-frontend-handler.php  # Fixed namespace & function calls
@@ -180,7 +180,7 @@ includes/class-redirect-handler.php  # Fixed namespace & function calls
 - Modern function-based PSR-4 autoloader
 - WebberZone Settings API integration
 - Centralized hook management via Hook_Registry
-- Consistent `WebberZone\Better_External_Links` namespace
+- Consistent `WebberZone\Link_Warnings` namespace
 - Automatic class loading
 - Modular structure with admin/, util/ subdirectories
 
@@ -209,25 +209,25 @@ includes/class-redirect-handler.php  # Fixed namespace & function calls
 
 ### Constants
 
-- `WZ_BEL_VERSION` - Plugin version
-- `WZ_BEL_PLUGIN_FILE` - Main plugin file path
-- `WZ_BEL_PLUGIN_DIR` - Plugin directory path
-- `WZ_BEL_PLUGIN_URL` - Plugin URL
-- `WZ_BEL_PLUGIN_BASENAME` - Plugin basename
+- `WZLW_VERSION` - Plugin version
+- `WZLW_PLUGIN_FILE` - Main plugin file path
+- `WZLW_PLUGIN_DIR` - Plugin directory path
+- `WZLW_PLUGIN_URL` - Plugin URL
+- `WZLW_PLUGIN_BASENAME` - Plugin basename
 
 ### Global Functions
 
-- `wz_bel()` - Returns main plugin instance
+- `wzlw()` - Returns main plugin instance
 
 ## Settings Structure
 
 ### Settings Key
 
-`wz_bel_settings` - Main settings option name
+`wzlw_settings` - Main settings option name
 
 ### Settings Prefix
 
-`wz_bel` - Used for filters and actions
+`wzlw` - Used for filters and actions
 
 ### Settings Sections
 
@@ -262,8 +262,8 @@ array(
 
 - All existing functionality preserved
 - Settings structure unchanged
-- Database option name unchanged (`wz_bel_settings`)
-- Public API unchanged (`wz_bel()` function)
+- Database option name unchanged (`wzlw_settings`)
+- Public API unchanged (`wzlw()` function)
 - CSS classes unchanged
 - JavaScript events unchanged
 
@@ -309,7 +309,7 @@ array(
 
 7. **Update text domain**
    - Some files still reference `external-link-accessibility`
-   - Should be `better-external-links` everywhere
+   - Should be `webberzone-link-warnings` everywhere
 
 ## Lint Warnings (Non-Critical)
 
@@ -337,7 +337,7 @@ Before deploying, test:
 
 ## Summary
 
-Successfully modernized Better External Links plugin with:
+Successfully modernized WebberZone Link Warnings plugin with:
 
 - ✅ Modern PSR-4 autoloader
 - ✅ WebberZone Settings API integration

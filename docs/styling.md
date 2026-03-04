@@ -1,6 +1,6 @@
-# Styling Better External Links
+# Styling WebberZone Link Warnings
 
-Better External Links uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
+WebberZone Link Warnings uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
 
 This guide covers the CSS class reference, custom property reference, and common customisation recipes — including replacing the default external link icon.
 

@@ -1,6 +1,6 @@
-# Getting Started with Better External Links
+# Getting Started with WebberZone Link Warnings
 
-Better External Links adds accessible warnings to external links and `target="_blank"` links in your WordPress content. It supports inline visual indicators, modal confirmation dialogs, and redirect interstitial screens — or combinations of these.
+WebberZone Link Warnings adds accessible warnings to external links and `target="_blank"` links in your WordPress content. It supports inline visual indicators, modal confirmation dialogs, and redirect interstitial screens — or combinations of these.
 
 This guide covers installation, initial setup, and the basics of how the plugin processes your content.
 
@@ -14,13 +14,13 @@ This guide covers installation, initial setup, and the basics of how the plugin 
 ### From the WordPress dashboard
 
 1. Navigate to **Plugins > Add New**.
-2. Search for "Better External Links".
+2. Search for "WebberZone Link Warnings".
 3. Click **Install Now**, then **Activate**.
 
 ### Manual upload
 
-1. Download the plugin archive from [GitHub releases](https://github.com/WebberZone/better-external-links/releases) or [WordPress.org](https://wordpress.org/plugins/better-external-links/).
-2. Upload the `better-external-links` folder to `/wp-content/plugins/`.
+1. Download the plugin archive from [GitHub releases](https://github.com/WebberZone/webberzone-link-warnings/releases) or [WordPress.org](https://wordpress.org/plugins/webberzone-link-warnings/).
+2. Upload the `webberzone-link-warnings` folder to `/wp-content/plugins/`.
 3. Activate the plugin from the **Plugins** screen.
 
 ## First-run wizard
@@ -37,7 +37,7 @@ You can dismiss the wizard and configure settings manually at any time.
 
 ## Manual configuration
 
-All settings are available at **Settings > Better External Links**. The settings page is organised into three tabs:
+All settings are available at **Settings > WebberZone Link Warnings**. The settings page is organised into three tabs:
 
 - **General** — warning method, link scope, and enabled post types.
 - **Display** — inline indicator options, modal dialog text, and redirect screen text.
@@ -47,7 +47,7 @@ See the [Settings Reference](settings-reference.md) for a full description of ev
 
 ## How content processing works
 
-Better External Links does not modify your stored content. It filters rendered output using the `the_content` and `the_excerpt` hooks at priority 999, which means it runs after most other content filters.
+WebberZone Link Warnings does not modify your stored content. It filters rendered output using the `the_content` and `the_excerpt` hooks at priority 999, which means it runs after most other content filters.
 
 For each `<a>` tag in the output, the plugin:
 
@@ -78,5 +78,5 @@ Deactivating the plugin removes all transients, flushes the rewrite rules cache,
 ## Next steps
 
 - [Settings Reference](settings-reference.md) — detailed breakdown of every option.
-- [Styling Better External Links](styling.md) — customise colours, icons, and layout with CSS.
+- [Styling WebberZone Link Warnings](styling.md) — customise colours, icons, and layout with CSS.
 - [Developer Reference](developer-reference.md) — filters, actions, and PHP functions for integration.

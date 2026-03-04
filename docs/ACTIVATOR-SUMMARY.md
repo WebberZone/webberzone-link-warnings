@@ -20,7 +20,7 @@
 - **Options API Integration**: Uses `Options_API::update_settings()` instead of direct `add_option()`
 - **Proper Rewrite Rules**: Initializes and flushes rewrite rules correctly
 - **Activation Transient**: Sets transient for potential wizard redirect
-- **Action Hooks**: Fires `wz_bel_activate` action after activation
+- **Action Hooks**: Fires `wzlw_activate` action after activation
 - **Error Handling**: Properly deactivates plugin with error messages if requirements not met
 
 **Key Methods**:
@@ -37,14 +37,14 @@
 - **Transient Cleanup**: Removes activation transient
 - **Cache Clearing**: Flushes WP cache
 - **Proper Rewrite Rules**: Initializes and flushes rewrite rules
-- **Action Hooks**: Fires `wz_bel_deactivate` action after deactivation
+- **Action Hooks**: Fires `wzlw_deactivate` action after deactivation
 
 **Key Methods**:
 
 - `deactivate($network_wide)` - Main deactivation handler
 - `single_deactivate()` - Single site deactivation logic
 
-### 3. Updated Main Plugin File (`better-external-links.php`)
+### 3. Updated Main Plugin File (`webberzone-link-warnings.php`)
 
 **Changes Made**:
 
@@ -63,18 +63,18 @@
 // Direct function calls
 function activate_plugin() {
     $defaults = array( ... );
-    add_option( 'wz_bel_settings', $defaults );
+    add_option( 'wzlw_settings', $defaults );
     flush_rewrite_rules();
 }
-register_activation_hook( WZ_BEL_PLUGIN_FILE, __NAMESPACE__ . '\activate_plugin' );
+register_activation_hook( WZLW_PLUGIN_FILE, __NAMESPACE__ . '\activate_plugin' );
 ```
 
 ### After
 
 ```php
 // Class-based with proper error handling
-register_activation_hook( WZ_BEL_PLUGIN_FILE, __NAMESPACE__ . '\Admin\Activator::activate' );
-register_deactivation_hook( WZ_BEL_PLUGIN_FILE, __NAMESPACE__ . '\Admin\Deactivator::deactivate' );
+register_activation_hook( WZLW_PLUGIN_FILE, __NAMESPACE__ . '\Admin\Activator::activate' );
+register_deactivation_hook( WZLW_PLUGIN_FILE, __NAMESPACE__ . '\Admin\Deactivator::deactivate' );
 ```
 
 ---
@@ -131,10 +131,10 @@ The activation/deactivation is now handled automatically when the plugin is acti
 
 ```php
 // Hook into activation
-add_action( 'wz_bel_activate', 'my_custom_activation_logic' );
+add_action( 'wzlw_activate', 'my_custom_activation_logic' );
 
 // Hook into deactivation
-add_action( 'wz_bel_deactivate', 'my_custom_deactivation_logic' );
+add_action( 'wzlw_deactivate', 'my_custom_deactivation_logic' );
 ```
 
 ---

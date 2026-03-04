@@ -1,6 +1,8 @@
 <?php
 /**
  * PHPUnit bootstrap file.
+ *
+ * @package WebberZone\Link_Warnings
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
@@ -16,15 +18,18 @@ if ( ! $_tests_dir ) {
 }
 
 if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
-	echo "Could not find $_tests_dir/includes/functions.php\n";
+	echo esc_html( "Could not find $_tests_dir/includes/functions.php\n" );
 	exit( 1 );
 }
 
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
+/**
+ * Manually load the plugin for testing.
+ */
 function _manually_load_plugin() {
-	require dirname( __DIR__ ) . '/better-external-links.php';
+	require dirname( __DIR__ ) . '/webberzone-link-warnings.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 

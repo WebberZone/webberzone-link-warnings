@@ -862,7 +862,6 @@ class Settings_Form {
 				<?php $this->render_repeater_item( $args, '{{INDEX}}' ); ?>
 			</script>
 		</div>
-
 		<?php
 		$html  = ob_get_clean();
 		$html .= $this->get_field_description( $args );

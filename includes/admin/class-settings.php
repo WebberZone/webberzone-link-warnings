@@ -260,7 +260,7 @@ class Settings {
 			'warning_method'     => array(
 				'id'      => 'warning_method',
 				'name'    => esc_html__( 'Warning Method', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Choose how to warn users about external links.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose how to warn users about external links. Modal and redirect warnings trigger on click; inline indicators appear next to the link.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => 'inline_modal',
 				'options' => array(
@@ -273,13 +273,13 @@ class Settings {
 			),
 			'scope'              => array(
 				'id'      => 'scope',
-				'name'    => esc_html__( 'Link Scope', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Which links should be processed.', 'webberzone-link-warnings' ),
+				'name'    => esc_html__( 'Inline Indicator Scope', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose which links show inline indicators. Modal and redirect warnings always apply to external links only.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => 'external',
 				'options' => array(
 					'external' => esc_html__( 'External links only', 'webberzone-link-warnings' ),
-					'both'     => esc_html__( 'External links and all target="_blank" links', 'webberzone-link-warnings' ),
+					'both'     => esc_html__( 'External links and internal links opening in a new tab', 'webberzone-link-warnings' ),
 				),
 			),
 			'enabled_post_types' => array(

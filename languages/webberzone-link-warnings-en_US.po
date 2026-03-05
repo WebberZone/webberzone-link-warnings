@@ -217,10 +217,6 @@ msgstr ""
 msgid "Warning Method"
 msgstr ""
 
-#: includes/admin/class-settings.php:263
-msgid "Choose how to warn users about external links."
-msgstr ""
-
 #: includes/admin/class-settings.php:267
 msgid "Inline indicators only"
 msgstr ""
@@ -241,20 +237,8 @@ msgstr ""
 msgid "Inline indicators + Redirect screen"
 msgstr ""
 
-#: includes/admin/class-settings.php:276
-msgid "Link Scope"
-msgstr ""
-
-#: includes/admin/class-settings.php:277
-msgid "Which links should be processed."
-msgstr ""
-
 #: includes/admin/class-settings.php:281
 msgid "External links only"
-msgstr ""
-
-#: includes/admin/class-settings.php:282
-msgid "External links and all target=\"_blank\" links"
 msgstr ""
 
 #: includes/admin/class-settings.php:287
@@ -442,7 +426,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #: webberzone-link-warnings.php
 #: includes/admin/class-admin.php:89
-#: includes/admin/class-settings.php:210
 msgid "WebberZone Link Warnings"
 msgstr ""
 
@@ -573,4 +556,24 @@ msgstr ""
 
 #: includes/util/class-icon-helper.php:40
 msgid "Custom (enter below)"
+msgstr ""
+
+#: includes/admin/class-settings.php:210
+msgid "Link Warnings"
+msgstr ""
+
+#: includes/admin/class-settings.php:263
+msgid "Choose how to warn users about external links. Modal and redirect warnings trigger on click; inline indicators appear next to the link."
+msgstr ""
+
+#: includes/admin/class-settings.php:276
+msgid "Inline Indicator Scope"
+msgstr ""
+
+#: includes/admin/class-settings.php:277
+msgid "Choose which links show inline indicators. Modal and redirect warnings always apply to external links only."
+msgstr ""
+
+#: includes/admin/class-settings.php:282
+msgid "External links and internal links opening in a new tab"
 msgstr ""

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-04T05:29:05+00:00\n"
+"POT-Creation-Date: 2026-03-05T19:25:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webberzone-link-warnings\n"
@@ -17,7 +17,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #: webberzone-link-warnings.php
 #: includes/admin/class-admin.php:89
-#: includes/admin/class-settings.php:210
 msgid "WebberZone Link Warnings"
 msgstr ""
 
@@ -263,6 +262,10 @@ msgstr ""
 msgid "Previously saved"
 msgstr ""
 
+#: includes/admin/class-settings.php:210
+msgid "Link Warnings"
+msgstr ""
+
 #: includes/admin/class-settings.php:226
 #: includes/admin/class-settings.php:507
 msgid "General"
@@ -281,7 +284,7 @@ msgid "Warning Method"
 msgstr ""
 
 #: includes/admin/class-settings.php:263
-msgid "Choose how to warn users about external links."
+msgid "Choose how to warn users about external links. Modal and redirect warnings trigger on click; inline indicators appear next to the link."
 msgstr ""
 
 #: includes/admin/class-settings.php:267
@@ -305,11 +308,11 @@ msgid "Inline indicators + Redirect screen"
 msgstr ""
 
 #: includes/admin/class-settings.php:276
-msgid "Link Scope"
+msgid "Inline Indicator Scope"
 msgstr ""
 
 #: includes/admin/class-settings.php:277
-msgid "Which links should be processed."
+msgid "Choose which links show inline indicators. Modal and redirect warnings always apply to external links only."
 msgstr ""
 
 #: includes/admin/class-settings.php:281
@@ -317,7 +320,7 @@ msgid "External links only"
 msgstr ""
 
 #: includes/admin/class-settings.php:282
-msgid "External links and all target=\"_blank\" links"
+msgid "External links and internal links opening in a new tab"
 msgstr ""
 
 #: includes/admin/class-settings.php:287

@@ -2,12 +2,12 @@
 /**
  * Admin Banner helper.
  *
- * @package WebberZone\FreemKit
+ * @package WebberZone\Link_Warnings
  */
 
-namespace WebberZone\FreemKit\Admin;
+namespace WebberZone\Link_Warnings\Admin;
 
-use WebberZone\FreemKit\Util\Hook_Registry;
+use WebberZone\Link_Warnings\Util\Hook_Registry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

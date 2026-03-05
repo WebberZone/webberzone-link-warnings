@@ -450,11 +450,7 @@ class Admin_Banner {
 	 * Get the current page slug from the request.
 	 */
 	private function get_request_page_slug(): string {
-		$page_param_raw = filter_input( INPUT_GET, 'page', FILTER_UNSAFE_RAW );
-
-		if ( is_string( $page_param_raw ) && '' !== $page_param_raw ) {
-			$page_raw = sanitize_text_field( $page_param_raw );
-		} elseif ( isset( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$page_raw = sanitize_text_field( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		} else {
 			return '';

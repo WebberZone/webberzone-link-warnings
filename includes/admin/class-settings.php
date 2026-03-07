@@ -422,7 +422,7 @@ class Settings {
 			'redirect_countdown'  => array(
 				'id'      => 'redirect_countdown',
 				'name'    => esc_html__( 'Redirect Countdown', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Number of seconds before the automatic redirect takes place. Set to 0 to disable the timed redirect and require the user to click the Continue button on the redirect screen.', 'webberzone-link-warnings' ),
 				'type'    => 'number',
 				'default' => 5,
 				'min'     => 0,

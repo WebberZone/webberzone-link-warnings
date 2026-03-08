@@ -2,8 +2,6 @@
 
 When the warning method is set to **Redirect screen** or **Inline indicators + Redirect screen**, clicking an external link navigates the user to an interstitial page before they reach the external destination. This page shows the destination URL, a message, and a countdown timer.
 
-This guide covers how the redirect screen works, how to override its template in your theme, and how to control its behaviour.
-
 ## How the redirect screen works
 
 1. The plugin registers a rewrite rule that maps `external-redirect/` to a custom query variable.
@@ -93,8 +91,8 @@ get_header();
     <p><a href="<?php echo esc_url( wp_get_referer() ? wp_get_referer() : home_url() ); ?>">Go back</a></p>
 
     <?php if ( $countdown > 0 ) : ?>
-        <p class="wz-bel-redirect-countdown" aria-live="polite">
-            Redirecting in <span class="wz-bel-countdown-number"><?php echo esc_html( $countdown ); ?></span> seconds...
+        <p class="wzlw-redirect-countdown" aria-live="polite">
+            Redirecting automatically in <span class="wzlw-countdown-number"><?php echo esc_html( $countdown ); ?></span> seconds...
         </p>
     <?php endif; ?>
 </div>
@@ -102,15 +100,15 @@ get_header();
 get_footer();
 ```
 
-The countdown JavaScript targets `.wz-bel-countdown-number` to update the displayed number. If you remove or rename this class, the visual countdown will stop updating, though the redirect itself still fires after the configured duration.
+The countdown JavaScript targets `.wzlw-countdown-number` to update the displayed number. If you remove or rename this class, the visual countdown will stop updating, though the redirect itself still fires after the configured duration.
 
 ## Countdown behaviour
 
 The countdown is handled by `redirect.js`, which is enqueued automatically on the redirect page. It reads its configuration from a localised JavaScript object:
 
 ```js
-wzBelRedirect.destination // The external URL.
-wzBelRedirect.countdown   // The countdown duration in seconds.
+wzlwRedirect.destination // The external URL.
+wzlwRedirect.countdown   // The countdown duration in seconds.
 ```
 
 ### Disabling auto-redirect
@@ -132,8 +130,8 @@ The plugin enqueues the following assets on the redirect page only:
 
 | Handle | File | Purpose |
 | --- | --- | --- |
-| `wz-bel-redirect` (CSS) | `includes/assets/css/redirect.css` | Page layout, card, buttons, countdown animation. |
-| `wz-bel-redirect` (JS) | `includes/assets/js/redirect.js` | Countdown timer and auto-redirect logic. |
+| `wzlw-redirect` (CSS) | `includes/assets/css/redirect.css` | Page layout, card, buttons, countdown animation. |
+| `wzlw-redirect` (JS) | `includes/assets/js/redirect.js` | Countdown timer and auto-redirect logic. |
 
 Both assets respect `SCRIPT_DEBUG` (loading unminified versions when enabled) and `is_rtl()` (loading RTL stylesheets when appropriate).
 
@@ -142,7 +140,7 @@ If you are using a fully custom template and do not need the default styles, you
 ```php
 add_action( 'wp_enqueue_scripts', function () {
     if ( get_query_var( 'wzlw_redirect' ) ) {
-        wp_dequeue_style( 'wz-bel-redirect' );
+        wp_dequeue_style( 'wzlw-redirect' );
     }
 }, 20 );
 ```

@@ -1,6 +1,6 @@
 # WebberZone Link Warnings Documentation
 
-This documentation covers configuration, styling, template customisation, and developer reference for WebberZone Link Warnings.
+This covers configuration, styling, template customisation, and developer reference for WebberZone Link Warnings.
 
 ## Tutorials
 

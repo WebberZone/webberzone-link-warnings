@@ -1,27 +1,27 @@
 # Developer Reference
 
-This document covers the filters, actions, PHP functions, and integration points available in WebberZone Link Warnings. All hooks use the `wzlw` prefix.
+Filters, actions, PHP functions, and integration points for WebberZone Link Warnings. All hooks use the `wzlw` prefix.
 
 ## PHP wrapper functions
 
-The following global functions are defined in `includes/options-api.php` and are available after the plugin loads.
+These global functions are defined in `includes/options-api.php` and are available after the plugin loads.
 
-### `wzbel_get_settings()`
+### `wzlw_get_settings()`
 
 Returns the full settings array, merged with defaults.
 
 ```php
-$settings = wzbel_get_settings();
+$settings = wzlw_get_settings();
 ```
 
 **Returns:** `array`
 
-### `wzbel_get_option( $key, $default_value )`
+### `wzlw_get_option( $key, $default_value )`
 
 Returns a single setting value. Falls back to the registered default if the key is not set. If `$default_value` is provided, it takes priority over the registered default.
 
 ```php
-$method = wzbel_get_option( 'warning_method', 'inline' );
+$method = wzlw_get_option( 'warning_method', 'inline' );
 ```
 
 **Parameters:**
@@ -31,12 +31,12 @@ $method = wzbel_get_option( 'warning_method', 'inline' );
 
 **Returns:** `mixed`
 
-### `wzbel_update_option( $key, $value )`
+### `wzlw_update_option( $key, $value )`
 
 Updates a single setting in the database and the in-memory cache.
 
 ```php
-wzbel_update_option( 'warning_method', 'modal' );
+wzlw_update_option( 'warning_method', 'modal' );
 ```
 
 **Parameters:**
@@ -46,26 +46,26 @@ wzbel_update_option( 'warning_method', 'modal' );
 
 **Returns:** `bool` — `true` if the option was updated.
 
-### `wzbel_delete_option( $key )`
+### `wzlw_delete_option( $key )`
 
 Removes a single key from the settings array.
 
 ```php
-wzbel_delete_option( 'excluded_domains' );
+wzlw_delete_option( 'excluded_domains' );
 ```
 
 **Returns:** `bool`
 
-### `wzbel_update_settings( $settings, $merge, $autoload )`
+### `wzlw_update_settings( $settings, $merge, $autoload )`
 
 Replaces or merges the entire settings array.
 
 ```php
 // Merge new values into existing settings.
-wzbel_update_settings( array( 'warning_method' => 'redirect' ) );
+wzlw_update_settings( array( 'warning_method' => 'redirect' ) );
 
 // Replace all settings (no merge).
-wzbel_update_settings( $new_settings, false );
+wzlw_update_settings( $new_settings, false );
 ```
 
 **Parameters:**
@@ -76,32 +76,32 @@ wzbel_update_settings( $new_settings, false );
 
 **Returns:** `bool`
 
-### `wzbel_settings_defaults()`
+### `wzlw_settings_defaults()`
 
 Returns the default settings array as derived from the registered settings fields.
 
 ```php
-$defaults = wzbel_settings_defaults();
+$defaults = wzlw_settings_defaults();
 ```
 
 **Returns:** `array`
 
-### `wzbel_get_default_option( $key )`
+### `wzlw_get_default_option( $key )`
 
 Returns the default value for a specific setting key.
 
 ```php
-$default_method = wzbel_get_default_option( 'warning_method' ); // 'inline_modal'
+$default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 ```
 
 **Returns:** `mixed` — The default value, or `false` if the key does not exist.
 
-### `wzbel_settings_reset()`
+### `wzlw_settings_reset()`
 
 Resets all settings to their defaults.
 
 ```php
-wzbel_settings_reset();
+wzlw_settings_reset();
 ```
 
 **Returns:** `bool`
@@ -126,7 +126,7 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 
 ### `wzlw_get_option`
 
-Filters the value of any individual setting when retrieved via `wzbel_get_option()`.
+Filters the value of any individual setting when retrieved via `wzlw_get_option()`.
 
 ```php
 add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
@@ -296,25 +296,25 @@ add_filter( 'the_content', array( wzlw()->content_processor, 'process_content' )
 
 The plugin exposes two JavaScript objects on the frontend, depending on the active warning method.
 
-### `wzBelSettings`
+### `wzlwSettings`
 
-Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wz-bel-modal` handle.
+Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wzlw-modal` handle.
 
 ```js
-wzBelSettings.modalTitle    // Modal heading text.
-wzBelSettings.modalMessage  // Modal body text.
-wzBelSettings.continueText  // Continue button label.
-wzBelSettings.cancelText    // Cancel button label.
-wzBelSettings.warningMethod // Active warning method string.
+wzlwSettings.modalTitle    // Modal heading text.
+wzlwSettings.modalMessage  // Modal body text.
+wzlwSettings.continueText  // Continue button label.
+wzlwSettings.cancelText    // Cancel button label.
+wzlwSettings.warningMethod // Active warning method string.
 ```
 
-### `wzBelRedirect`
+### `wzlwRedirect`
 
-Available on the redirect interstitial page only. Localised on the `wz-bel-redirect` handle.
+Available on the redirect interstitial page only. Localised on the `wzlw-redirect` handle.
 
 ```js
-wzBelRedirect.destination // The external URL.
-wzBelRedirect.countdown   // Countdown duration in seconds.
+wzlwRedirect.destination // The external URL.
+wzlwRedirect.countdown   // Countdown duration in seconds.
 ```
 
 ## Data attributes
@@ -323,11 +323,11 @@ The plugin adds the following `data-` attributes to processed external links whe
 
 | Attribute | Value |
 | --- | --- |
-| `data-wz-bel-external` | `"true"` — marks the link as an external link handled by the plugin. |
-| `data-wz-bel-url` | The escaped external URL. |
-| `data-wz-bel-redirect-url` | The full redirect interstitial URL for this destination. |
+| `data-wzlw-external` | `"true"` — marks the link as an external link handled by the plugin. |
+| `data-wzlw-url` | The escaped external URL. |
+| `data-wzlw-redirect-url` | The full redirect interstitial URL for this destination. |
 
-The frontend JavaScript uses `data-wz-bel-external` as the selector for click delegation.
+The frontend JavaScript uses `data-wzlw-external` as the selector for click delegation.
 
 ## CSS handles
 
@@ -335,12 +335,12 @@ Use these handles when declaring stylesheet dependencies:
 
 | Handle | File | Loaded on |
 | --- | --- | --- |
-| `wz-bel-frontend` | `includes/assets/css/frontend.css` | All frontend pages. |
-| `wz-bel-redirect` | `includes/assets/css/redirect.css` | Redirect interstitial page only. |
+| `wzlw-frontend` | `includes/assets/css/frontend.css` | All frontend pages. |
+| `wzlw-redirect` | `includes/assets/css/redirect.css` | Redirect interstitial page only. |
 
 ## Script handles
 
 | Handle | File | Loaded on |
 | --- | --- | --- |
-| `wz-bel-modal` | `includes/admin/js/modal.js` | Frontend, when method includes modal or redirect. |
-| `wz-bel-redirect` | `includes/assets/js/redirect.js` | Redirect interstitial page only. |
+| `wzlw-modal` | `includes/admin/js/modal.js` | Frontend, when method includes modal or redirect. |
+| `wzlw-redirect` | `includes/assets/js/redirect.js` | Redirect interstitial page only. |

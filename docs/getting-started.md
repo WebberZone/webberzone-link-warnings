@@ -2,8 +2,6 @@
 
 WebberZone Link Warnings adds accessible warnings to external links and `target="_blank"` links in your WordPress content. It supports inline visual indicators, modal confirmation dialogs, and redirect interstitial screens — or combinations of these.
 
-This guide covers installation, initial setup, and the basics of how the plugin processes your content.
-
 ## Requirements
 
 - WordPress 6.6 or later
@@ -25,10 +23,10 @@ This guide covers installation, initial setup, and the basics of how the plugin 
 
 ## First-run wizard
 
-On first activation, an admin notice appears offering a guided setup wizard. The wizard walks through the core decisions:
+On first activation, an admin notice appears offering a guided setup wizard. It walks through the core decisions:
 
 1. **Warning method** — inline indicators, modal dialog, redirect screen, or a combined approach.
-2. **Link scope** — external links only, or external links plus all `target="_blank"` links.
+2. **Link scope** — external links only, or external links plus internal links opening in a new tab.
 3. **Visual indicator** — icon, text, both, or screen-reader-only.
 4. **Modal settings** — title, message, and button text (if using a modal method).
 5. **Redirect settings** — message and countdown duration (if using a redirect method).
@@ -37,7 +35,7 @@ You can dismiss the wizard and configure settings manually at any time.
 
 ## Manual configuration
 
-All settings are available at **Settings > WebberZone Link Warnings**. The settings page is organised into three tabs:
+All settings are available at **Settings > Link Warnings**. The settings page is organised into three tabs:
 
 - **General** — warning method, link scope, and enabled post types.
 - **Display** — inline indicator options, modal dialog text, and redirect screen text.
@@ -53,10 +51,10 @@ For each `<a>` tag in the output, the plugin:
 
 1. Checks whether the current post type is enabled in settings.
 2. Determines whether the link is external by comparing its host against the site host and the excluded domains list.
-3. Applies scope rules — external links only, or external links plus `target="_blank"` links.
-4. Adds CSS classes (`wz-bel-processed`, `wz-bel-external`) for styling.
+3. Applies scope rules — external links only, or external links plus internal `target="_blank"` links.
+4. Adds CSS classes (`wzlw-processed`, `wzlw-external`) for styling.
 5. Appends the configured screen reader text to any existing `aria-label` attribute.
-6. For modal and redirect methods, adds `data-wz-bel-external`, `data-wz-bel-url`, and `data-wz-bel-redirect-url` attributes used by the frontend JavaScript.
+6. For modal and redirect methods, adds `data-wzlw-external`, `data-wzlw-url`, and `data-wzlw-redirect-url` attributes used by the frontend JavaScript.
 7. For inline methods, appends visual indicator markup (icon, text, or both) inside the link.
 
 The plugin uses WordPress's native `WP_HTML_Tag_Processor` class for HTML parsing, which avoids regex-based content manipulation for the structural changes.
@@ -65,7 +63,7 @@ The plugin uses WordPress's native `WP_HTML_Tag_Processor` class for HTML parsin
 
 | Method | Behaviour |
 | --- | --- |
-| **Inline** | Adds a visual indicator (icon ↗, text, or both) and screen reader text inside the link. No click interception. |
+| **Inline** | Adds a visual indicator (icon, text, or both) and screen reader text inside the link. No click interception. |
 | **Modal** | Intercepts clicks on external links and shows a confirmation dialog. The user can continue (opens in a new window) or cancel. |
 | **Redirect** | Intercepts clicks and navigates to an interstitial page with a countdown timer before redirecting to the external URL. |
 | **Inline + Modal** | Combines inline indicators with the modal dialog on click. |

@@ -1,24 +1,24 @@
 # Troubleshooting
 
-This guide covers common issues, diagnostics, and frequently asked questions for WebberZone Link Warnings.
+Common issues, diagnostics, and frequently asked questions for WebberZone Link Warnings.
 
 ## Links are not being processed
 
-**Check the post type.** The plugin only processes content on singular views of enabled post types. Archive pages, search results, and custom loops are not affected. Verify that the current post type is listed under **Settings > WebberZone Link Warnings > General > Enabled Post Types**.
+**Check the post type.** The plugin only processes content on singular views of enabled post types. Archive pages, search results, and custom loops are not affected. Verify that the current post type is listed under **Settings > Link Warnings > General > Enabled Post Types**.
 
-**Check the link scope.** If the scope is set to "External links only", internal links with `target="_blank"` are not processed. Switch to "External links and all target='_blank' links" if you need those covered.
+**Check the link scope.** If the scope is set to "External links only", internal links with `target="_blank"` are not processed. Switch to "External links and internal links opening in a new tab" if you need those covered.
 
 **Check excluded domains.** If a domain appears in the excluded domains list (under the Advanced tab), links to that domain are treated as internal and skipped.
 
-**Check for filter conflicts.** Another plugin or theme may be removing or overriding the `the_content` filter at a priority that interferes. WebberZone Link Warnings runs at priority 999. If another filter runs later and strips data attributes or classes, the plugin's output may be lost.
+**Check for filter conflicts.** Another plugin or theme may be removing or overriding the `the_content` filter. WebberZone Link Warnings runs at priority 999. If another filter runs later and strips data attributes or classes, the plugin's output may be lost.
 
 ## The modal does not appear
 
-**Verify the warning method.** The modal only renders when the warning method is set to "Modal dialog" or "Inline indicators + Modal dialog". Check **Settings > WebberZone Link Warnings > General > Warning Method**.
+**Verify the warning method.** The modal only renders when the warning method is set to "Modal dialog" or "Inline indicators + Modal dialog". Check **Settings > Link Warnings > General > Warning Method**.
 
 **Check for JavaScript errors.** Open the browser console (F12 > Console) and look for errors. A JavaScript error from another plugin or theme can prevent the modal script from initialising.
 
-**Check that the script is enqueued.** View the page source and search for `wz-bel-modal`. If the script tag is missing, another plugin may be dequeuing it, or the warning method may not be set correctly.
+**Check that the script is enqueued.** View the page source and search for `wzlw-modal`. If the script tag is missing, another plugin may be dequeuing it, or the warning method may not be set correctly.
 
 **Check the modal HTML.** The modal markup is rendered in `wp_footer`. If your theme does not call `wp_footer()`, the modal HTML will not be present in the page.
 
@@ -32,7 +32,7 @@ This guide covers common issues, diagnostics, and frequently asked questions for
 
 ## The countdown does not update
 
-The countdown JavaScript targets the `.wz-bel-countdown-number` class. If you are using a custom redirect template and have removed or renamed this class, the visual countdown will not update. The automatic redirect still fires after the configured duration.
+The countdown JavaScript targets the `.wzlw-countdown-number` class. If you are using a custom redirect template and have removed or renamed this class, the visual countdown will not update. The automatic redirect still fires after the configured duration.
 
 If the countdown is set to `0` in settings, no countdown element is rendered and no timer runs.
 
@@ -42,7 +42,7 @@ If the countdown is set to `0` in settings, no countdown element is rendered and
 
 **Check the visual indicator setting.** If set to "None (screen reader only)", no visible indicator is rendered. Only the hidden screen reader text span is added.
 
-**Check for CSS conflicts.** Another stylesheet may be hiding the indicator elements. Inspect the link in your browser's developer tools and check whether `.wz-bel-icon` or `.wz-bel-text` elements are present but hidden by CSS rules.
+**Check for CSS conflicts.** Another stylesheet may be hiding the indicator elements. Inspect the link in your browser's developer tools and check whether `.wzlw-icon` or `.wzlw-text` elements are present but hidden by CSS rules.
 
 ## Styles look wrong or are overridden by the theme
 
@@ -70,7 +70,7 @@ Be aware that this runs all content filters, not just WebberZone Link Warnings.
 
 ## The plugin affects REST API responses
 
-The plugin does not process REST API responses. It hooks into `the_content` and `the_excerpt` at priority 999, but the `is_singular()` check in `is_post_type_enabled()` returns `false` in REST API contexts, so no processing occurs.
+The plugin does not process REST API responses. It hooks into `the_content` and `the_excerpt` at priority 999, but the `is_singular()` check returns `false` in REST API contexts, so no processing occurs.
 
 ## Performance concerns
 

@@ -10,8 +10,8 @@ The plugin adds the following classes to processed `<a>` tags:
 
 | Class | Applied when |
 | --- | --- |
-| `wz-bel-processed` | Always added to every link the plugin processes. |
-| `wz-bel-external` | Added when the link is classified as external. |
+| `wzlw-processed` | Always added to every link the plugin processes. |
+| `wzlw-external` | Added when the link is classified as external. |
 
 These classes are useful for writing targeted CSS rules.
 
@@ -21,14 +21,18 @@ When an inline warning method is active (`inline`, `inline_modal`, or `inline_re
 
 ### Icon indicator
 
+The icon is rendered via a CSS `::before` pseudo-element using a CSS variable. The HTML is an empty span:
+
 ```html
-<span class="wz-bel-icon" aria-hidden="true">↗</span>
+<span class="wzlw-icon" aria-hidden="true"></span>
 ```
+
+The displayed character is controlled by the `--wzlw-icon-content` CSS variable, which the plugin sets as an inline style based on the Icon Style setting.
 
 ### Text indicator
 
 ```html
-<span class="wz-bel-text" aria-hidden="true">(opens in new window)</span>
+<span class="wzlw-text" aria-hidden="true">(opens in new window)</span>
 ```
 
 ### Screen reader text
@@ -37,6 +41,14 @@ Always added to processed links, regardless of the visual indicator setting:
 
 ```html
 <span class="screen-reader-text">Opens in a new window</span>
+```
+
+### Suppressing the icon on specific links
+
+Add the `wzlw-no-icon` class to any link to suppress its icon:
+
+```html
+<a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
 ## CSS custom properties
@@ -49,24 +61,24 @@ Defined in `includes/assets/css/frontend.css`:
 
 ```css
 :root {
-    --wz-bel-color-text: #1a1a1a;
-    --wz-bel-color-text-muted: #4a4a4a;
-    --wz-bel-color-indicator: #595959;
-    --wz-bel-color-surface: #fff;
-    --wz-bel-color-on-primary: #fff;
-    --wz-bel-color-surface-muted: #f5f5f5;
-    --wz-bel-color-border: #c3c4c7;
-    --wz-bel-color-border-strong: #8c8f94;
-    --wz-bel-color-button-muted: #f0f0f0;
-    --wz-bel-color-button-muted-hover: #d5d5d5;
-    --wz-bel-color-link: #2271b1;
-    --wz-bel-color-link-hover: #135e96;
-    --wz-bel-color-focus: #2271b1;
-    --wz-bel-modal-overlay-bg: rgba(0, 0, 0, 0.7);
-    --wz-bel-shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.3);
-    --wz-bel-radius-sm: 4px;
-    --wz-bel-radius-md: 8px;
-    --wz-bel-transition: all 0.2s ease;
+    --wzlw-color-text: #1a1a1a;
+    --wzlw-color-text-muted: #4a4a4a;
+    --wzlw-color-indicator: #595959;
+    --wzlw-color-surface: #fff;
+    --wzlw-color-on-primary: #fff;
+    --wzlw-color-surface-muted: #f5f5f5;
+    --wzlw-color-border: #c3c4c7;
+    --wzlw-color-border-strong: #8c8f94;
+    --wzlw-color-button-muted: #f0f0f0;
+    --wzlw-color-button-muted-hover: #d5d5d5;
+    --wzlw-color-link: #2271b1;
+    --wzlw-color-link-hover: #135e96;
+    --wzlw-color-focus: #2271b1;
+    --wzlw-modal-overlay-bg: rgba(0, 0, 0, 0.7);
+    --wzlw-shadow-modal: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --wzlw-radius-sm: 4px;
+    --wzlw-radius-md: 8px;
+    --wzlw-transition: all 0.2s ease;
 }
 ```
 
@@ -76,21 +88,23 @@ Defined in `includes/assets/css/redirect.css`:
 
 ```css
 :root {
-    --wz-bel-color-text: #1a1a1a;
-    --wz-bel-color-text-muted: #4a4a4a;
-    --wz-bel-color-text-subtle: #5a6268;
-    --wz-bel-color-surface: #fff;
-    --wz-bel-color-surface-muted: #f8f9fa;
-    --wz-bel-color-link: #2271b1;
-    --wz-bel-color-link-hover: #135e96;
-    --wz-bel-color-on-primary: #fff;
-    --wz-bel-color-back-hover: #f0f6fc;
-    --wz-bel-radius-lg: 12px;
-    --wz-bel-radius-md: 8px;
-    --wz-bel-shadow-card: 0 10px 40px rgba(0, 0, 0, 0.1);
-    --wz-bel-shadow-primary-hover: 0 4px 12px rgba(34, 113, 177, 0.3);
-    --wz-bel-transition: all 0.2s ease;
-    --wz-bel-redirect-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --wzlw-color-text: #3a3a3a;
+    --wzlw-color-text-muted: #666;
+    --wzlw-color-text-subtle: #757575;
+    --wzlw-color-surface: #fff;
+    --wzlw-color-page-bg: #fafbfc;
+    --wzlw-color-surface-muted: #f9fafb;
+    --wzlw-color-border: #e5e7eb;
+    --wzlw-color-border-accent: #0274be;
+    --wzlw-color-link: #0274be;
+    --wzlw-color-link-hover: #024a7e;
+    --wzlw-color-on-primary: #fff;
+    --wzlw-color-back-hover: #f3f4f6;
+    --wzlw-radius-lg: 8px;
+    --wzlw-radius-md: 6px;
+    --wzlw-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --wzlw-shadow-primary-hover: 0 4px 12px rgba(2, 116, 190, 0.2);
+    --wzlw-transition: all 0.2s ease;
 }
 ```
 
@@ -100,10 +114,10 @@ Add overrides in your theme's stylesheet (or via the Customiser's Additional CSS
 
 ```css
 :root {
-    --wz-bel-color-link: #0073aa;
-    --wz-bel-color-link-hover: #005177;
-    --wz-bel-color-indicator: #333;
-    --wz-bel-radius-md: 12px;
+    --wzlw-color-link: #0073aa;
+    --wzlw-color-link-hover: #005177;
+    --wzlw-color-indicator: #333;
+    --wzlw-radius-md: 12px;
 }
 ```
 
@@ -111,13 +125,14 @@ This changes the modal button colour, indicator text colour, and border radius a
 
 ## Replacing the default icon
 
-The default icon is the ↗ Unicode character rendered inside a `<span class="wz-bel-icon">`. There are several ways to replace it.
+The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CSS variable on the `::before` pseudo-element of `.wzlw-icon`. The Icon Style and Icon Color settings in the admin control the defaults. You can go further with CSS.
 
-### Hide the character and use a background image
+### Use a background image
 
 ```css
-.wz-bel-icon {
-    font-size: 0;
+.wzlw-icon::before {
+    content: '';
+    display: inline-block;
     width: 16px;
     height: 16px;
     background: url('/path/to/your-icon.svg') no-repeat center / contain;
@@ -125,41 +140,10 @@ The default icon is the ↗ Unicode character rendered inside a `<span class="wz
 }
 ```
 
-This hides the Unicode character by setting `font-size: 0` and displays your SVG as a background image instead.
-
-### Hide the character and use a pseudo-element
-
-```css
-.wz-bel-icon {
-    font-size: 0;
-    position: relative;
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-}
-
-.wz-bel-icon::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('/path/to/your-icon.svg') no-repeat center / contain;
-    font-size: 14px; /* Reset to desired size. */
-}
-```
-
 ### Use a different Unicode character
 
-If you only need a different symbol, override the character with CSS:
-
 ```css
-.wz-bel-icon {
-    font-size: 0;
-}
-
-.wz-bel-icon::after {
+.wzlw-icon::before {
     content: '\1F517'; /* Link emoji, or any Unicode code point. */
     font-size: 0.875em;
 }
@@ -170,11 +154,7 @@ If you only need a different symbol, override the character with CSS:
 If your theme already loads an icon font, you can reference a glyph:
 
 ```css
-.wz-bel-icon {
-    font-size: 0;
-}
-
-.wz-bel-icon::after {
+.wzlw-icon::before {
     font-family: 'dashicons';
     content: '\f504'; /* Dashicons external link glyph. */
     font-size: 14px;
@@ -186,29 +166,29 @@ Replace the `font-family` and `content` values with the appropriate values for y
 
 ## Styling the modal dialog
 
-The modal container uses the class `wz-bel-modal-container`. Key child classes:
+Key classes for the modal:
 
 | Class | Element |
 | --- | --- |
-| `wz-bel-modal-overlay` | Semi-transparent backdrop. |
-| `wz-bel-modal-container` | The dialog box itself. |
-| `wz-bel-modal-close-btn` | The close (×) button. |
-| `wz-bel-modal-title` | The `<h2>` heading. |
-| `wz-bel-modal-message` | The body text. |
-| `wz-bel-modal-url` | The destination URL display. |
-| `wz-bel-modal-actions` | The button row. |
-| `wz-bel-modal-cancel` | The cancel button. |
-| `wz-bel-modal-continue` | The continue button. |
+| `wzlw-modal-overlay` | Semi-transparent backdrop. |
+| `wzlw-modal-container` | The dialog box itself. |
+| `wzlw-modal-close-btn` | The close (×) button. |
+| `wzlw-modal-title` | The `<h2>` heading. |
+| `wzlw-modal-message` | The body text. |
+| `wzlw-modal-url` | The destination URL display. |
+| `wzlw-modal-actions` | The button row. |
+| `wzlw-modal-cancel` | The cancel button. |
+| `wzlw-modal-continue` | The continue button. |
 
 Example — wider modal with a darker overlay:
 
 ```css
-.wz-bel-modal-container {
+.wzlw-modal-container {
     width: 640px;
 }
 
 :root {
-    --wz-bel-modal-overlay-bg: rgba(0, 0, 0, 0.85);
+    --wzlw-modal-overlay-bg: rgba(0, 0, 0, 0.85);
 }
 ```
 
@@ -218,26 +198,29 @@ The redirect page uses a centred card layout. Key classes:
 
 | Class | Element |
 | --- | --- |
-| `wz-bel-redirect-container` | Full-page wrapper with gradient background. |
-| `wz-bel-redirect-content` | The card. |
-| `wz-bel-redirect-icon` | The SVG icon area. |
-| `wz-bel-redirect-title` | The `<h1>` heading. |
-| `wz-bel-redirect-message` | The message paragraph. |
-| `wz-bel-redirect-url-container` | The URL display block. |
-| `wz-bel-redirect-actions` | The button row. |
-| `wz-bel-redirect-continue` | The "Continue to site" button. |
-| `wz-bel-redirect-back` | The "Go back" button. |
-| `wz-bel-redirect-countdown` | The countdown text. |
-| `wz-bel-countdown-number` | The countdown number. |
+| `wzlw-redirect-container` | Full-page wrapper. |
+| `wzlw-redirect-content` | The card. |
+| `wzlw-redirect-icon` | The SVG icon area. |
+| `wzlw-redirect-title` | The `<h1>` heading. |
+| `wzlw-redirect-message` | The message paragraph. |
+| `wzlw-redirect-url-container` | The URL display block. |
+| `wzlw-redirect-url-label` | The "Destination:" label. |
+| `wzlw-redirect-url` | The destination domain. |
+| `wzlw-redirect-url-full` | The full destination URL (monospace). |
+| `wzlw-redirect-actions` | The button row. |
+| `wzlw-redirect-continue` | The "Continue to site" button. |
+| `wzlw-redirect-back` | The "Go back" button. |
+| `wzlw-redirect-countdown` | The countdown text. |
+| `wzlw-countdown-number` | The countdown number. |
 
-Example — change the redirect page background:
+Example — dark redirect page:
 
 ```css
 :root {
-    --wz-bel-redirect-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    --wz-bel-color-surface: #1e1e2f;
-    --wz-bel-color-text: #e0e0e0;
-    --wz-bel-color-text-muted: #b0b0b0;
+    --wzlw-color-page-bg: #1a1a2e;
+    --wzlw-color-surface: #1e1e2f;
+    --wzlw-color-text: #e0e0e0;
+    --wzlw-color-text-muted: #b0b0b0;
 }
 ```
 
@@ -251,13 +234,13 @@ The plugin ships with RTL-specific stylesheets (`frontend-rtl.css`, `redirect-rt
 
 ## Enqueue order
 
-The plugin stylesheet is enqueued with the handle `wz-bel-frontend`. If you need to ensure your overrides load after the plugin, declare a dependency:
+The plugin stylesheet is enqueued with the handle `wzlw-frontend`. If you need to ensure your overrides load after the plugin, declare a dependency:
 
 ```php
 wp_enqueue_style(
-    'my-theme-bel-overrides',
-    get_stylesheet_directory_uri() . '/css/bel-overrides.css',
-    array( 'wz-bel-frontend' ),
+    'my-theme-wzlw-overrides',
+    get_stylesheet_directory_uri() . '/css/wzlw-overrides.css',
+    array( 'wzlw-frontend' ),
     '1.0.0'
 );
 ```

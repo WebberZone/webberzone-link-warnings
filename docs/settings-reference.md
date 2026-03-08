@@ -1,6 +1,6 @@
 # Settings Reference
 
-All plugin settings are available at **Settings > WebberZone Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
+All plugin settings are available at **Settings > Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
@@ -21,14 +21,14 @@ Controls how users are warned about external links.
 **Default:** `inline_modal`
 **Setting key:** `warning_method`
 
-### Link Scope
+### Inline Indicator Scope
 
-Determines which links the plugin processes.
+Determines which links receive inline indicators. Modal and redirect warnings always apply to external links only.
 
 | Value | Label | Behaviour |
 | --- | --- | --- |
 | `external` | External links only | Processes links whose host differs from the site host. |
-| `both` | External links and all `target="_blank"` links | Processes external links and any link with `target="_blank"`, even if the destination is internal. |
+| `both` | External links and internal links opening in a new tab | Processes external links and any internal link with `target="_blank"`. |
 
 **Default:** `external`
 **Setting key:** `scope`
@@ -52,13 +52,41 @@ These settings control the visual indicators appended inside processed links. Th
 
 | Value | Label | Output |
 | --- | --- | --- |
-| `icon` | Icon (↗) | Appends a `<span class="wz-bel-icon">` containing the ↗ character. |
-| `text` | Text | Appends a `<span class="wz-bel-text">` containing the configured indicator text. |
+| `icon` | Icon (↗) | Appends a `<span class="wzlw-icon">` whose content is rendered via CSS. |
+| `text` | Text | Appends a `<span class="wzlw-text">` containing the configured indicator text. |
 | `both` | Icon + text | Appends both the icon and text spans. |
 | `none` | None (screen reader only) | No visible indicator. Only the screen reader text span is added. |
 
 **Default:** `icon`
 **Setting key:** `visual_indicator`
+
+#### Icon Style
+
+Selects which icon to display next to external links. Options include several built-in arrow and external link symbols, plus a Custom option that uses whatever you enter in the Custom Icon field.
+
+**Default:** `arrow_ne`
+**Setting key:** `icon_style`
+
+#### Custom Icon
+
+A custom icon character or symbol, used only when Icon Style is set to "Custom". Accepts Unicode symbols or emoji.
+
+**Default:** empty
+**Setting key:** `custom_icon`
+
+#### Icon Color
+
+The colour for the icon.
+
+**Default:** `#595959`
+**Setting key:** `icon_color`
+
+#### Icon Background Color
+
+Background colour for the icon. Leave empty for transparent.
+
+**Default:** empty
+**Setting key:** `icon_background`
 
 #### Indicator Text
 
@@ -150,16 +178,16 @@ All settings can be read and modified programmatically using the wrapper functio
 
 ```php
 // Get all settings (merged with defaults).
-$settings = wzbel_get_settings();
+$settings = wzlw_get_settings();
 
 // Get a single setting with an optional fallback.
-$method = wzbel_get_option( 'warning_method', 'inline' );
+$method = wzlw_get_option( 'warning_method', 'inline' );
 
 // Update a single setting.
-wzbel_update_option( 'warning_method', 'modal' );
+wzlw_update_option( 'warning_method', 'modal' );
 
 // Reset all settings to defaults.
-wzbel_settings_reset();
+wzlw_settings_reset();
 ```
 
 See the [Developer Reference](developer-reference.md) for the full list of functions and filter hooks.

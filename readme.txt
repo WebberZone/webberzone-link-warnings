@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -179,10 +179,16 @@ Your links return to their original state. The plugin doesn't modify your conten
 
 == Changelog ==
 
+= 1.1.0 =
+* Add support for excluding links inside wrappers with the `wzlw-no-icon-wrapper` class.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.
 
 = 1.0.0 =
 Initial release.

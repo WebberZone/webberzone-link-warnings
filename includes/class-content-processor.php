@@ -74,9 +74,29 @@ class Content_Processor {
 		$this->settings = wzlw_get_settings();
 
 		// Use WP_HTML_Tag_Processor to parse links.
-		$processor = new \WP_HTML_Tag_Processor( $content );
+		$processor  = new \WP_HTML_Tag_Processor( $content );
+		$skip_depth = 0;
 
-		while ( $processor->next_tag( array( 'tag_name' => 'a' ) ) ) {
+		while ( $processor->next_tag() ) {
+			if ( $skip_depth > 0 ) {
+				$skip_depth += $this->get_skip_depth_delta( $processor );
+
+				if ( 0 >= $skip_depth ) {
+					$skip_depth = 0;
+				}
+
+				continue;
+			}
+
+			if ( $this->is_skip_wrapper_tag( $processor ) ) {
+				$skip_depth = 1;
+				continue;
+			}
+
+			if ( 'A' !== $processor->get_tag() ) {
+				continue;
+			}
+
 			$href   = $processor->get_attribute( 'href' );
 			$target = $processor->get_attribute( 'target' );
 
@@ -146,6 +166,82 @@ class Content_Processor {
 		);
 
 		return $content;
+	}
+
+	/**
+	 * Check if the current tag starts a wrapper that should skip processing.
+	 *
+	 * @since 1.1.0
+	 * @param \WP_HTML_Tag_Processor $processor HTML tag processor instance.
+	 * @return bool True if the tag is a skip wrapper.
+	 */
+	private function is_skip_wrapper_tag( \WP_HTML_Tag_Processor $processor ) {
+		if ( $processor->is_tag_closer() ) {
+			return false;
+		}
+
+		$class_name = $processor->get_attribute( 'class' );
+
+		if ( ! is_string( $class_name ) || '' === $class_name ) {
+			return false;
+		}
+
+		return $this->has_skip_wrapper_class( $class_name );
+	}
+
+	/**
+	 * Check if a class attribute contains the skip wrapper class.
+	 *
+	 * @since 1.1.0
+	 * @param string $class_name Class attribute value.
+	 * @return bool True if the class is present.
+	 */
+	private function has_skip_wrapper_class( $class_name ) {
+		$classes = preg_split( '/\s+/', trim( $class_name ) );
+
+		if ( ! is_array( $classes ) ) {
+			return false;
+		}
+
+		return in_array( 'wzlw-no-icon-wrapper', $classes, true );
+	}
+
+	/**
+	 * Get the nesting delta for skipped wrapper traversal.
+	 *
+	 * @since 1.1.0
+	 * @param \WP_HTML_Tag_Processor $processor HTML tag processor instance.
+	 * @return int Nesting delta.
+	 */
+	private function get_skip_depth_delta( \WP_HTML_Tag_Processor $processor ) {
+		if ( $processor->is_tag_closer() ) {
+			return -1;
+		}
+
+		if ( $this->tag_is_void( $processor->get_tag() ) ) {
+			return 0;
+		}
+
+		return 1;
+	}
+
+	/**
+	 * Check whether a tag is a void element.
+	 *
+	 * @since 1.1.0
+	 * @param string|null $tag_name Tag name.
+	 * @return bool True if the tag is a void element.
+	 */
+	private function tag_is_void( $tag_name ) {
+		if ( ! is_string( $tag_name ) || '' === $tag_name ) {
+			return false;
+		}
+
+		return in_array(
+			strtoupper( $tag_name ),
+			array( 'AREA', 'BASE', 'BR', 'COL', 'EMBED', 'HR', 'IMG', 'INPUT', 'LINK', 'META', 'SOURCE', 'TRACK', 'WBR' ),
+			true
+		);
 	}
 
 	/**

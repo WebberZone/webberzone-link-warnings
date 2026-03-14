@@ -77,23 +77,25 @@ class Content_Processor {
 		$processor  = new \WP_HTML_Tag_Processor( $content );
 		$skip_depth = 0;
 
-		while ( $processor->next_tag() ) {
+		while ( $processor->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 			if ( $skip_depth > 0 ) {
 				$skip_depth += $this->get_skip_depth_delta( $processor );
 
 				if ( 0 >= $skip_depth ) {
 					$skip_depth = 0;
 				}
-
-				continue;
-			}
-
-			if ( $this->is_skip_wrapper_tag( $processor ) ) {
-				$skip_depth = 1;
-				continue;
+			} elseif ( $this->is_skip_wrapper_tag( $processor ) ) {
+				if ( ! $this->tag_is_void( $processor->get_tag() ) ) {
+					$skip_depth = 1;
+				}
 			}
 
 			if ( 'A' !== $processor->get_tag() ) {
+				continue;
+			}
+
+			// Skip closing </a> tags.
+			if ( $processor->is_tag_closer() ) {
 				continue;
 			}
 
@@ -110,12 +112,20 @@ class Content_Processor {
 			$has_target     = '_blank' === $target;
 			$should_process = $this->should_process_link( $is_external, $has_target );
 
+			// Inside a skip wrapper, target="_blank" links still need ARIA for accessibility
+			// even when the visual icon/modal is suppressed.
 			if ( ! $should_process ) {
+				if ( $skip_depth > 0 && $has_target ) {
+					$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
+					if ( $aria_label ) {
+						$processor->set_attribute( 'aria-label', $aria_label );
+					}
+				}
 				continue;
 			}
 
-			// Add data attributes for JavaScript handling.
-			if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
+			// Add data attributes for JavaScript handling (skipped inside no-icon wrappers).
+			if ( 0 === $skip_depth && in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wzlw-external', 'true' );
 					$processor->set_attribute( 'data-wzlw-url', esc_url( $href ) );
@@ -134,6 +144,9 @@ class Content_Processor {
 			$new_class      = trim( $existing_class . ' wzlw-processed' );
 			if ( $is_external ) {
 				$new_class .= ' wzlw-external';
+			}
+			if ( $skip_depth > 0 ) {
+				$new_class .= ' wzlw-no-icon';
 			}
 			$processor->set_attribute( 'class', $new_class );
 		}
@@ -254,8 +267,12 @@ class Content_Processor {
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
 
-		// Check if link has wzlw-no-icon class.
+		// Check if link has wzlw-no-icon class — suppress visual indicator but
+		// still add screen reader text for target="_blank" links.
 		if ( strpos( $link_html, 'wzlw-no-icon' ) !== false ) {
+			if ( strpos( $link_html, 'target="_blank"' ) !== false ) {
+				$link_html = str_replace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
+			}
 			return $link_html;
 		}
 

@@ -71,7 +71,11 @@
 			const redirectUrl = link.getAttribute('data-wzlw-redirect-url');
 			if (redirectUrl) {
 				e.preventDefault();
-				window.location.href = redirectUrl;
+				if ('_blank' === link.getAttribute('target')) {
+					window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+				} else {
+					window.location.href = redirectUrl;
+				}
 				return;
 			}
 		}
@@ -130,8 +134,12 @@
 		}
 
 		const url = currentLink.getAttribute('data-wzlw-url');
-		// Navigate to external URL.
-		window.open(url, '_blank', 'noopener,noreferrer');
+		// Navigate to external URL, respecting the original link's target.
+		if ('_blank' === currentLink.getAttribute('target')) {
+			window.open(url, '_blank', 'noopener,noreferrer');
+		} else {
+			window.location.href = url;
+		}
 		// Close modal.
 		closeModal();
 	}

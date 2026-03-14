@@ -97,13 +97,21 @@ After activation, the setup wizard guides you through the initial configuration.
 
 ## Excluding Icons on Specific Links
 
-To prevent icons from appearing on specific links, add the class `wzlw-no-icon` to the link:
+To prevent icons from appearing on a specific link, add the class `wzlw-no-icon` to the link:
 
 ```html
 <a href="https://example.com" class="wzlw-no-icon">Link without icon</a>
 ```
 
-This will exclude the link from having visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+To exclude all links inside a wrapper element (e.g. a navigation block or card), add the class `wzlw-no-icon-wrapper` to the containing element:
+
+```html
+<div class="wzlw-no-icon-wrapper">
+  <a href="https://example.com">Link without icon</a>
+</div>
+```
+
+Both approaches exclude links from visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
 
 ## Customizing Icons
 
@@ -148,12 +156,6 @@ WebberZone Link Warnings is one of the many plugins developed by WebberZone. Che
 - [Auto-Close](https://wordpress.org/plugins/autoclose/) - Automatically close comments, pingbacks and trackbacks and manage revisions
 - [Popular Authors](https://wordpress.org/plugins/popular-authors/) - Display popular authors in your WordPress widget
 - [Followed Posts](https://wordpress.org/plugins/where-did-they-go-from-here/) - Show a list of related posts based on what your users have read
-
-## Security
-
-Where do I report security bugs found in this plugin?
-
-You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/webberzone-link-warnings)
 
 ## Contribute
 

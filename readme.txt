@@ -149,6 +149,12 @@ Add the class `wzlw-no-icon` to any link where you don't want an icon to appear.
 
 This will exclude the link from having visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
 
+To exclude all links inside a wrapper element (e.g. a navigation block or card), add the class `wzlw-no-icon-wrapper` to the containing element:
+
+`<div class="wzlw-no-icon-wrapper"><a href="https://example.com">Link without icon</a></div>`
+
+All links inside that wrapper will be excluded from visual indicators.
+
 = Can I customize the icon that appears? =
 
 Yes. Go to Settings > WebberZone Link Warnings > Display tab and find the "Icon Style" dropdown. You can choose from several preset icons:
@@ -187,7 +193,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 [Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
 
-* Add support for excluding links inside wrappers with the `wzlw-no-icon-wrapper` class.
+* New: Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
 
 = 1.0.0 (7 March 2026) =
 

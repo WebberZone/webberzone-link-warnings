@@ -172,6 +172,10 @@ No. The plugin only alters rendered output. Your stored content remains unchange
 
 Your links return to their original state. The plugin doesn't modify your content in the database — it only changes how links are displayed.
 
+= Where do I report security bugs found in this plugin? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/webberzone-link-warnings)
+
 == Screenshots ==
 
 1. External link with icon indicator

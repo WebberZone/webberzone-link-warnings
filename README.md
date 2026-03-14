@@ -149,6 +149,12 @@ WebberZone Link Warnings is one of the many plugins developed by WebberZone. Che
 - [Popular Authors](https://wordpress.org/plugins/popular-authors/) - Display popular authors in your WordPress widget
 - [Followed Posts](https://wordpress.org/plugins/where-did-they-go-from-here/) - Show a list of related posts based on what your users have read
 
+## Security
+
+Where do I report security bugs found in this plugin?
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/webberzone-link-warnings)
+
 ## Contribute
 
 WebberZone Link Warnings is also available on [GitHub](https://github.com/WebberZone/webberzone-link-warnings).

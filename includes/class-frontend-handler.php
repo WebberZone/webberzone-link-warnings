@@ -76,7 +76,8 @@ class Frontend_Handler {
 					'modalMessage'  => isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
 					'continueText'  => isset( $settings['modal_continue_text'] ) ? $settings['modal_continue_text'] : __( 'Continue', 'webberzone-link-warnings' ),
 					'cancelText'    => isset( $settings['modal_cancel_text'] ) ? $settings['modal_cancel_text'] : __( 'Cancel', 'webberzone-link-warnings' ),
-					'warningMethod' => $method,
+					'warningMethod'    => $method,
+					'screenReaderText' => isset( $settings['screen_reader_text'] ) ? $settings['screen_reader_text'] : __( 'Opens in a new window', 'webberzone-link-warnings' ),
 				)
 			);
 		}
@@ -105,10 +106,10 @@ class Frontend_Handler {
 				<div class="wzlw-modal-content">
 					<h2 id="wzlw-modal-title" class="wzlw-modal-title"></h2>
 					<div id="wzlw-modal-message" class="wzlw-modal-message"></div>
-					<div class="wzlw-modal-url"></div>
+					<div class="wzlw-modal-url"><span class="screen-reader-text"><?php esc_html_e( 'External URL:', 'webberzone-link-warnings' ); ?></span><span class="wzlw-modal-url-value"></span></div>
 					<div class="wzlw-modal-actions">
-						<button type="button" class="wzlw-modal-button wzlw-modal-cancel" data-wzlw-close></button>
-						<button type="button" class="wzlw-modal-button wzlw-modal-continue" data-wzlw-continue></button>
+						<button type="button" class="wzlw-modal-button wzlw-modal-cancel" data-wzlw-close><?php esc_html_e( 'Cancel', 'webberzone-link-warnings' ); ?></button>
+						<button type="button" class="wzlw-modal-button wzlw-modal-continue" data-wzlw-continue><?php esc_html_e( 'Continue', 'webberzone-link-warnings' ); ?></button>
 					</div>
 				</div>
 			</div>

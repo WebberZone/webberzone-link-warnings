@@ -18,6 +18,7 @@
 	let focusableElements = [];
 	let firstFocusable = null;
 	let lastFocusable = null;
+	let hiddenElements = [];
 
 	/**
 	 * Initialize modal functionality.
@@ -34,7 +35,7 @@
 
 		modalTitle = modal.querySelector('#wzlw-modal-title');
 		modalMessage = modal.querySelector('#wzlw-modal-message');
-		modalUrl = modal.querySelector('.wzlw-modal-url');
+		modalUrl = modal.querySelector('.wzlw-modal-url-value');
 		modalContinue = modal.querySelector('[data-wzlw-continue]');
 		modalCancel = modal.querySelector('.wzlw-modal-cancel');
 		// Set button text from settings.
@@ -99,10 +100,24 @@
 		const url = link.getAttribute('data-wzlw-url');
 		// Update modal content.
 		modalUrl.textContent = url;
+		// Update continue button aria-label for new window links.
+		if ('_blank' === link.getAttribute('target') && typeof wzlwSettings !== 'undefined' && wzlwSettings.screenReaderText) {
+			modalContinue.setAttribute('aria-label', wzlwSettings.continueText + ', ' + wzlwSettings.screenReaderText);
+		} else {
+			modalContinue.removeAttribute('aria-label');
+		}
 		// Show modal.
 		modal.removeAttribute('hidden');
 		// Lock body scroll.
 		document.body.classList.add('wzlw-modal-active');
+		// Hide background content from screen readers.
+		hiddenElements = [];
+		Array.from(document.body.children).forEach(function (el) {
+			if (el !== modal && !el.hasAttribute('aria-hidden')) {
+				el.setAttribute('aria-hidden', 'true');
+				hiddenElements.push(el);
+			}
+		});
 		// Set up focus trap.
 		setupFocusTrap();
 		// Focus first element.
@@ -118,6 +133,11 @@
 		modal.setAttribute('hidden', '');
 		// Unlock body scroll.
 		document.body.classList.remove('wzlw-modal-active');
+		// Restore background content for screen readers.
+		hiddenElements.forEach(function (el) {
+			el.removeAttribute('aria-hidden');
+		});
+		hiddenElements = [];
 		// Return focus to link.
 		if (currentLink) {
 			currentLink.focus();

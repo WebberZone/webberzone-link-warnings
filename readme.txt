@@ -194,6 +194,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 [Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
 
 * New: Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
+* Improved: Enhanced modal accessibility — background content is now hidden from screen readers when the modal is open, the external URL display includes a screen reader label, modal buttons have fallback accessible names when JavaScript is unavailable, and the Continue button announces "opens in a new window" for `target="_blank"` links.
 
 = 1.0.0 (7 March 2026) =
 

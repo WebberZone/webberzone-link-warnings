@@ -1,12 +1,71 @@
-.wzlw-settings-page {max-width: 1200px;}
-.wzlw-settings-page fieldset {margin-top: .5rem;}
-.wzlw-settings-page fieldset label {display: block;margin-bottom: .5rem;}
-.wzlw-settings-page .description {margin-top: .5rem;color: #646970;font-style: italic;}
-.wzlw-settings-page h2 {border-bottom: 2px solid #2271b1;padding-bottom: .5rem;margin-top: 2rem;}
-.wzlw-preview-box {margin-top: 1rem;padding: 1rem;background-color: #f6f7f7;border: 1px solid #c3c4c7;border-radius: 4px;}
-.wzlw-preview-box h4 {margin-top: 0;margin-bottom: .5rem;}
-.wzlw-preview-link {color: #2271b1;text-decoration: underline;}
-.form-table th {padding-top: 1.5rem;}
-.form-table td {padding-top: 1.5rem;}
-.form-table fieldset label {font-weight: 400;}
-.form-table fieldset input[type="radio"], .form-table fieldset input[type="checkbox"] {margin-left: .5rem;}
+/**
+ * Admin styles for External Link Accessibility plugin.
+ *
+ * @package WebberZone\External_Link_Accessibility
+ * @since 1.0.0
+ */
+
+/* Settings page styles. */
+.wzlw-settings-page {
+	max-width: 1200px;
+}
+
+.wzlw-settings-page fieldset {
+	margin-top: 0.5rem;
+}
+
+.wzlw-settings-page fieldset label {
+	display: block;
+	margin-bottom: 0.5rem;
+}
+
+.wzlw-settings-page .description {
+	margin-top: 0.5rem;
+	color: #646970;
+	font-style: italic;
+}
+
+/* Section headings. */
+.wzlw-settings-page h2 {
+	border-bottom: 2px solid #2271b1;
+	padding-bottom: 0.5rem;
+	margin-top: 2rem;
+}
+
+/* Preview box. */
+.wzlw-preview-box {
+	margin-top: 1rem;
+	padding: 1rem;
+	background-color: #f6f7f7;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+}
+
+.wzlw-preview-box h4 {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
+}
+
+.wzlw-preview-link {
+	color: #2271b1;
+	text-decoration: underline;
+}
+
+/* Improved spacing. */
+.form-table th {
+	padding-top: 1.5rem;
+}
+
+.form-table td {
+	padding-top: 1.5rem;
+}
+
+/* Radio and checkbox groups. */
+.form-table fieldset label {
+	font-weight: 400;
+}
+
+.form-table fieldset input[type="radio"],
+.form-table fieldset input[type="checkbox"] {
+	margin-left: 0.5rem;
+}

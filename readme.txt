@@ -183,16 +183,19 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 1.1.0 =
+= 1.1.0 (14 March 2026) =
+
+[Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
+
 * Add support for excluding links inside wrappers with the `wzlw-no-icon-wrapper` class.
 
-= 1.0.0 =
+= 1.0.0 (7 March 2026) =
+
+[Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
+
 * Initial release.
 
 == Upgrade Notice ==
 
 = 1.1.0 =
 Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.
-
-= 1.0.0 =
-Initial release.

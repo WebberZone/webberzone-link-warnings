@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?>
 <div class="postbox-container">
+	<a href="https://wzn.io/donate-wz" target="_blank" rel="noopener noreferrer"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/support.webp' ); ?>" alt="<?php esc_attr_e( 'Support WebberZone Link Warnings', 'webberzone-link-warnings' ); ?>" style="max-width: 100%; height: auto;"></a>
+
 	<div id="qlinksdiv" class="postbox meta-box-sortables">
 		<h2 class="metabox-holder"><span><?php esc_html_e( 'Quick links', 'webberzone-link-warnings' ); ?></span></h2>
 
@@ -72,8 +74,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<h2 class="metabox-holder"><span><?php esc_html_e( 'Follow us', 'webberzone-link-warnings' ); ?></span></h2>
 
 		<div class="inside" style="text-align: center">
-			<a href="https://x.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/x.png' ); ?>" width="100" height="100" alt="X (Twitter)"></a>
-			<a href="https://facebook.com/webberzone/" target="_blank"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/fb.png' ); ?>" width="100" height="100" alt="Facebook"></a>
+			<a href="https://x.com/webberzone/" target="_blank" rel="noopener noreferrer"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/x.png' ); ?>" width="100" height="100" alt="X (Twitter)"></a>
+			<a href="https://facebook.com/webberzone/" target="_blank" rel="noopener noreferrer"><img src="<?php echo esc_url( WZLW_PLUGIN_URL . 'includes/admin/images/fb.png' ); ?>" width="100" height="100" alt="Facebook"></a>
 		</div><!-- /.inside -->
 	</div><!-- /.postbox -->
 </div>

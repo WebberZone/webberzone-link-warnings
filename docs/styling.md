@@ -46,14 +46,14 @@ Always added to processed links, regardless of the visual indicator setting:
 
 ### Forcing links to be treated as external
 
-Add the `wzlw-force-external` class (configurable under Settings > Advanced) to any link or wrapper element to override automatic URL detection and treat it as external:
+Add the `wzlw-force-external` class (configurable under Settings > Advanced > Force External Class) directly to an `<a>` tag, or add `wzlw-force-external-wrapper` (configurable under Force External Wrapper Class) to any containing element, to override automatic URL detection:
 
 ```html
 <!-- Single link -->
 <a href="/affiliate/go/partner/" class="wzlw-force-external">Partner link</a>
 
 <!-- All links inside a wrapper -->
-<div class="wzlw-force-external">
+<div class="wzlw-force-external-wrapper">
   <a href="/go/product-a/">Product A</a>
   <a href="/go/product-b/">Product B</a>
 </div>

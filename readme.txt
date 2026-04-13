@@ -145,15 +145,15 @@ Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-scr
 
 = How can I force an internal link to be treated as external? =
 
-Add the class `wzlw-force-external` to the `<a>` tag:
+Add the class `wzlw-force-external` directly to the `<a>` tag:
 
 `<a href="/go/partner/" class="wzlw-force-external">Partner link</a>`
 
-This is useful for affiliate or tracking links that use internal paths but should trigger the warning modal, redirect, or inline indicator. You can also add the class to any wrapper element to force all links inside it to be treated as external:
+To force all links inside a container, add `wzlw-force-external-wrapper` to the wrapper element instead:
 
-`<div class="wzlw-force-external"><a href="/go/product-a/">Product A</a><a href="/go/product-b/">Product B</a></div>`
+`<div class="wzlw-force-external-wrapper"><a href="/go/product-a/">Product A</a><a href="/go/product-b/">Product B</a></div>`
 
-The class name is configurable under Settings > WebberZone Link Warnings > Advanced > Force External Class.
+Both class names are configurable under Settings > WebberZone Link Warnings > Advanced.
 
 = How can I prevent icons from appearing on specific links? =
 
@@ -205,7 +205,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.2.0 =
 
-* New: Add `wzlw-force-external` class support — add it to any link or wrapper element to force it to be treated as an external link, overriding automatic detection. The class name is configurable under Settings > WebberZone Link Warnings > Advanced.
+* New: Add force-external class support — add `wzlw-force-external` to an `<a>` tag or `wzlw-force-external-wrapper` to a container element to force links to be treated as external, overriding automatic detection. Both class names are configurable under Settings > WebberZone Link Warnings > Advanced.
+* New: The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > WebberZone Link Warnings > Advanced, allowing you to use your own class names to suppress visual indicators.
 
 = 1.1.0 (14 March 2026) =
 
@@ -223,7 +224,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 
 = 1.2.0 =
-Adds `wzlw-force-external` class support to force any link or group of links to be treated as external.
+Adds `wzlw-force-external` class support and makes the `wzlw-no-icon` / `wzlw-no-icon-wrapper` class names configurable.
 
 = 1.1.0 =
 Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.

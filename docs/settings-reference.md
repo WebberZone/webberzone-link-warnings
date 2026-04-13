@@ -172,27 +172,61 @@ The matching is substring-based: if the link's host contains the excluded domain
 **Default:** empty
 **Setting key:** `excluded_domains`
 
-### Force External Class
+### Suppress Icon Class
 
-The CSS class that forces a link — or all links inside a wrapper element — to be treated as external, overriding automatic URL-based detection. Add this class directly to an `<a>` tag or to any containing element.
+The CSS class that suppresses the visual indicator on a specific link. Add this class directly to an `<a>` tag to prevent the icon and indicator text from appearing on that link while still maintaining ARIA attributes and screen reader text.
 
 ```html
-<!-- Force a single internal link to be treated as external -->
-<a class="wzlw-force-external" href="/affiliate/partner/">Partner link</a>
+<a href="https://example.com" class="my-no-icon">Link without icon</a>
+```
 
-<!-- Force all links inside a wrapper to be treated as external -->
-<div class="wzlw-force-external">
+Change this setting if your theme or another plugin already uses `wzlw-no-icon` for a different purpose.
+
+**Default:** `wzlw-no-icon`
+**Setting key:** `no_icon_class`
+
+### Suppress Icon Wrapper Class
+
+The CSS class that suppresses visual indicators on all links inside a wrapper element. Add this class to any containing element to exclude all its descendant links from showing icons or indicator text.
+
+```html
+<div class="my-no-icon-wrapper">
+  <a href="https://example.com">Link without icon</a>
+  <a href="https://other.com">Also without icon</a>
+</div>
+```
+
+Links inside such a wrapper still receive ARIA attributes and screen reader text for `target="_blank"` links, but the visual `wzlw-icon` and `wzlw-text` spans are not added.
+
+**Default:** `wzlw-no-icon-wrapper`
+**Setting key:** `no_icon_wrapper_class`
+
+### Force External Class
+
+The CSS class that forces a specific link to be treated as external, overriding automatic URL-based detection. Add this class directly to an `<a>` tag.
+
+```html
+<a class="wzlw-force-external" href="/affiliate/partner/">Partner link</a>
+```
+
+**Default:** `wzlw-force-external`
+**Setting key:** `force_external_class`
+
+### Force External Wrapper Class
+
+The CSS class that forces all links inside a wrapper element to be treated as external. Add this class to any containing element.
+
+```html
+<div class="wzlw-force-external-wrapper">
   <a href="/go/product-a/">Product A</a>
   <a href="/go/product-b/">Product B</a>
 </div>
 ```
 
-Links matched this way receive the same treatment as genuinely external links: the `wzlw-external` class, data attributes for modal/redirect handling, ARIA labels, and inline indicators.
+Links matched by either force-external setting receive the same treatment as genuinely external links: the `wzlw-external` class, data attributes for modal/redirect handling, ARIA labels, and inline indicators.
 
-Change this setting if your theme or another plugin already uses the default class name for a different purpose.
-
-**Default:** `wzlw-force-external`
-**Setting key:** `force_external_class`
+**Default:** `wzlw-force-external-wrapper`
+**Setting key:** `force_external_wrapper_class`
 
 ## Programmatic access
 

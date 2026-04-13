@@ -450,19 +450,40 @@ class Settings {
 	 */
 	public static function settings_advanced() {
 		$settings = array(
-			'excluded_domains'     => array(
+			'excluded_domains'             => array(
 				'id'      => 'excluded_domains',
 				'name'    => esc_html__( 'Excluded Domains', 'webberzone-link-warnings' ),
 				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
 				'default' => '',
 			),
-			'force_external_class' => array(
+			'no_icon_class'                => array(
+				'id'      => 'no_icon_class',
+				'name'    => esc_html__( 'Suppress Icon Class', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that suppresses the visual indicator on a specific link. Add this class directly to an &lt;a&gt; tag.', 'webberzone-link-warnings' ),
+				'type'    => 'text',
+				'default' => 'wzlw-no-icon',
+			),
+			'no_icon_wrapper_class'        => array(
+				'id'      => 'no_icon_wrapper_class',
+				'name'    => esc_html__( 'Suppress Icon Wrapper Class', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that suppresses visual indicators on all links inside a wrapper element. Add this class to any containing element.', 'webberzone-link-warnings' ),
+				'type'    => 'text',
+				'default' => 'wzlw-no-icon-wrapper',
+			),
+			'force_external_class'         => array(
 				'id'      => 'force_external_class',
 				'name'    => esc_html__( 'Force External Class', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'CSS class that forces a link (or all links inside a wrapper element) to be treated as external, overriding automatic detection. Add this class directly to an &lt;a&gt; tag or to any containing element.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that forces a specific link to be treated as external. Add this class directly to an &lt;a&gt; tag.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
 				'default' => 'wzlw-force-external',
+			),
+			'force_external_wrapper_class' => array(
+				'id'      => 'force_external_wrapper_class',
+				'name'    => esc_html__( 'Force External Wrapper Class', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that forces all links inside a wrapper element to be treated as external. Add this class to any containing element.', 'webberzone-link-warnings' ),
+				'type'    => 'text',
+				'default' => 'wzlw-force-external-wrapper',
 			),
 		);
 

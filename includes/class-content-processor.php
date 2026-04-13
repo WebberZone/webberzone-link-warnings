@@ -121,7 +121,7 @@ class Content_Processor {
 			}
 
 			// Determine if link should be processed.
-			$is_external    = $force_external_depth > 0 || $this->is_external_link( $href );
+			$is_external    = $force_external_depth > 0 || $this->link_has_force_external_class( $processor ) || $this->is_external_link( $href );
 			$has_target     = '_blank' === $target;
 			$should_process = $this->should_process_link( $is_external, $has_target );
 
@@ -159,7 +159,10 @@ class Content_Processor {
 				$new_class .= ' wzlw-external';
 			}
 			if ( $skip_depth > 0 ) {
-				$new_class .= ' wzlw-no-icon';
+				$no_icon_class = isset( $this->settings['no_icon_class'] ) ? trim( $this->settings['no_icon_class'] ) : 'wzlw-no-icon';
+				if ( '' !== $no_icon_class ) {
+					$new_class .= ' ' . $no_icon_class;
+				}
 			}
 			$processor->set_attribute( 'class', $new_class );
 		}
@@ -223,13 +226,19 @@ class Content_Processor {
 	 * @return bool True if the class is present.
 	 */
 	private function has_skip_wrapper_class( $class_name ) {
+		$wrapper_class = isset( $this->settings['no_icon_wrapper_class'] ) ? trim( $this->settings['no_icon_wrapper_class'] ) : 'wzlw-no-icon-wrapper';
+
+		if ( '' === $wrapper_class ) {
+			return false;
+		}
+
 		$classes = preg_split( '/\s+/', trim( $class_name ) );
 
 		if ( ! is_array( $classes ) ) {
 			return false;
 		}
 
-		return in_array( 'wzlw-no-icon-wrapper', $classes, true );
+		return in_array( $wrapper_class, $classes, true );
 	}
 
 	/**
@@ -250,20 +259,49 @@ class Content_Processor {
 			return false;
 		}
 
-		return $this->has_force_external_class( $class_name );
+		return $this->has_force_external_wrapper_class( $class_name );
 	}
 
 	/**
-	 * Check if a class attribute contains the force-external class.
+	 * Check if a class attribute contains the force-external wrapper class.
 	 *
 	 * @since 1.2.0
 	 * @param string $class_name Class attribute value.
 	 * @return bool True if the class is present.
 	 */
-	private function has_force_external_class( $class_name ) {
+	private function has_force_external_wrapper_class( $class_name ) {
+		$wrapper_class = isset( $this->settings['force_external_wrapper_class'] ) ? trim( $this->settings['force_external_wrapper_class'] ) : 'wzlw-force-external-wrapper';
+
+		if ( '' === $wrapper_class ) {
+			return false;
+		}
+
+		$classes = preg_split( '/\s+/', trim( $class_name ) );
+
+		if ( ! is_array( $classes ) ) {
+			return false;
+		}
+
+		return in_array( $wrapper_class, $classes, true );
+	}
+
+	/**
+	 * Check if an <a> tag has the force-external class directly applied.
+	 *
+	 * @since 1.2.0
+	 * @param \WP_HTML_Tag_Processor $processor HTML tag processor instance.
+	 * @return bool True if the class is present.
+	 */
+	private function link_has_force_external_class( \WP_HTML_Tag_Processor $processor ) {
 		$force_class = isset( $this->settings['force_external_class'] ) ? trim( $this->settings['force_external_class'] ) : 'wzlw-force-external';
 
 		if ( '' === $force_class ) {
+			return false;
+		}
+
+		$class_name = $processor->get_attribute( 'class' );
+
+		if ( ! is_string( $class_name ) || '' === $class_name ) {
 			return false;
 		}
 
@@ -324,9 +362,15 @@ class Content_Processor {
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
 
-		// Check if link has wzlw-no-icon class — suppress visual indicator but
+		// Check if link has the no-icon class — suppress visual indicator but
 		// still add screen reader text for target="_blank" links.
-		if ( strpos( $link_html, 'wzlw-no-icon' ) !== false ) {
+		$no_icon_class     = isset( $this->settings['no_icon_class'] ) ? trim( $this->settings['no_icon_class'] ) : 'wzlw-no-icon';
+		$has_no_icon_class = false;
+		if ( '' !== $no_icon_class && preg_match( '/class="([^"]*)"/', $link_html, $class_attr_match ) ) {
+			$link_classes      = preg_split( '/\s+/', trim( $class_attr_match[1] ) );
+			$has_no_icon_class = is_array( $link_classes ) && in_array( $no_icon_class, $link_classes, true );
+		}
+		if ( $has_no_icon_class ) {
 			if ( strpos( $link_html, 'target="_blank"' ) !== false ) {
 				$link_html = str_replace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
 			}

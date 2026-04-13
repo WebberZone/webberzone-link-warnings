@@ -67,8 +67,8 @@ After adding or significantly editing any `.css` or `.js` file, run `npm run bui
 
 ## Key Conventions
 
-- Link exclusion: Links with class `wzlw-no-icon` are skipped; links inside elements with class `wzlw-no-icon-wrapper` are also skipped.
-- Force external: Links with the configured force-external class (default `wzlw-force-external`) are treated as external regardless of their URL. The class can be placed on a `<a>` tag or any wrapper element — all descendant links are affected. Configurable via `force_external_class` setting.
+- Link exclusion: Links with the configured no-icon class (default `wzlw-no-icon`, setting `no_icon_class`) have visual indicators suppressed. Links inside elements with the configured wrapper class (default `wzlw-no-icon-wrapper`, setting `no_icon_wrapper_class`) are also suppressed. All three special class names are configurable under Advanced settings.
+- Force external: Links with the configured force-external class (default `wzlw-force-external`, setting `force_external_class`) placed directly on an `<a>` tag are treated as external. Adding the wrapper class (default `wzlw-force-external-wrapper`, setting `force_external_wrapper_class`) to any container forces all descendant links to be treated as external.
 - Both exclusion and force-external use a depth counter (`$skip_depth`, `$force_external_depth`) in `Content_Processor::process_content()` to track nesting across the `WP_HTML_Tag_Processor` token stream.
 - Content processing uses WordPress's native `WP_HTML_Tag_Processor` (requires WordPress 6.6+, PHP 7.4+).
 - All admin components are loaded conditionally (only on admin pages) within `Admin\Admin`.

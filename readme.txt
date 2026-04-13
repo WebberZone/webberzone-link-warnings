@@ -189,6 +189,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 1.2.0 =
+
+* New: Add `wzlw-force-external` class support — add it to any link or wrapper element to force it to be treated as an external link, overriding automatic detection. The class name is configurable under Settings > WebberZone Link Warnings > Advanced.
+
 = 1.1.0 (14 March 2026) =
 
 [Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
@@ -203,6 +207,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Adds `wzlw-force-external` class support to force any link or group of links to be treated as external.
 
 = 1.1.0 =
 Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.

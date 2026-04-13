@@ -450,12 +450,19 @@ class Settings {
 	 */
 	public static function settings_advanced() {
 		$settings = array(
-			'excluded_domains' => array(
+			'excluded_domains'     => array(
 				'id'      => 'excluded_domains',
 				'name'    => esc_html__( 'Excluded Domains', 'webberzone-link-warnings' ),
 				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
 				'default' => '',
+			),
+			'force_external_class' => array(
+				'id'      => 'force_external_class',
+				'name'    => esc_html__( 'Force External Class', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that forces a link (or all links inside a wrapper element) to be treated as external, overriding automatic detection. Add this class directly to an &lt;a&gt; tag or to any containing element.', 'webberzone-link-warnings' ),
+				'type'    => 'text',
+				'default' => 'wzlw-force-external',
 			),
 		);
 

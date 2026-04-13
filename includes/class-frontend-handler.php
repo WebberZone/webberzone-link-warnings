@@ -72,12 +72,12 @@ class Frontend_Handler {
 				'wzlw-modal',
 				'wzlwSettings',
 				array(
-					'modalTitle'    => isset( $settings['modal_title'] ) ? $settings['modal_title'] : __( 'You are leaving this site', 'webberzone-link-warnings' ),
-					'modalMessage'  => isset( $settings['modal_message'] ) ? $settings['modal_message'] : __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
-					'continueText'  => isset( $settings['modal_continue_text'] ) ? $settings['modal_continue_text'] : __( 'Continue', 'webberzone-link-warnings' ),
-					'cancelText'    => isset( $settings['modal_cancel_text'] ) ? $settings['modal_cancel_text'] : __( 'Cancel', 'webberzone-link-warnings' ),
+					'modalTitle'       => $settings['modal_title'] ?? __( 'You are leaving this site', 'webberzone-link-warnings' ),
+					'modalMessage'     => $settings['modal_message'] ?? __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
+					'continueText'     => $settings['modal_continue_text'] ?? __( 'Continue', 'webberzone-link-warnings' ),
+					'cancelText'       => $settings['modal_cancel_text'] ?? __( 'Cancel', 'webberzone-link-warnings' ),
 					'warningMethod'    => $method,
-					'screenReaderText' => isset( $settings['screen_reader_text'] ) ? $settings['screen_reader_text'] : __( 'Opens in a new window', 'webberzone-link-warnings' ),
+					'screenReaderText' => $settings['screen_reader_text'] ?? __( 'Opens in a new window', 'webberzone-link-warnings' ),
 				)
 			);
 		}

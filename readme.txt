@@ -207,6 +207,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 * New: Add force-external class support — add `wzlw-force-external` to an `<a>` tag or `wzlw-force-external-wrapper` to a container element to force links to be treated as external, overriding automatic detection. Both class names are configurable under Settings > WebberZone Link Warnings > Advanced.
 * New: The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > WebberZone Link Warnings > Advanced, allowing you to use your own class names to suppress visual indicators.
+* Bug fix: Excluded domains now correctly match when entered with a scheme (`https://example.com/`) or trailing path — only the hostname is used for comparison.
 
 = 1.1.0 (14 March 2026) =
 

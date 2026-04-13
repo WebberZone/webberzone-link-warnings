@@ -483,6 +483,21 @@ class Content_Processor {
 			$excluded_domains = array_filter( array_map( 'trim', explode( "\n", $excluded_domains ) ) );
 		}
 
+		// Strip scheme and path — keep only the hostname for matching.
+		$excluded_domains = array_filter(
+			array_map(
+				function ( $domain ) {
+					$parsed = wp_parse_url( $domain );
+					if ( ! empty( $parsed['host'] ) ) {
+						return strtolower( $parsed['host'] );
+					}
+					// No scheme present; strip any trailing slashes/paths.
+					return strtolower( strtok( rtrim( $domain, '/' ), '/' ) );
+				},
+				$excluded_domains
+			)
+		);
+
 		/**
 		 * Filter the excluded domains.
 		 *
@@ -493,8 +508,10 @@ class Content_Processor {
 		 */
 		$excluded_domains = apply_filters( 'wzlw_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
+		$link_host = strtolower( $link_host );
+
 		foreach ( $excluded_domains as $domain ) {
-			if ( false !== strpos( $link_host, $domain ) ) {
+			if ( $link_host === $domain || substr( $link_host, -( strlen( $domain ) + 1 ) ) === '.' . $domain ) {
 				return false;
 			}
 		}

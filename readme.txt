@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,7 @@ WebberZone Link Warnings uses WordPress's native `WP_HTML_Tag_Processor` class t
 * __Customizable Indicators__: Configure visual icons, text, or screen reader-only warnings
 * __Modal Dialog__: Show a confirmation dialog before users navigate to external sites with keyboard navigation and focus management
 * __Redirect Screen__: Display an intermediate page with a configurable countdown before external navigation
+* __Force External__: Add a class to any link or wrapper element to force it to be treated as external — useful for affiliate links or tracking URLs that use internal paths
 * __Domain Exclusions__: Allow trusted domains to treat them as internal links
 * __Post Type Control__: Enable warnings on specific post types only
 * __Built to support accessibility best practices for external link behaviour in WordPress__: Adds screen reader text, ARIA attributes, and keyboard-friendly modal confirmations
@@ -74,6 +75,7 @@ __Advanced Settings:__
 * Custom redirect page content and countdown duration
 * Domain exclusion list
 * Post type selection
+* Force-external class name (default: `wzlw-force-external`)
 
 ### GDPR
 
@@ -140,6 +142,18 @@ Yes. The plugin processes content through standard WordPress filters (`the_conte
 = Can I customize the redirect screen template? =
 
 Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-screen.php` to override the default redirect screen with your own design.
+
+= How can I force an internal link to be treated as external? =
+
+Add the class `wzlw-force-external` to the `<a>` tag:
+
+`<a href="/go/partner/" class="wzlw-force-external">Partner link</a>`
+
+This is useful for affiliate or tracking links that use internal paths but should trigger the warning modal, redirect, or inline indicator. You can also add the class to any wrapper element to force all links inside it to be treated as external:
+
+`<div class="wzlw-force-external"><a href="/go/product-a/">Product A</a><a href="/go/product-b/">Product B</a></div>`
+
+The class name is configurable under Settings > WebberZone Link Warnings > Advanced > Force External Class.
 
 = How can I prevent icons from appearing on specific links? =
 

@@ -11,7 +11,8 @@ The plugin adds the following classes to processed `<a>` tags:
 | Class | Applied when |
 | --- | --- |
 | `wzlw-processed` | Always added to every link the plugin processes. |
-| `wzlw-external` | Added when the link is classified as external. |
+| `wzlw-external` | Added when the link is classified as external (including links forced external via `wzlw-force-external`). |
+| `wzlw-no-icon` | Added when the link is inside a `wzlw-no-icon-wrapper` element — visual indicators are suppressed. |
 
 These classes are useful for writing targeted CSS rules.
 
@@ -42,6 +43,23 @@ Always added to processed links, regardless of the visual indicator setting:
 ```html
 <span class="screen-reader-text">Opens in a new window</span>
 ```
+
+### Forcing links to be treated as external
+
+Add the `wzlw-force-external` class (configurable under Settings > Advanced) to any link or wrapper element to override automatic URL detection and treat it as external:
+
+```html
+<!-- Single link -->
+<a href="/affiliate/go/partner/" class="wzlw-force-external">Partner link</a>
+
+<!-- All links inside a wrapper -->
+<div class="wzlw-force-external">
+  <a href="/go/product-a/">Product A</a>
+  <a href="/go/product-b/">Product B</a>
+</div>
+```
+
+Forced-external links receive `wzlw-external` and `wzlw-processed` classes and are handled identically to genuinely external links — including modal/redirect interception and inline indicators.
 
 ### Suppressing the icon on specific links
 

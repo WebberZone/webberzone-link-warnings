@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Plugin Overview
 
-**WebberZone Link Warnings** (v1.1.0) adds configurable warnings to external links, affiliate links, or any URL pattern — displaying a modal countdown or inline icon before the visitor leaves the site. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
+**WebberZone Link Warnings** (v1.2.0) adds configurable warnings to external links, affiliate links, or any URL pattern — displaying a modal countdown or inline icon before the visitor leaves the site. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
 
 Settings prefix/key: `wzlw` / `wzlw_settings` (wp_options). Access via `wzlw_get_option($key)` / `wzlw_get_settings()`.
 
@@ -68,6 +68,8 @@ After adding or significantly editing any `.css` or `.js` file, run `npm run bui
 ## Key Conventions
 
 - Link exclusion: Links with class `wzlw-no-icon` are skipped; links inside elements with class `wzlw-no-icon-wrapper` are also skipped.
+- Force external: Links with the configured force-external class (default `wzlw-force-external`) are treated as external regardless of their URL. The class can be placed on a `<a>` tag or any wrapper element — all descendant links are affected. Configurable via `force_external_class` setting.
+- Both exclusion and force-external use a depth counter (`$skip_depth`, `$force_external_depth`) in `Content_Processor::process_content()` to track nesting across the `WP_HTML_Tag_Processor` token stream.
 - Content processing uses WordPress's native `WP_HTML_Tag_Processor` (requires WordPress 6.6+, PHP 7.4+).
 - All admin components are loaded conditionally (only on admin pages) within `Admin\Admin`.
 - The redirect endpoint uses WordPress rewrite rules managed by `Redirect_Handler`.

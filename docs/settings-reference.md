@@ -172,6 +172,28 @@ The matching is substring-based: if the link's host contains the excluded domain
 **Default:** empty
 **Setting key:** `excluded_domains`
 
+### Force External Class
+
+The CSS class that forces a link — or all links inside a wrapper element — to be treated as external, overriding automatic URL-based detection. Add this class directly to an `<a>` tag or to any containing element.
+
+```html
+<!-- Force a single internal link to be treated as external -->
+<a class="wzlw-force-external" href="/affiliate/partner/">Partner link</a>
+
+<!-- Force all links inside a wrapper to be treated as external -->
+<div class="wzlw-force-external">
+  <a href="/go/product-a/">Product A</a>
+  <a href="/go/product-b/">Product B</a>
+</div>
+```
+
+Links matched this way receive the same treatment as genuinely external links: the `wzlw-external` class, data attributes for modal/redirect handling, ARIA labels, and inline indicators.
+
+Change this setting if your theme or another plugin already uses the default class name for a different purpose.
+
+**Default:** `wzlw-force-external`
+**Setting key:** `force_external_class`
+
 ## Programmatic access
 
 All settings can be read and modified programmatically using the wrapper functions defined in `includes/options-api.php`:

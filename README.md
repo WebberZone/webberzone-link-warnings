@@ -38,6 +38,7 @@ WebberZone Link Warnings uses WordPress's native `WP_HTML_Tag_Processor` class t
 - __Customizable Indicators__: Configure visual icons, text, or screen reader-only warnings
 - __Modal Dialog__: Show a confirmation dialog before users navigate to external sites with keyboard navigation and focus management
 - __Redirect Screen__: Display an intermediate page with a configurable countdown before external navigation
+- __Force External__: Add a class to any link or wrapper element to force it to be treated as external — useful for affiliate links or tracking URLs that use internal paths
 - __Domain Exclusions__: Allow trusted domains to treat them as internal links
 - __Post Type Control__: Enable warnings on specific post types only
 - __Built to support accessibility best practices for external link behaviour in WordPress__: Adds screen reader text, ARIA attributes, and keyboard-friendly modal confirmations
@@ -94,6 +95,7 @@ After activation, the setup wizard guides you through the initial configuration.
 5. __Advanced Settings__
    - Excluded domains
    - Enabled post types
+   - Force-external class name (default: `wzlw-force-external`)
 
 ## Excluding Icons on Specific Links
 
@@ -112,6 +114,25 @@ To exclude all links inside a wrapper element (e.g. a navigation block or card),
 ```
 
 Both approaches exclude links from visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+
+## Forcing Links to Be Treated as External
+
+To force an internal link to be treated as external, add the class `wzlw-force-external` directly to the `<a>` tag:
+
+```html
+<a href="/go/partner/" class="wzlw-force-external">Partner link</a>
+```
+
+To force all links inside a container, add `wzlw-force-external-wrapper` to the wrapper element:
+
+```html
+<div class="wzlw-force-external-wrapper">
+  <a href="/go/product-a/">Product A</a>
+  <a href="/go/product-b/">Product B</a>
+</div>
+```
+
+Both class names are configurable under __Settings > WebberZone Link Warnings > Advanced__.
 
 ## Customizing Icons
 
@@ -137,12 +158,84 @@ To use a custom icon:
 2. In the "Custom Icon" field, enter any Unicode symbol or emoji
 3. Examples: `→`, `⇗`, `🔗`, `🌐`, `*`, `+`
 
+## Frequently Asked Questions
+
+### Does this plugin affect SEO?
+
+No. WebberZone Link Warnings only modifies how links are displayed to users. It does not alter the href attribute, link structure, or indexing behaviour. Search engines see your links exactly as you created them.
+
+### Is it accessible?
+
+Yes. The plugin adds screen reader text, ARIA attributes, and (for modal mode) keyboard navigation and focus management.
+
+### Does it work with multilingual sites?
+
+Yes. WebberZone Link Warnings is translation-ready. It uses standard WordPress translation functions and works with popular multilingual plugins such as WPML and Polylang.
+
+### Does this work with page builders?
+
+Yes. The plugin processes content through standard WordPress filters (`the_content` and `the_excerpt`), making it compatible with most themes, page builders, and the block editor.
+
+### Can I customize the redirect screen template?
+
+Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-screen.php` to override the default redirect screen with your own design.
+
+### Does this modify my database content?
+
+No. The plugin only alters rendered output. Your stored content remains unchanged.
+
+### What happens if I deactivate the plugin?
+
+Your links return to their original state. The plugin doesn't modify your content in the database — it only changes how links are displayed.
+
+### Where do I report security bugs found in this plugin?
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/webberzone-link-warnings)
+
 ## Screenshots
 
 ![WebberZone Link Warnings Settings](https://github.com/WebberZone/webberzone-link-warnings/blob/main/wporg-assets/screenshot-2.png)
 *WebberZone Link Warnings Settings Page*
 
 For more screenshots, visit the [WordPress plugin page](https://wordpress.org/plugins/webberzone-link-warnings/screenshots/).
+
+## Changelog
+
+### 1.2.0
+
+**New Features**
+
+- Add `wzlw-force-external` / `wzlw-force-external-wrapper` class support to force links to be treated as external regardless of automatic detection. Both class names are configurable under Settings > Advanced.
+- The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > Advanced.
+
+**Security**
+
+- Redirect endpoint now requires an HMAC signature on every URL. Unsigned or tampered URLs are rejected, preventing open-redirect abuse.
+
+**Bug Fixes**
+
+- Redirect URLs with HMAC signatures were broken due to double-encoding of the `&` separator in HTML output.
+- Redundant URL encoding in `get_redirect_url()` caused malformed redirect URLs.
+- Same-host check now normalises hostnames before comparison, so variants like `EXAMPLE.COM` or `example.com.` are treated as internal.
+- Excluded domains now match correctly when entered with a scheme or trailing path.
+
+### 1.1.0 (14 March 2026)
+
+[Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
+
+**New Features**
+
+- Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
+
+**Improvements**
+
+- Enhanced modal accessibility: background content is now hidden from screen readers when the modal is open, URL display includes a screen reader label, buttons have fallback accessible names, and the Continue button announces "opens in a new window" for `target="_blank"` links.
+
+### 1.0.0 (7 March 2026)
+
+[Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
+
+- Initial release.
 
 ## Other plugins by WebberZone
 

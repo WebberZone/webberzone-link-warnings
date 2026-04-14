@@ -203,7 +203,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= 1.2.0 =
+= 1.2.0 (14 April 2026) =
 
 **New Features**
 

@@ -47,7 +47,7 @@ class Content_Processor {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+		$this->site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
 
 		Hook_Registry::add_filter( 'the_content', array( $this, 'process_content' ), 999 );
 		Hook_Registry::add_filter( 'the_excerpt', array( $this, 'process_content' ), 999 );
@@ -469,7 +469,7 @@ class Content_Processor {
 			return false;
 		}
 
-		$link_host = $parsed_url['host'];
+		$link_host = strtolower( rtrim( $parsed_url['host'], '.' ) );
 
 		// Check if it's the same as site host.
 		if ( $link_host === $this->site_host ) {
@@ -507,8 +507,6 @@ class Content_Processor {
 		 * @param string $link_host        The link host being checked.
 		 */
 		$excluded_domains = apply_filters( 'wzlw_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
-		$link_host = strtolower( $link_host );
 
 		foreach ( $excluded_domains as $domain ) {
 			if ( $link_host === $domain || substr( $link_host, -( strlen( $domain ) + 1 ) ) === '.' . $domain ) {

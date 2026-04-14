@@ -58,7 +58,7 @@ class Redirect_Handler {
 	 */
 	public function add_query_vars( $vars ) {
 		$vars[] = 'wzlw_redirect';
-		$vars[] = 'wzlw_url';
+		$vars[] = 'wzlw_sig';
 		return $vars;
 	}
 
@@ -87,9 +87,10 @@ class Redirect_Handler {
 			exit;
 		}
 
-		// Verify that the destination matches the one used in the redirect URL generation to prevent open redirect bypass.
-		$expected_url = get_query_var( 'wzlw_url' );
-		if ( ! empty( $expected_url ) && esc_url_raw( $expected_url ) !== $destination ) {
+		// Verify HMAC signature to prevent open redirect abuse.
+		$provided_sig = isset( $_GET['wzlw_sig'] ) ? sanitize_text_field( wp_unslash( $_GET['wzlw_sig'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$expected_sig = hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) );
+		if ( ! hash_equals( $expected_sig, $provided_sig ) ) {
 			wp_safe_redirect( home_url() );
 			exit;
 		}
@@ -113,8 +114,8 @@ class Redirect_Handler {
 		}
 
 		// Must be external.
-		$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
-		$url_host  = wp_parse_url( $url, PHP_URL_HOST );
+		$site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
+		$url_host  = strtolower( rtrim( (string) wp_parse_url( $url, PHP_URL_HOST ), '.' ) );
 
 		return $url_host !== $site_host;
 	}
@@ -220,7 +221,8 @@ class Redirect_Handler {
 	public static function get_redirect_url( $destination ) {
 		return add_query_arg(
 			array(
-				'url' => rawurlencode( $destination ),
+				'url'      => $destination,
+				'wzlw_sig' => hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ),
 			),
 			home_url( 'external-redirect/' )
 		);

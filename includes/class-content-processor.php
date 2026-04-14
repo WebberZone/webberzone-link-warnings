@@ -141,8 +141,8 @@ class Content_Processor {
 			if ( 0 === $skip_depth && in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wzlw-external', 'true' );
-					$processor->set_attribute( 'data-wzlw-url', esc_url( $href ) );
-					$processor->set_attribute( 'data-wzlw-redirect-url', esc_url( Redirect_Handler::get_redirect_url( $href ) ) );
+					$processor->set_attribute( 'data-wzlw-url', $href );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href ) );
 				}
 			}
 

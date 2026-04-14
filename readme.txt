@@ -205,16 +205,33 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.2.0 =
 
-* New: Add force-external class support — add `wzlw-force-external` to an `<a>` tag or `wzlw-force-external-wrapper` to a container element to force links to be treated as external, overriding automatic detection. Both class names are configurable under Settings > WebberZone Link Warnings > Advanced.
-* New: The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > WebberZone Link Warnings > Advanced, allowing you to use your own class names to suppress visual indicators.
-* Bug fix: Excluded domains now correctly match when entered with a scheme (`https://example.com/`) or trailing path — only the hostname is used for comparison.
+**New Features**
+
+* Add `wzlw-force-external` / `wzlw-force-external-wrapper` class support to force links to be treated as external regardless of automatic detection. Both class names are configurable under Settings > Advanced.
+* The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > Advanced.
+
+**Security**
+
+* Redirect endpoint now requires an HMAC signature on every URL. Unsigned or tampered URLs are rejected, preventing open-redirect abuse.
+
+**Bug Fixes**
+
+* Redirect URLs with HMAC signatures were broken due to double-encoding of the `&` separator in HTML output.
+* Redundant URL encoding in `get_redirect_url()` caused malformed redirect URLs.
+* Same-host check now normalises hostnames before comparison, so variants like `EXAMPLE.COM` or `example.com.` are treated as internal.
+* Excluded domains now match correctly when entered with a scheme or trailing path.
 
 = 1.1.0 (14 March 2026) =
 
 [Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
 
-* New: Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
-* Improved: Enhanced modal accessibility — background content is now hidden from screen readers when the modal is open, the external URL display includes a screen reader label, modal buttons have fallback accessible names when JavaScript is unavailable, and the Continue button announces "opens in a new window" for `target="_blank"` links.
+**New Features**
+
+* Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
+
+**Improvements**
+
+* Enhanced modal accessibility: background content is now hidden from screen readers when the modal is open, URL display includes a screen reader label, buttons have fallback accessible names, and the Continue button announces "opens in a new window" for `target="_blank"` links.
 
 = 1.0.0 (7 March 2026) =
 
@@ -225,7 +242,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 
 = 1.2.0 =
-Adds `wzlw-force-external` class support and makes the `wzlw-no-icon` / `wzlw-no-icon-wrapper` class names configurable.
+Adds `wzlw-force-external` class support, makes the `wzlw-no-icon` / `wzlw-no-icon-wrapper` class names configurable, and fixes an open-redirect vulnerability in the redirect endpoint.
 
 = 1.1.0 =
 Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.

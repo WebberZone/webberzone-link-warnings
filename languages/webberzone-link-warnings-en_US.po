@@ -30,14 +30,15 @@ msgstr ""
 
 #: includes/admin/class-activator.php:116
 #: includes/admin/class-settings.php:362
-#: includes/class-content-processor.php:203
+#: includes/class-content-processor.php:417
 msgid "(opens in new window)"
 msgstr ""
 
 #: includes/admin/class-activator.php:117
 #: includes/admin/class-settings.php:369
-#: includes/class-content-processor.php:217
-#: includes/class-content-processor.php:229
+#: includes/class-content-processor.php:431
+#: includes/class-content-processor.php:443
+#: includes/class-frontend-handler.php:80
 msgid "Opens in a new window"
 msgstr ""
 
@@ -56,18 +57,20 @@ msgstr ""
 #: includes/admin/class-activator.php:120
 #: includes/admin/class-settings.php:398
 #: includes/class-frontend-handler.php:77
+#: includes/class-frontend-handler.php:112
 msgid "Continue"
 msgstr ""
 
 #: includes/admin/class-activator.php:121
 #: includes/admin/class-settings.php:405
 #: includes/class-frontend-handler.php:78
+#: includes/class-frontend-handler.php:111
 msgid "Cancel"
 msgstr ""
 
 #: includes/admin/class-activator.php:122
 #: includes/admin/class-settings.php:420
-#: includes/class-redirect-handler.php:153
+#: includes/class-redirect-handler.php:154
 msgid "You are being redirected to an external site."
 msgstr ""
 
@@ -77,14 +80,14 @@ msgstr ""
 
 #: includes/admin/class-admin.php:95
 #: includes/admin/class-settings.php:182
-#: includes/admin/class-settings.php:546
+#: includes/admin/class-settings.php:574
 msgid "Settings"
 msgstr ""
 
 #: includes/admin/class-admin.php:101
-#: includes/admin/class-settings.php:491
-#: includes/admin/class-settings.php:564
-#: includes/admin/sidebar.php:30
+#: includes/admin/class-settings.php:519
+#: includes/admin/class-settings.php:592
+#: includes/admin/sidebar.php:32
 msgid "Support"
 msgstr ""
 
@@ -201,7 +204,7 @@ msgid "Previously saved"
 msgstr ""
 
 #: includes/admin/class-settings.php:226
-#: includes/admin/class-settings.php:507
+#: includes/admin/class-settings.php:535
 msgid "General"
 msgstr ""
 
@@ -337,10 +340,6 @@ msgstr ""
 msgid "Redirect Countdown"
 msgstr ""
 
-#: includes/admin/class-settings.php:425
-msgid "Number of seconds before the automatic redirect takes place. Set to 0 to disable auto-redirect."
-msgstr ""
-
 #: includes/admin/class-settings.php:455
 msgid "Excluded Domains"
 msgstr ""
@@ -349,55 +348,55 @@ msgstr ""
 msgid "Enter one domain per line (e.g., example.com). These domains will be treated as internal."
 msgstr ""
 
-#: includes/admin/class-settings.php:489
+#: includes/admin/class-settings.php:517
 msgid "For more information:"
 msgstr ""
 
-#: includes/admin/class-settings.php:490
+#: includes/admin/class-settings.php:518
 msgid "Plugin Homepage"
 msgstr ""
 
-#: includes/admin/class-settings.php:509
+#: includes/admin/class-settings.php:537
 msgid "Configure the general behavior of the plugin."
 msgstr ""
 
-#: includes/admin/class-settings.php:510
+#: includes/admin/class-settings.php:538
 msgid "Choose your preferred warning method and which links should be processed."
 msgstr ""
 
-#: includes/admin/class-settings.php:565
+#: includes/admin/class-settings.php:593
 msgid "Donate"
 msgstr ""
 
-#: includes/admin/sidebar.php:16
+#: includes/admin/sidebar.php:18
 msgid "Quick links"
 msgstr ""
 
-#: includes/admin/sidebar.php:26
+#: includes/admin/sidebar.php:28
 msgid "Knowledge Base"
 msgstr ""
 
-#: includes/admin/sidebar.php:34
+#: includes/admin/sidebar.php:36
 msgid "Reviews"
 msgstr ""
 
-#: includes/admin/sidebar.php:38
+#: includes/admin/sidebar.php:40
 msgid "Github repository"
 msgstr ""
 
-#: includes/admin/sidebar.php:42
+#: includes/admin/sidebar.php:44
 msgid "Ajay's blog"
 msgstr ""
 
-#: includes/admin/sidebar.php:50
+#: includes/admin/sidebar.php:52
 msgid "WebberZone plugins"
 msgstr ""
 
-#: includes/admin/sidebar.php:72
+#: includes/admin/sidebar.php:74
 msgid "Follow us"
 msgstr ""
 
-#: includes/class-frontend-handler.php:102
+#: includes/class-frontend-handler.php:103
 msgid "Close dialog"
 msgstr ""
 
@@ -485,12 +484,12 @@ msgid "WebberZone Link Warnings Settings"
 msgstr ""
 
 #. translators: 1: WebberZone Link Warnings link, 2: Plugin rating link
-#: includes/admin/class-settings.php:527
+#: includes/admin/class-settings.php:555
 #, php-format
 msgid "Thank you for using <a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">WebberZone Link Warnings</a>! Please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">rate us</a> on WordPress.org"
 msgstr ""
 
-#: includes/admin/sidebar.php:22
+#: includes/admin/sidebar.php:24
 msgid "WebberZone Link Warnings homepage"
 msgstr ""
 
@@ -576,4 +575,48 @@ msgstr ""
 
 #: includes/admin/class-settings.php:282
 msgid "External links and internal links opening in a new tab"
+msgstr ""
+
+#: includes/admin/class-settings.php:425
+msgid "Number of seconds before the automatic redirect takes place. Set to 0 to disable the timed redirect and require the user to click the Continue button on the redirect screen."
+msgstr ""
+
+#: includes/admin/class-settings.php:462
+msgid "Suppress Icon Class"
+msgstr ""
+
+#: includes/admin/class-settings.php:463
+msgid "CSS class that suppresses the visual indicator on a specific link. Add this class directly to an &lt;a&gt; tag."
+msgstr ""
+
+#: includes/admin/class-settings.php:469
+msgid "Suppress Icon Wrapper Class"
+msgstr ""
+
+#: includes/admin/class-settings.php:470
+msgid "CSS class that suppresses visual indicators on all links inside a wrapper element. Add this class to any containing element."
+msgstr ""
+
+#: includes/admin/class-settings.php:476
+msgid "Force External Class"
+msgstr ""
+
+#: includes/admin/class-settings.php:477
+msgid "CSS class that forces a specific link to be treated as external. Add this class directly to an &lt;a&gt; tag."
+msgstr ""
+
+#: includes/admin/class-settings.php:483
+msgid "Force External Wrapper Class"
+msgstr ""
+
+#: includes/admin/class-settings.php:484
+msgid "CSS class that forces all links inside a wrapper element to be treated as external. Add this class to any containing element."
+msgstr ""
+
+#: includes/admin/sidebar.php:15
+msgid "Support WebberZone Link Warnings"
+msgstr ""
+
+#: includes/class-frontend-handler.php:109
+msgid "External URL:"
 msgstr ""

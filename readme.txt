@@ -205,6 +205,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.2.0 (14 April 2026) =
 
+[Version 1.2.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-2-0/)
+
 **New Features**
 
 * Add `wzlw-force-external` / `wzlw-force-external-wrapper` class support to force links to be treated as external regardless of automatic detection. Both class names are configurable under Settings > Advanced.
@@ -223,7 +225,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.1.0 (14 March 2026) =
 
-[Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
+[Version 1.1.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
 
 **New Features**
 
@@ -235,7 +237,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.0.0 (7 March 2026) =
 
-[Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
+[Version 1.0.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
 
 * Initial release.
 

@@ -22,6 +22,7 @@ composer test
 
 # Individual checks
 composer phpcs       # PHP CodeSniffer
+composer phpcbf      # Auto-fix PHP code style
 composer phpstan     # Static analysis
 composer phpcompat   # PHP compatibility check
 

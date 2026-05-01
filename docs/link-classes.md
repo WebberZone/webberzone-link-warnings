@@ -1,4 +1,4 @@
-# Controlling links with CSS classes
+# Suppress or force link warnings using CSS classes
 
 WebberZone Link Warnings gives you two sets of CSS classes you can add directly to links (or their containers) in your content. One set suppresses the warning icon or modal on specific links. The other forces links to be treated as external even when they point to your own domain.
 
@@ -75,7 +75,7 @@ Add the class `wzlw-force-external-wrapper` to any element that wraps the links.
 
 Every link inside the wrapper is treated as external, regardless of its URL.
 
-### How to add these classes in WordPress
+### How to add force-external classes in WordPress
 
 The steps are identical to the exclusion classes above. Add `wzlw-force-external` to a single link element, or `wzlw-force-external-wrapper` to the section, column, or block that contains the links you want to force.
 

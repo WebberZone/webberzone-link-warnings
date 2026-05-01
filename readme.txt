@@ -203,6 +203,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 1.3.0 =
+
+**Bug Fixes**
+
+* Links inside `wzlw-no-icon-wrapper` now correctly receive `data-wzlw-*` attributes so the redirect/modal warning still fires; only the visual icon is suppressed.
+
 = 1.2.0 (14 April 2026) =
 
 [Version 1.2.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-2-0/)

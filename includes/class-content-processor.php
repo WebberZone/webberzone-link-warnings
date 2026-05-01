@@ -137,8 +137,8 @@ class Content_Processor {
 				continue;
 			}
 
-			// Add data attributes for JavaScript handling (skipped inside no-icon wrappers).
-			if ( 0 === $skip_depth && in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
+			// Add data attributes for JavaScript handling.
+			if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wzlw-external', 'true' );
 					$processor->set_attribute( 'data-wzlw-url', $href );

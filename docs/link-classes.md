@@ -4,20 +4,6 @@ WebberZone Link Warnings gives you two sets of CSS classes you can add directly 
 
 You do not need to write any code. You add these classes the same way you would add any CSS class in your page builder, block editor, or theme.
 
-## Where do these classes work?
-
-**These classes only work inside post and page content** — specifically, in the main body text and excerpts of posts and pages. The plugin processes those areas automatically.
-
-They do **not** work in:
-
-- Navigation menus
-- Widget areas (sidebars, footers)
-- Page headers or footers
-- Archive pages (blog index, category pages, tag pages)
-- Any area outside the main post or page content
-
-If you need the plugin's warnings to apply outside of post content, that requires a code customisation. See the [Developer Reference](developer-reference.md).
-
 ## Exclusion classes — turn off warnings on specific links
 
 Use these when the plugin is adding a warning icon or modal to a link that you do not want it to touch. Common examples: a "back to top" link, a logo link, or a navigation link placed inside content.

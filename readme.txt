@@ -206,6 +206,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.3.0 (1 May 2026) =
 
+[Version 1.3.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-3-0/)
+
 **New Features**
 
 * Sitewide link processing: JavaScript now scans the full rendered page on load and applies warnings to links in navigation menus, footers, sidebars, widgets, and any other theme output — not just post content. All four CSS class rules (`wzlw-force-external`, `wzlw-force-external-wrapper`, `wzlw-no-icon`, `wzlw-no-icon-wrapper`) work everywhere on the page.

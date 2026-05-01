@@ -106,7 +106,7 @@
 
 			appendAriaLabel(link);
 
-			if (needsDataAttrs && isExternal) {
+			if (needsDataAttrs) {
 				link.setAttribute('data-wzlw-external', 'true');
 				link.setAttribute('data-wzlw-url', href);
 				if (needsRedirectUrl) {

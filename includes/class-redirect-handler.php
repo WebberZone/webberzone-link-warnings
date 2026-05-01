@@ -34,6 +34,8 @@ class Redirect_Handler {
 		Hook_Registry::add_action( 'template_redirect', array( $this, 'handle_redirect' ) );
 		Hook_Registry::add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 		Hook_Registry::add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_redirect_assets' ) );
+		Hook_Registry::add_action( 'wp_ajax_wzlw_sign_urls', array( $this, 'ajax_sign_urls' ) );
+		Hook_Registry::add_action( 'wp_ajax_nopriv_wzlw_sign_urls', array( $this, 'ajax_sign_urls' ) );
 	}
 
 	/**
@@ -209,6 +211,31 @@ class Redirect_Handler {
 				'countdown'   => $countdown,
 			)
 		);
+	}
+
+	/**
+	 * AJAX handler: return HMAC-signed redirect URLs for a batch of external URLs.
+	 *
+	 * @since 1.3.0
+	 */
+	public function ajax_sign_urls() {
+		check_ajax_referer( 'wzlw_sign_urls', 'nonce' );
+
+		$raw_urls = isset( $_POST['urls'] ) ? wp_unslash( $_POST['urls'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		if ( ! is_array( $raw_urls ) ) {
+			wp_send_json_error( 'invalid_input' );
+		}
+
+		$result = array();
+		foreach ( $raw_urls as $raw_url ) {
+			$url = esc_url_raw( (string) $raw_url );
+			if ( $url && $this->is_valid_url( $url ) ) {
+				$result[ $url ] = self::get_redirect_url( $url );
+			}
+		}
+
+		wp_send_json_success( $result );
 	}
 
 	/**

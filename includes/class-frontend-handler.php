@@ -57,30 +57,40 @@ class Frontend_Handler {
 		// Add inline CSS with icon variable.
 		$this->add_icon_inline_style();
 
-		// Enqueue JavaScript for modal and redirect methods.
-		if ( in_array( $method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
-			wp_enqueue_script(
-				'wzlw-modal',
-				WZLW_PLUGIN_URL . 'includes/admin/js/modal' . $min_suffix . '.js',
-				array(),
-				WZLW_VERSION,
-				true
-			);
+		// Always enqueue JS — needed for DOM scanning of non-post-content links.
+		wp_enqueue_script(
+			'wzlw-modal',
+			WZLW_PLUGIN_URL . 'includes/admin/js/modal' . $min_suffix . '.js',
+			array(),
+			WZLW_VERSION,
+			true
+		);
 
-			// Pass settings to JavaScript.
-			wp_localize_script(
-				'wzlw-modal',
-				'wzlwSettings',
-				array(
-					'modalTitle'       => $settings['modal_title'] ?? __( 'You are leaving this site', 'webberzone-link-warnings' ),
-					'modalMessage'     => $settings['modal_message'] ?? __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
-					'continueText'     => $settings['modal_continue_text'] ?? __( 'Continue', 'webberzone-link-warnings' ),
-					'cancelText'       => $settings['modal_cancel_text'] ?? __( 'Cancel', 'webberzone-link-warnings' ),
-					'warningMethod'    => $method,
-					'screenReaderText' => $settings['screen_reader_text'] ?? __( 'Opens in a new window', 'webberzone-link-warnings' ),
-				)
-			);
-		}
+		$site_url_parts = wp_parse_url( home_url() );
+		$site_host      = strtolower( rtrim( (string) ( $site_url_parts['host'] ?? '' ), '.' ) );
+
+		wp_localize_script(
+			'wzlw-modal',
+			'wzlwSettings',
+			array(
+				'siteHost'                  => $site_host,
+				'scope'                     => $settings['scope'] ?? 'external',
+				'warningMethod'             => $method,
+				'noIconClass'               => isset( $settings['no_icon_class'] ) ? trim( $settings['no_icon_class'] ) : 'wzlw-no-icon',
+				'noIconWrapperClass'        => isset( $settings['no_icon_wrapper_class'] ) ? trim( $settings['no_icon_wrapper_class'] ) : 'wzlw-no-icon-wrapper',
+				'forceExternalClass'        => isset( $settings['force_external_class'] ) ? trim( $settings['force_external_class'] ) : 'wzlw-force-external',
+				'forceExternalWrapperClass' => isset( $settings['force_external_wrapper_class'] ) ? trim( $settings['force_external_wrapper_class'] ) : 'wzlw-force-external-wrapper',
+				'visualIndicator'           => $settings['visual_indicator'] ?? 'icon',
+				'indicatorText'             => $settings['indicator_text'] ?? __( '(opens in new window)', 'webberzone-link-warnings' ),
+				'screenReaderText'          => $settings['screen_reader_text'] ?? __( 'Opens in a new window', 'webberzone-link-warnings' ),
+				'modalTitle'                => $settings['modal_title'] ?? __( 'You are leaving this site', 'webberzone-link-warnings' ),
+				'modalMessage'              => $settings['modal_message'] ?? __( 'You are about to visit an external website. Continue?', 'webberzone-link-warnings' ),
+				'continueText'              => $settings['modal_continue_text'] ?? __( 'Continue', 'webberzone-link-warnings' ),
+				'cancelText'                => $settings['modal_cancel_text'] ?? __( 'Cancel', 'webberzone-link-warnings' ),
+				'ajaxUrl'                   => admin_url( 'admin-ajax.php' ),
+				'nonce'                     => wp_create_nonce( 'wzlw_sign_urls' ),
+			)
+		);
 	}
 
 	/**

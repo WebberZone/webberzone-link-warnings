@@ -7,6 +7,10 @@
 
 (function () {
 	'use strict';
+
+	const settings = typeof wzlwSettings !== 'undefined' ? wzlwSettings : {};
+	const method = settings.warningMethod || 'inline';
+
 	// Modal elements.
 	let modal = null;
 	let modalTitle = null;
@@ -24,10 +28,10 @@
 	 * Initialize modal functionality.
 	 */
 	function init() {
-		// Always add click delegation for redirect and modal methods.
+		scanNonPostLinks();
+
 		document.addEventListener('click', handleLinkClick);
 
-		// Get modal elements.
 		modal = document.getElementById('wzlw-modal');
 		if (!modal) {
 			return;
@@ -38,23 +42,221 @@
 		modalUrl = modal.querySelector('.wzlw-modal-url-value');
 		modalContinue = modal.querySelector('[data-wzlw-continue]');
 		modalCancel = modal.querySelector('.wzlw-modal-cancel');
-		// Set button text from settings.
-		if (typeof wzlwSettings !== 'undefined') {
-			modalTitle.textContent = wzlwSettings.modalTitle;
-			modalMessage.textContent = wzlwSettings.modalMessage;
-			modalContinue.textContent = wzlwSettings.continueText;
-			modalCancel.textContent = wzlwSettings.cancelText;
-		}
 
-		// Modal close handlers.
+		if (settings.modalTitle) modalTitle.textContent = settings.modalTitle;
+		if (settings.modalMessage) modalMessage.textContent = settings.modalMessage;
+		if (settings.continueText) modalContinue.textContent = settings.continueText;
+		if (settings.cancelText) modalCancel.textContent = settings.cancelText;
+
 		modal.querySelectorAll('[data-wzlw-close]').forEach(function (element) {
 			element.addEventListener('click', closeModal);
 		});
-		// Continue button handler.
 		modalContinue.addEventListener('click', handleContinue);
-		// Keyboard handlers.
 		modal.addEventListener('keydown', handleKeydown);
 	}
+
+	// ─── DOM scan ─────────────────────────────────────────────────────────────
+
+	/**
+	 * Scan all links not already processed by PHP and apply the same rules.
+	 */
+	function scanNonPostLinks() {
+		if (!settings.siteHost) {
+			return;
+		}
+
+		const noIconWrapperClass        = settings.noIconWrapperClass || '';
+		const forceExternalWrapperClass = settings.forceExternalWrapperClass || '';
+		const forceExternalClass        = settings.forceExternalClass || '';
+		const noIconClass               = settings.noIconClass || '';
+		const isInlineMethod            = ['inline', 'inline_modal', 'inline_redirect'].includes(method);
+		const needsDataAttrs            = ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(method);
+		const needsRedirectUrl          = ['redirect', 'inline_redirect'].includes(method);
+
+		const linksNeedingRedirectUrl = [];
+
+		document.querySelectorAll('a:not(.wzlw-processed)').forEach(function (link) {
+			const href = link.getAttribute('href');
+			if (!href) {
+				return;
+			}
+
+			const inNoIconWrapper   = noIconWrapperClass && link.closest('.' + CSS.escape(noIconWrapperClass));
+			const inForceExtWrapper = forceExternalWrapperClass && link.closest('.' + CSS.escape(forceExternalWrapperClass));
+			const hasForceExtClass  = forceExternalClass && link.classList.contains(forceExternalClass);
+			const hasNoIconClass    = noIconClass && link.classList.contains(noIconClass);
+
+			const isExternal = !!(inForceExtWrapper || hasForceExtClass || isExternalHref(href));
+			const hasTarget  = '_blank' === link.getAttribute('target');
+
+			if (!shouldProcess(isExternal, hasTarget)) {
+				if (inNoIconWrapper && hasTarget) {
+					appendAriaLabel(link);
+				}
+				return;
+			}
+
+			link.classList.add('wzlw-processed');
+			if (isExternal) {
+				link.classList.add('wzlw-external');
+			}
+			if (inNoIconWrapper && noIconClass) {
+				link.classList.add(noIconClass);
+			}
+
+			appendAriaLabel(link);
+
+			if (needsDataAttrs && isExternal) {
+				link.setAttribute('data-wzlw-external', 'true');
+				link.setAttribute('data-wzlw-url', href);
+				if (needsRedirectUrl) {
+					linksNeedingRedirectUrl.push(link);
+				}
+			}
+
+			if (isInlineMethod) {
+				const indicator = buildIndicatorHtml(!!(inNoIconWrapper || hasNoIconClass), hasTarget);
+				if (indicator) {
+					link.insertAdjacentHTML('beforeend', indicator);
+				}
+			}
+		});
+
+		if (linksNeedingRedirectUrl.length) {
+			fetchRedirectUrls(linksNeedingRedirectUrl);
+		}
+	}
+
+	/**
+	 * Determine if a URL points to an external host.
+	 *
+	 * @param {string} href
+	 * @return {boolean}
+	 */
+	function isExternalHref(href) {
+		if (href.startsWith('/') || href.startsWith('#') || href.startsWith('?')) {
+			return false;
+		}
+		try {
+			const host = new URL(href, window.location.href).hostname;
+			if (!host) {
+				return false;
+			}
+			return host.toLowerCase().replace(/\.$/, '') !== settings.siteHost;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Mirror PHP's should_process_link() logic.
+	 *
+	 * @param {boolean} isExternal
+	 * @param {boolean} hasTarget
+	 * @return {boolean}
+	 */
+	function shouldProcess(isExternal, hasTarget) {
+		return 'both' === (settings.scope || 'external')
+			? (isExternal || hasTarget)
+			: isExternal;
+	}
+
+	/**
+	 * Append screen reader text to aria-label if one already exists.
+	 *
+	 * @param {HTMLElement} link
+	 */
+	function appendAriaLabel(link) {
+		const srText = settings.screenReaderText || '';
+		if (!srText) {
+			return;
+		}
+		const existing = link.getAttribute('aria-label');
+		if (existing) {
+			link.setAttribute('aria-label', existing + ', ' + srText);
+		}
+	}
+
+	/**
+	 * Build indicator HTML, mirroring PHP's get_visual_indicator() /
+	 * add_indicator_to_link() logic.
+	 *
+	 * @param {boolean} suppress  True when the link has the no-icon class or is in a no-icon wrapper.
+	 * @param {boolean} hasTarget True when the link has target="_blank".
+	 * @return {string}
+	 */
+	function buildIndicatorHtml(suppress, hasTarget) {
+		const srText = settings.screenReaderText || '';
+		const srSpan = srText ? '<span class="screen-reader-text">' + escHtml(srText) + '</span>' : '';
+
+		if (suppress) {
+			return hasTarget ? srSpan : '';
+		}
+
+		const visual = settings.visualIndicator || 'icon';
+		let html = srSpan;
+
+		if ('icon' === visual || 'both' === visual) {
+			html += '<span class="wzlw-icon" aria-hidden="true"></span>';
+		}
+		if ('text' === visual || 'both' === visual) {
+			html += '<span class="wzlw-text" aria-hidden="true">' + escHtml(settings.indicatorText || '') + '</span>';
+		}
+
+		return html;
+	}
+
+	/**
+	 * Minimal HTML escaping for text injected via insertAdjacentHTML.
+	 *
+	 * @param {string} str
+	 * @return {string}
+	 */
+	function escHtml(str) {
+		return str
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+	}
+
+	/**
+	 * Fetch HMAC-signed redirect URLs for a batch of links via AJAX.
+	 * Only used for redirect/inline_redirect methods.
+	 *
+	 * @param {HTMLElement[]} links
+	 */
+	function fetchRedirectUrls(links) {
+		const formData = new FormData();
+		formData.append('action', 'wzlw_sign_urls');
+		formData.append('nonce', settings.nonce || '');
+		links.forEach(function (link) {
+			formData.append('urls[]', link.getAttribute('data-wzlw-url'));
+		});
+
+		fetch(settings.ajaxUrl, {
+			method: 'POST',
+			body: formData,
+			credentials: 'same-origin',
+		})
+			.then(function (response) {
+				return response.json();
+			})
+			.then(function (data) {
+				if (!data.success) {
+					return;
+				}
+				links.forEach(function (link) {
+					const signed = data.data[link.getAttribute('data-wzlw-url')];
+					if (signed) {
+						link.setAttribute('data-wzlw-redirect-url', signed);
+					}
+				});
+			})
+			.catch(function () {});
+	}
+
+	// ─── Click handling ───────────────────────────────────────────────────────
 
 	/**
 	 * Handle link clicks.
@@ -67,7 +269,6 @@
 			return;
 		}
 
-		const method = typeof wzlwSettings !== 'undefined' ? wzlwSettings.warningMethod : 'inline';
 		if ('redirect' === method || 'inline_redirect' === method) {
 			const redirectUrl = link.getAttribute('data-wzlw-redirect-url');
 			if (redirectUrl) {
@@ -82,14 +283,13 @@
 		}
 
 		if ('modal' === method || 'inline_modal' === method) {
-			// Prevent default navigation.
 			e.preventDefault();
-			// Store link reference.
 			currentLink = link;
-			// Show modal with link information.
 			showModal(link);
 		}
 	}
+
+	// ─── Modal ────────────────────────────────────────────────────────────────
 
 	/**
 	 * Show modal.
@@ -98,19 +298,14 @@
 	 */
 	function showModal(link) {
 		const url = link.getAttribute('data-wzlw-url');
-		// Update modal content.
 		modalUrl.textContent = url;
-		// Update continue button aria-label for new window links.
-		if ('_blank' === link.getAttribute('target') && typeof wzlwSettings !== 'undefined' && wzlwSettings.screenReaderText) {
-			modalContinue.setAttribute('aria-label', wzlwSettings.continueText + ', ' + wzlwSettings.screenReaderText);
+		if ('_blank' === link.getAttribute('target') && settings.screenReaderText) {
+			modalContinue.setAttribute('aria-label', settings.continueText + ', ' + settings.screenReaderText);
 		} else {
 			modalContinue.removeAttribute('aria-label');
 		}
-		// Show modal.
 		modal.removeAttribute('hidden');
-		// Lock body scroll.
 		document.body.classList.add('wzlw-modal-active');
-		// Hide background content from screen readers.
 		hiddenElements = [];
 		Array.from(document.body.children).forEach(function (el) {
 			if (el !== modal && !el.hasAttribute('aria-hidden')) {
@@ -118,9 +313,7 @@
 				hiddenElements.push(el);
 			}
 		});
-		// Set up focus trap.
 		setupFocusTrap();
-		// Focus first element.
 		if (firstFocusable) {
 			firstFocusable.focus();
 		}
@@ -131,14 +324,11 @@
 	 */
 	function closeModal() {
 		modal.setAttribute('hidden', '');
-		// Unlock body scroll.
 		document.body.classList.remove('wzlw-modal-active');
-		// Restore background content for screen readers.
 		hiddenElements.forEach(function (el) {
 			el.removeAttribute('aria-hidden');
 		});
 		hiddenElements = [];
-		// Return focus to link.
 		if (currentLink) {
 			currentLink.focus();
 		}
@@ -152,15 +342,12 @@
 		if (!currentLink) {
 			return;
 		}
-
 		const url = currentLink.getAttribute('data-wzlw-url');
-		// Navigate to external URL, respecting the original link's target.
 		if ('_blank' === currentLink.getAttribute('target')) {
 			window.open(url, '_blank', 'noopener,noreferrer');
 		} else {
 			window.location.href = url;
 		}
-		// Close modal.
 		closeModal();
 	}
 
@@ -168,7 +355,6 @@
 	 * Set up focus trap.
 	 */
 	function setupFocusTrap() {
-		// Get all focusable elements.
 		focusableElements = modal.querySelectorAll(
 			'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 		);
@@ -182,22 +368,17 @@
 	 * @param {KeyboardEvent} e Keyboard event.
 	 */
 	function handleKeydown(e) {
-		// Close on Escape.
 		if ('Escape' === e.key) {
 			closeModal();
 			return;
 		}
-
-		// Focus trap with Tab.
 		if ('Tab' === e.key) {
 			if (e.shiftKey) {
-				// Shift + Tab.
 				if (document.activeElement === firstFocusable) {
 					e.preventDefault();
 					lastFocusable.focus();
 				}
 			} else {
-				// Tab.
 				if (document.activeElement === lastFocusable) {
 					e.preventDefault();
 					firstFocusable.focus();
@@ -206,7 +387,6 @@
 		}
 	}
 
-	// Initialize when DOM is ready.
 	if ('loading' === document.readyState) {
 		document.addEventListener('DOMContentLoaded', init);
 	} else {

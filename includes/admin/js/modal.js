@@ -107,8 +107,12 @@
 			appendAriaLabel(link);
 
 			if (needsDataAttrs) {
-				link.setAttribute('data-wzlw-external', 'true');
 				link.setAttribute('data-wzlw-url', href);
+				if (isExternal) {
+					link.setAttribute('data-wzlw-external', 'true');
+				} else {
+					link.setAttribute('data-wzlw-blank', 'true');
+				}
 				if (needsRedirectUrl) {
 					linksNeedingRedirectUrl.push(link);
 				}
@@ -264,7 +268,7 @@
 	 * @param {Event} e Click event.
 	 */
 	function handleLinkClick(e) {
-		const link = e.target.closest('a[data-wzlw-external]');
+		const link = e.target.closest('a[data-wzlw-external], a[data-wzlw-blank]');
 		if (!link) {
 			return;
 		}

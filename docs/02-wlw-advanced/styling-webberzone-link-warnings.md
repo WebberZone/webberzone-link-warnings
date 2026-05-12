@@ -1,18 +1,43 @@
-# Styling WebberZone Link Warnings
+---
+id: 9738
+slug: styling-webberzone-link-warnings
+title: "Styling WebberZone Link Warnings"
+products: [link-warnings]
+sections: [02-wlw-advanced]
+status: publish
+order: 0
+---
 
-WebberZone Link Warnings uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
+<a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
 
 This guide covers the CSS class reference, custom property reference, and common customisation recipes — including replacing the default external link icon.
+
+<style>.kb-table-of-content-nav.kb-table-of-content-id9738_d7914f-dc .kb-table-of-content-wrap{padding-top:var(--global-kb-spacing-sm, 1.5rem);padding-right:var(--global-kb-spacing-sm, 1.5rem);padding-bottom:var(--global-kb-spacing-sm, 1.5rem);padding-left:var(--global-kb-spacing-sm, 1.5rem);box-shadow:0px 0px 14px 0px rgba(0, 0, 0, 0.2);}.kb-table-of-content-nav.kb-table-of-content-id9738_d7914f-dc .kb-table-of-contents-title-wrap{padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;}.kb-table-of-content-nav.kb-table-of-content-id9738_d7914f-dc .kb-table-of-contents-title{font-weight:regular;font-style:normal;}.kb-table-of-content-nav.kb-table-of-content-id9738_d7914f-dc .kb-table-of-content-wrap .kb-table-of-content-list{font-weight:regular;font-style:normal;margin-top:var(--global-kb-spacing-sm, 1.5rem);margin-right:0px;margin-bottom:0px;margin-left:0px;}</style>
 
 ## CSS classes added to links
 
 The plugin adds the following classes to processed `<a>` tags:
 
-| Class | Applied when |
-| --- | --- |
-| `wzlw-processed` | Always added to every link the plugin processes. |
-| `wzlw-external` | Added when the link is classified as external (including links forced external via `wzlw-force-external`). |
-| `wzlw-no-icon` | Added when the link is inside a `wzlw-no-icon-wrapper` element — visual indicators are suppressed. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Class</th>
+<th>Applied when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wzlw-processed</code></td>
+<td>Always added to every link the plugin processes.</td>
+</tr>
+<tr>
+<td><code>wzlw-external</code></td>
+<td>Added when the link is classified as external.</td>
+</tr>
+</tbody>
+</table>
+</figure>
 
 These classes are useful for writing targeted CSS rules.
 
@@ -24,7 +49,7 @@ When an inline warning method is active (`inline`, `inline_modal`, or `inline_re
 
 The icon is rendered via a CSS `::before` pseudo-element using a CSS variable. The HTML is an empty span:
 
-```html
+``` wp-block-code
 <span class="wzlw-icon" aria-hidden="true"></span>
 ```
 
@@ -32,7 +57,7 @@ The displayed character is controlled by the `--wzlw-icon-content` CSS variable,
 
 ### Text indicator
 
-```html
+``` wp-block-code
 <span class="wzlw-text" aria-hidden="true">(opens in new window)</span>
 ```
 
@@ -40,32 +65,15 @@ The displayed character is controlled by the `--wzlw-icon-content` CSS variable,
 
 Always added to processed links, regardless of the visual indicator setting:
 
-```html
+``` wp-block-code
 <span class="screen-reader-text">Opens in a new window</span>
 ```
-
-### Forcing links to be treated as external
-
-Add the `wzlw-force-external` class (configurable under Settings > Advanced > Force External Class) directly to an `<a>` tag, or add `wzlw-force-external-wrapper` (configurable under Force External Wrapper Class) to any containing element, to override automatic URL detection:
-
-```html
-<!-- Single link -->
-<a href="/affiliate/go/partner/" class="wzlw-force-external">Partner link</a>
-
-<!-- All links inside a wrapper -->
-<div class="wzlw-force-external-wrapper">
-  <a href="/go/product-a/">Product A</a>
-  <a href="/go/product-b/">Product B</a>
-</div>
-```
-
-Forced-external links receive `wzlw-external` and `wzlw-processed` classes and are handled identically to genuinely external links — including modal/redirect interception and inline indicators.
 
 ### Suppressing the icon on specific links
 
 Add the `wzlw-no-icon` class to any link to suppress its icon:
 
-```html
+``` wp-block-code
 <a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
@@ -77,7 +85,7 @@ The plugin defines all visual tokens as CSS custom properties on `:root`. Overri
 
 Defined in `includes/assets/css/frontend.css`:
 
-```css
+``` wp-block-code
 :root {
     --wzlw-color-text: #1a1a1a;
     --wzlw-color-text-muted: #4a4a4a;
@@ -104,7 +112,7 @@ Defined in `includes/assets/css/frontend.css`:
 
 Defined in `includes/assets/css/redirect.css`:
 
-```css
+``` wp-block-code
 :root {
     --wzlw-color-text: #3a3a3a;
     --wzlw-color-text-muted: #666;
@@ -128,9 +136,9 @@ Defined in `includes/assets/css/redirect.css`:
 
 ## Overriding custom properties
 
-Add overrides in your theme's stylesheet (or via the Customiser's Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
+Add overrides in your theme’s stylesheet (or via the Customiser’s Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
 
-```css
+``` wp-block-code
 :root {
     --wzlw-color-link: #0073aa;
     --wzlw-color-link-hover: #005177;
@@ -147,7 +155,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 ### Use a background image
 
-```css
+``` wp-block-code
 .wzlw-icon::before {
     content: '';
     display: inline-block;
@@ -160,7 +168,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 ### Use a different Unicode character
 
-```css
+``` wp-block-code
 .wzlw-icon::before {
     content: '\1F517'; /* Link emoji, or any Unicode code point. */
     font-size: 0.875em;
@@ -171,7 +179,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 If your theme already loads an icon font, you can reference a glyph:
 
-```css
+``` wp-block-code
 .wzlw-icon::before {
     font-family: 'dashicons';
     content: '\f504'; /* Dashicons external link glyph. */
@@ -180,27 +188,64 @@ If your theme already loads an icon font, you can reference a glyph:
 }
 ```
 
-Replace the `font-family` and `content` values with the appropriate values for your icon font.
+Replace the `font-family` and `content` values for your icon font.
 
 ## Styling the modal dialog
 
 Key classes for the modal:
 
-| Class | Element |
-| --- | --- |
-| `wzlw-modal-overlay` | Semi-transparent backdrop. |
-| `wzlw-modal-container` | The dialog box itself. |
-| `wzlw-modal-close-btn` | The close (×) button. |
-| `wzlw-modal-title` | The `<h2>` heading. |
-| `wzlw-modal-message` | The body text. |
-| `wzlw-modal-url` | The destination URL display. |
-| `wzlw-modal-actions` | The button row. |
-| `wzlw-modal-cancel` | The cancel button. |
-| `wzlw-modal-continue` | The continue button. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Class</th>
+<th>Element</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wzlw-modal-overlay</code></td>
+<td>Semi-transparent backdrop.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-container</code></td>
+<td>The dialog box itself.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-close-btn</code></td>
+<td>The close (×) button.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-title</code></td>
+<td>The <code>&lt;h2&gt;</code> heading.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-message</code></td>
+<td>The body text.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-url</code></td>
+<td>The destination URL display.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-actions</code></td>
+<td>The button row.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-cancel</code></td>
+<td>The cancel button.</td>
+</tr>
+<tr>
+<td><code>wzlw-modal-continue</code></td>
+<td>The continue button.</td>
+</tr>
+</tbody>
+</table>
+</figure>
 
 Example — wider modal with a darker overlay:
 
-```css
+``` wp-block-code
 .wzlw-modal-container {
     width: 640px;
 }
@@ -214,26 +259,78 @@ Example — wider modal with a darker overlay:
 
 The redirect page uses a centred card layout. Key classes:
 
-| Class | Element |
-| --- | --- |
-| `wzlw-redirect-container` | Full-page wrapper. |
-| `wzlw-redirect-content` | The card. |
-| `wzlw-redirect-icon` | The SVG icon area. |
-| `wzlw-redirect-title` | The `<h1>` heading. |
-| `wzlw-redirect-message` | The message paragraph. |
-| `wzlw-redirect-url-container` | The URL display block. |
-| `wzlw-redirect-url-label` | The "Destination:" label. |
-| `wzlw-redirect-url` | The destination domain. |
-| `wzlw-redirect-url-full` | The full destination URL (monospace). |
-| `wzlw-redirect-actions` | The button row. |
-| `wzlw-redirect-continue` | The "Continue to site" button. |
-| `wzlw-redirect-back` | The "Go back" button. |
-| `wzlw-redirect-countdown` | The countdown text. |
-| `wzlw-countdown-number` | The countdown number. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Class</th>
+<th>Element</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wzlw-redirect-container</code></td>
+<td>Full-page wrapper.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-content</code></td>
+<td>The card.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-icon</code></td>
+<td>The SVG icon area.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-title</code></td>
+<td>The <code>&lt;h1&gt;</code> heading.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-message</code></td>
+<td>The message paragraph.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-url-container</code></td>
+<td>The URL display block.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-url-label</code></td>
+<td>The “Destination:” label.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-url</code></td>
+<td>The destination domain.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-url-full</code></td>
+<td>The full destination URL (monospace).</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-actions</code></td>
+<td>The button row.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-continue</code></td>
+<td>The “Continue to site” button.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-back</code></td>
+<td>The “Go back” button.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect-countdown</code></td>
+<td>The countdown text.</td>
+</tr>
+<tr>
+<td><code>wzlw-countdown-number</code></td>
+<td>The countdown number.</td>
+</tr>
+</tbody>
+</table>
+</figure>
 
 Example — dark redirect page:
 
-```css
+``` wp-block-code
 :root {
     --wzlw-color-page-bg: #1a1a2e;
     --wzlw-color-surface: #1e1e2f;
@@ -254,7 +351,7 @@ The plugin ships with RTL-specific stylesheets (`frontend-rtl.css`, `redirect-rt
 
 The plugin stylesheet is enqueued with the handle `wzlw-frontend`. If you need to ensure your overrides load after the plugin, declare a dependency:
 
-```php
+``` wp-block-code
 wp_enqueue_style(
     'my-theme-wzlw-overrides',
     get_stylesheet_directory_uri() . '/css/wzlw-overrides.css',
@@ -263,4 +360,4 @@ wp_enqueue_style(
 );
 ```
 
-This guarantees your stylesheet loads after the plugin's frontend CSS.
+This guarantees your stylesheet loads after the plugin’s frontend CSS.

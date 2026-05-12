@@ -1,6 +1,14 @@
-# Developer Reference
+---
+id: 9742
+slug: webberzone-link-warnings-developer-reference
+title: "WebberZone Link Warnings Developer Reference"
+products: [link-warnings]
+sections: [03-wlw-developer-docs]
+status: publish
+order: 0
+---
 
-Filters, actions, PHP functions, and integration points for WebberZone Link Warnings. All hooks use the `wzlw` prefix.
+This article covers the filters, actions, PHP functions, and integration points for <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a>. All hooks use the `wzlw` prefix.
 
 ## PHP wrapper functions
 
@@ -10,7 +18,7 @@ These global functions are defined in `includes/options-api.php` and are availab
 
 Returns the full settings array, merged with defaults.
 
-```php
+``` wp-block-code
 $settings = wzlw_get_settings();
 ```
 
@@ -20,7 +28,7 @@ $settings = wzlw_get_settings();
 
 Returns a single setting value. Falls back to the registered default if the key is not set. If `$default_value` is provided, it takes priority over the registered default.
 
-```php
+``` wp-block-code
 $method = wzlw_get_option( 'warning_method', 'inline' );
 ```
 
@@ -35,7 +43,7 @@ $method = wzlw_get_option( 'warning_method', 'inline' );
 
 Updates a single setting in the database and the in-memory cache.
 
-```php
+``` wp-block-code
 wzlw_update_option( 'warning_method', 'modal' );
 ```
 
@@ -50,7 +58,7 @@ wzlw_update_option( 'warning_method', 'modal' );
 
 Removes a single key from the settings array.
 
-```php
+``` wp-block-code
 wzlw_delete_option( 'excluded_domains' );
 ```
 
@@ -60,7 +68,7 @@ wzlw_delete_option( 'excluded_domains' );
 
 Replaces or merges the entire settings array.
 
-```php
+``` wp-block-code
 // Merge new values into existing settings.
 wzlw_update_settings( array( 'warning_method' => 'redirect' ) );
 
@@ -80,7 +88,7 @@ wzlw_update_settings( $new_settings, false );
 
 Returns the default settings array as derived from the registered settings fields.
 
-```php
+``` wp-block-code
 $defaults = wzlw_settings_defaults();
 ```
 
@@ -90,7 +98,7 @@ $defaults = wzlw_settings_defaults();
 
 Returns the default value for a specific setting key.
 
-```php
+``` wp-block-code
 $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 ```
 
@@ -100,7 +108,7 @@ $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 
 Resets all settings to their defaults.
 
-```php
+``` wp-block-code
 wzlw_settings_reset();
 ```
 
@@ -112,7 +120,7 @@ wzlw_settings_reset();
 
 Filters the full settings array after it is retrieved and merged with defaults.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_get_settings', function ( array $settings ): array {
     // Force modal method on all sites.
     $settings['warning_method'] = 'modal';
@@ -128,7 +136,7 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 
 Filters the value of any individual setting when retrieved via `wzlw_get_option()`.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
     if ( 'redirect_countdown' === $key ) {
         return 10; // Override countdown to 10 seconds.
@@ -147,7 +155,7 @@ add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
 
 Key-specific variant of the above filter. Fires only for the named key.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_get_option_warning_method', function ( $value ) {
     if ( wp_is_mobile() ) {
         return 'inline'; // Use inline-only on mobile devices.
@@ -158,9 +166,9 @@ add_filter( 'wzlw_get_option_warning_method', function ( $value ) {
 
 ### `wzlw_update_option`
 
-Filters a setting value before it is saved to the database.
+Filters a setting value before saving it to the database.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_update_option', function ( $value, string $key ) {
     if ( 'redirect_countdown' === $key ) {
         return max( 3, (int) $value ); // Enforce minimum 3 seconds.
@@ -178,7 +186,7 @@ add_filter( 'wzlw_update_option', function ( $value, string $key ) {
 
 Filters the list of excluded domains before the external link check runs. Use this to add domains programmatically without modifying the settings.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_host ): array {
     $domains[] = 'cdn.example.com';
     $domains[] = 'assets.example.com';
@@ -195,7 +203,7 @@ add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_hos
 
 Filters the default settings array. Useful for changing defaults in a must-use plugin or theme.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
     $defaults['warning_method'] = 'redirect';
     $defaults['redirect_countdown'] = 10;
@@ -207,7 +215,7 @@ add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
 
 Filters the registered settings array. Use this to add, remove, or modify settings fields on the admin page.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_registered_settings', function ( array $settings ): array {
     // Remove the redirect countdown field.
     unset( $settings['display']['redirect_countdown'] );
@@ -219,7 +227,7 @@ add_filter( 'wzlw_registered_settings', function ( array $settings ): array {
 
 Filters the settings page tab definitions.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_settings_sections', function ( array $sections ): array {
     $sections['custom'] = esc_html__( 'Custom', 'my-plugin' );
     return $sections;
@@ -228,13 +236,13 @@ add_filter( 'wzlw_settings_sections', function ( array $sections ): array {
 
 ### Section-specific filters
 
-Each settings section has its own filter, fired when the section's fields are defined:
+Each settings section has its own filter, fired when the section’s fields are defined:
 
 - `wzlw_settings_general` — General tab fields.
 - `wzlw_settings_display` — Display tab fields.
 - `wzlw_settings_advanced` — Advanced tab fields.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_settings_advanced', function ( array $settings ): array {
     $settings['my_custom_field'] = array(
         'id'      => 'my_custom_field',
@@ -251,7 +259,7 @@ add_filter( 'wzlw_settings_advanced', function ( array $settings ): array {
 
 Filters the settings array immediately before it is saved. Runs on every settings save.
 
-```php
+``` wp-block-code
 add_filter( 'wzlw_settings_sanitize', function ( array $settings ): array {
     // Ensure countdown is never below 3.
     if ( isset( $settings['redirect_countdown'] ) ) {
@@ -265,7 +273,7 @@ add_filter( 'wzlw_settings_sanitize', function ( array $settings ): array {
 
 The main plugin singleton is accessible via the `wzlw()` function:
 
-```php
+``` wp-block-code
 $plugin = wzlw();
 
 // Access sub-components.
@@ -286,7 +294,7 @@ The high priority ensures the plugin runs after most other content filters. If y
 
 To prevent the plugin from processing specific content, you can remove the filter temporarily:
 
-```php
+``` wp-block-code
 remove_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
 echo apply_filters( 'the_content', $my_content );
 add_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
@@ -300,7 +308,7 @@ The plugin exposes two JavaScript objects on the frontend, depending on the acti
 
 Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wzlw-modal` handle.
 
-```js
+``` wp-block-code
 wzlwSettings.modalTitle    // Modal heading text.
 wzlwSettings.modalMessage  // Modal body text.
 wzlwSettings.continueText  // Continue button label.
@@ -312,7 +320,7 @@ wzlwSettings.warningMethod // Active warning method string.
 
 Available on the redirect interstitial page only. Localised on the `wzlw-redirect` handle.
 
-```js
+``` wp-block-code
 wzlwRedirect.destination // The external URL.
 wzlwRedirect.countdown   // Countdown duration in seconds.
 ```
@@ -321,11 +329,30 @@ wzlwRedirect.countdown   // Countdown duration in seconds.
 
 The plugin adds the following `data-` attributes to processed external links when a modal or redirect method is active:
 
-| Attribute | Value |
-| --- | --- |
-| `data-wzlw-external` | `"true"` — marks the link as an external link handled by the plugin. |
-| `data-wzlw-url` | The escaped external URL. |
-| `data-wzlw-redirect-url` | The full redirect interstitial URL for this destination. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data-wzlw-external</code></td>
+<td><code>"true"</code> — marks the link as an external link handled by the plugin.</td>
+</tr>
+<tr>
+<td><code>data-wzlw-url</code></td>
+<td>The escaped external URL.</td>
+</tr>
+<tr>
+<td><code>data-wzlw-redirect-url</code></td>
+<td>The full redirect interstitial URL for this destination.</td>
+</tr>
+</tbody>
+</table>
+</figure>
 
 The frontend JavaScript uses `data-wzlw-external` as the selector for click delegation.
 
@@ -333,14 +360,52 @@ The frontend JavaScript uses `data-wzlw-external` as the selector for click dele
 
 Use these handles when declaring stylesheet dependencies:
 
-| Handle | File | Loaded on |
-| --- | --- | --- |
-| `wzlw-frontend` | `includes/assets/css/frontend.css` | All frontend pages. |
-| `wzlw-redirect` | `includes/assets/css/redirect.css` | Redirect interstitial page only. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Handle</th>
+<th>File</th>
+<th>Loaded on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wzlw-frontend</code></td>
+<td><code>includes/assets/css/frontend.css</code></td>
+<td>All frontend pages.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect</code></td>
+<td><code>includes/assets/css/redirect.css</code></td>
+<td>Redirect interstitial page only.</td>
+</tr>
+</tbody>
+</table>
+</figure>
 
 ## Script handles
 
-| Handle | File | Loaded on |
-| --- | --- | --- |
-| `wzlw-modal` | `includes/admin/js/modal.js` | Frontend, when method includes modal or redirect. |
-| `wzlw-redirect` | `includes/assets/js/redirect.js` | Redirect interstitial page only. |
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Handle</th>
+<th>File</th>
+<th>Loaded on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wzlw-modal</code></td>
+<td><code>includes/admin/js/modal.js</code></td>
+<td>Frontend, when method includes modal or redirect.</td>
+</tr>
+<tr>
+<td><code>wzlw-redirect</code></td>
+<td><code>includes/assets/js/redirect.js</code></td>
+<td>Redirect interstitial page only.</td>
+</tr>
+</tbody>
+</table>
+</figure>

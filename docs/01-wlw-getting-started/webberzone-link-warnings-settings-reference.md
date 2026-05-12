@@ -8,11 +8,13 @@ status: publish
 order: 0
 ---
 
+<div class="wp-block-kadence-tableofcontents">
+
+</div>
+
 This document describes all available settings for the WebberZone Link Warnings plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
-
-<style>.kb-table-of-content-nav.kb-table-of-content-id9735_0bb059-f9 .kb-table-of-content-wrap{padding-top:var(--global-kb-spacing-sm, 1.5rem);padding-right:var(--global-kb-spacing-sm, 1.5rem);padding-bottom:var(--global-kb-spacing-sm, 1.5rem);padding-left:var(--global-kb-spacing-sm, 1.5rem);box-shadow:0px 0px 14px 0px rgba(0, 0, 0, 0.2);}.kb-table-of-content-nav.kb-table-of-content-id9735_0bb059-f9 .kb-table-of-contents-title-wrap{padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;}.kb-table-of-content-nav.kb-table-of-content-id9735_0bb059-f9 .kb-table-of-contents-title{font-weight:regular;font-style:normal;}.kb-table-of-content-nav.kb-table-of-content-id9735_0bb059-f9 .kb-table-of-content-wrap .kb-table-of-content-list{font-weight:regular;font-style:normal;margin-top:var(--global-kb-spacing-sm, 1.5rem);margin-right:0px;margin-bottom:0px;margin-left:0px;}</style>
 
 ## General tab
 

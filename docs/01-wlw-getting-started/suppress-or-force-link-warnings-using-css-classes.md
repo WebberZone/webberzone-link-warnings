@@ -8,11 +8,13 @@ status: publish
 order: 0
 ---
 
+<div class="wp-block-kadence-tableofcontents">
+
+</div>
+
 <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> gives you two sets of CSS classes you can add directly to links (or their containers) in your content. One set suppresses the warning icon or modal on specific links. The other set treats links as external even when they point to your own domain.
 
 You do not need to write any code. You add these classes the same way you would add any CSS class in your page builder, block editor, or theme.
-
-<style>.kb-table-of-content-nav.kb-table-of-content-id9925_b95a4a-0e .kb-table-of-content-wrap{padding-top:var(--global-kb-spacing-sm, 1.5rem);padding-right:var(--global-kb-spacing-sm, 1.5rem);padding-bottom:var(--global-kb-spacing-sm, 1.5rem);padding-left:var(--global-kb-spacing-sm, 1.5rem);box-shadow:0px 0px 14px 0px rgba(0, 0, 0, 0.2);}.kb-table-of-content-nav.kb-table-of-content-id9925_b95a4a-0e .kb-table-of-contents-title-wrap{padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;}.kb-table-of-content-nav.kb-table-of-content-id9925_b95a4a-0e .kb-table-of-contents-title{font-weight:regular;font-style:normal;}.kb-table-of-content-nav.kb-table-of-content-id9925_b95a4a-0e .kb-table-of-content-wrap .kb-table-of-content-list{font-weight:regular;font-style:normal;margin-top:var(--global-kb-spacing-sm, 1.5rem);margin-right:0px;margin-bottom:0px;margin-left:0px;}</style>
 
 ## Exclusion classes: Turn off warnings on specific links
 

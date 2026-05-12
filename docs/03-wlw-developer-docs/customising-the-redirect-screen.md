@@ -8,11 +8,13 @@ status: publish
 order: 0
 ---
 
+<div class="wp-block-kadence-tableofcontents">
+
+</div>
+
 This article is intended for advanced users and developers who want to modify the behaviour of the Redirect screen in <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a>.
 
 When the warning method is set to **Redirect screen** or **Inline indicators + Redirect screen**, clicking an external link opens an interstitial page before the user reaches the external destination. This page shows the destination URL, a message, and a countdown timer.
-
-<style>.kb-table-of-content-nav.kb-table-of-content-id9740_b11a1b-fd .kb-table-of-content-wrap{padding-top:var(--global-kb-spacing-sm, 1.5rem);padding-right:var(--global-kb-spacing-sm, 1.5rem);padding-bottom:var(--global-kb-spacing-sm, 1.5rem);padding-left:var(--global-kb-spacing-sm, 1.5rem);box-shadow:0px 0px 14px 0px rgba(0, 0, 0, 0.2);}.kb-table-of-content-nav.kb-table-of-content-id9740_b11a1b-fd .kb-table-of-contents-title-wrap{padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;}.kb-table-of-content-nav.kb-table-of-content-id9740_b11a1b-fd .kb-table-of-contents-title{font-weight:regular;font-style:normal;}.kb-table-of-content-nav.kb-table-of-content-id9740_b11a1b-fd .kb-table-of-content-wrap .kb-table-of-content-list{font-weight:regular;font-style:normal;margin-top:var(--global-kb-spacing-sm, 1.5rem);margin-right:0px;margin-bottom:0px;margin-left:0px;}</style>
 
 ## How the redirect screen works
 

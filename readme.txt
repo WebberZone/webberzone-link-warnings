@@ -206,6 +206,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 = 1.4.0 (23 May 2026) =
 
+[Version 1.4.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-4-0/)
+
 **New Features**
 
 * Excluded domains now support wildcard entries: `*.example.com` matches any subdomain of `example.com` but not the base domain itself. Plain entries (e.g. `example.com`) match that exact domain only. Add both to exclude a domain and all its subdomains.

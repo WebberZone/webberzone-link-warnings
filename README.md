@@ -114,7 +114,7 @@ To exclude all links inside a wrapper element (e.g. a navigation block or card),
 </div>
 ```
 
-Both approaches exclude links from visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+Both approaches suppress the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added.
 
 ## Forcing Links to Be Treated as External
 

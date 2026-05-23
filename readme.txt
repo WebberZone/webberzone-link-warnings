@@ -162,13 +162,13 @@ Add the class `wzlw-no-icon` to any link where you don't want an icon to appear.
 
 `<a href="https://example.com" class="wzlw-no-icon">Link without icon</a>`
 
-This will exclude the link from having visual indicators while still maintaining other accessibility features like screen reader text and ARIA attributes.
+This suppresses the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added.
 
 To exclude all links inside a wrapper element (e.g. a navigation block or card), add the class `wzlw-no-icon-wrapper` to the containing element:
 
 `<div class="wzlw-no-icon-wrapper"><a href="https://example.com">Link without icon</a></div>`
 
-All links inside that wrapper will be excluded from visual indicators.
+All links inside that wrapper will have their visual indicators suppressed.
 
 = Can I customize the icon that appears? =
 
@@ -211,6 +211,10 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * Excluded domains now support wildcard entries: `*.example.com` matches any subdomain of `example.com` but not the base domain itself. Plain entries (e.g. `example.com`) match that exact domain only. Add both to exclude a domain and all its subdomains.
 * Excluded domains are now honoured by the sitewide JavaScript scan, not just PHP content processing. Previously, links excluded in settings could still be flagged as external by the JS scan on navigation menus, footers, and widgets.
 * All four class settings (Suppress Icon Class, Suppress Icon Wrapper Class, Force External Class, Force External Wrapper Class) now accept comma-separated values, allowing multiple class names per setting.
+
+**Bug Fixes**
+
+* Excluded domains with `target="_blank"` in scope=both mode no longer incorrectly show a modal or redirect warning when processed by the JavaScript scanner. ARIA attributes are still applied for screen reader accessibility.
 
 = 1.3.0 (1 May 2026) =
 

@@ -278,7 +278,7 @@ example.com
 
 ### Suppress Icon Class
 
-The CSS class name that suppresses the visual indicator when added directly to an `<a>` tag. The icon and modal are hidden for that link; screen reader text is still added if the link opens in a new tab.
+The CSS class name that suppresses the visual indicator (icon and/or text) when added directly to an `<a>` tag. The modal or redirect warning still applies if your warning method includes one. Screen reader text is still added if the link opens in a new tab.
 
 Accepts a comma-separated list of class names. A link carrying any of the listed classes is treated as a match.
 

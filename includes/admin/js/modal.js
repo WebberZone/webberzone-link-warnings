@@ -96,6 +96,13 @@
 				return;
 			}
 
+			// Excluded-domain links with target=_blank reach here under scope=both.
+			// Suppress modal/data attrs but keep ARIA so screen readers know the tab will open.
+			if (!isExternal && hasTarget && isExcludedHref(href)) {
+				appendAriaLabel(link);
+				return;
+			}
+
 			link.classList.add('wzlw-processed');
 			if (isExternal) {
 				link.classList.add('wzlw-external');
@@ -161,6 +168,39 @@
 				}
 			}
 			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Return true if the href matches an excluded domain entry.
+	 * Unlike isExternalHref, this does not check the site host.
+	 *
+	 * @param {string} href
+	 * @return {boolean}
+	 */
+	function isExcludedHref(href) {
+		if (href.startsWith('/') || href.startsWith('#') || href.startsWith('?')) {
+			return false;
+		}
+		try {
+			const host = new URL(href, window.location.href).hostname.toLowerCase().replace(/\.$/, '');
+			if (!host) {
+				return false;
+			}
+			const excludedDomains = settings.excludedDomains || [];
+			for (const domain of excludedDomains) {
+				if (domain.startsWith('*.')) {
+					const base = domain.slice(2);
+					if (base && host.endsWith('.' + base)) {
+						return true;
+					}
+				} else if (host === domain) {
+					return true;
+				}
+			}
+			return false;
 		} catch (e) {
 			return false;
 		}

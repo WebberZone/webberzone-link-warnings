@@ -28,7 +28,7 @@ Add the class `wzlw-no-icon` directly to the `<a>` tag.
 <a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
-The icon and modal are suppressed. If the link opens in a new tab, a hidden screen-reader label is still added so screen reader users know the tab will open.
+The visual indicator (icon and/or text) is suppressed. The modal or redirect warning still applies if your warning method includes one. If the link opens in a new tab, a hidden screen-reader label is still added so screen reader users know the tab will open.
 
 ### Turn off warnings on a group of links
 

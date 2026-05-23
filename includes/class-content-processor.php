@@ -137,6 +137,15 @@ class Content_Processor {
 				continue;
 			}
 
+			// Excluded-domain links with target=_blank (scope=both): ARIA only, no icon, no modal.
+			if ( ! $is_external && $has_target && $this->is_excluded_domain( $href ) ) {
+				$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
+				if ( $aria_label ) {
+					$processor->set_attribute( 'aria-label', $aria_label );
+				}
+				continue;
+			}
+
 			// Add data attributes for JavaScript handling.
 			if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				if ( $is_external ) {
@@ -521,6 +530,61 @@ class Content_Processor {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if a URL's host matches the excluded domains list.
+	 *
+	 * Unlike is_external_link(), this does not check the site host — it only
+	 * tests whether the domain is explicitly excluded. Used to detect
+	 * excluded-domain target=_blank links under scope=both.
+	 *
+	 * @since 1.5.0
+	 * @param string $url URL to check.
+	 * @return bool True if the host matches an excluded domain entry.
+	 */
+	private function is_excluded_domain( string $url ): bool {
+		if ( 0 === strpos( $url, '/' ) || 0 === strpos( $url, '#' ) || 0 === strpos( $url, '?' ) ) {
+			return false;
+		}
+
+		$parsed_url = wp_parse_url( $url );
+		if ( ! isset( $parsed_url['host'] ) ) {
+			return false;
+		}
+
+		$link_host = strtolower( rtrim( $parsed_url['host'], '.' ) );
+
+		$excluded_domains = $this->settings['excluded_domains'] ?? '';
+		if ( is_string( $excluded_domains ) ) {
+			$excluded_domains = array_filter( array_map( 'trim', explode( "\n", $excluded_domains ) ) );
+		}
+
+		$excluded_domains = array_filter(
+			array_map(
+				function ( $domain ) {
+					$parsed = wp_parse_url( $domain );
+					if ( ! empty( $parsed['host'] ) ) {
+						return strtolower( $parsed['host'] );
+					}
+					return strtolower( strtok( rtrim( $domain, '/' ), '/' ) );
+				},
+				$excluded_domains
+			)
+		);
+
+		foreach ( $excluded_domains as $domain ) {
+			if ( 0 === strpos( $domain, '*.' ) ) {
+				$base = substr( $domain, 2 );
+				if ( $base && substr( $link_host, -( strlen( $base ) + 1 ) ) === '.' . $base ) {
+					return true;
+				}
+			} elseif ( $link_host === $domain ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

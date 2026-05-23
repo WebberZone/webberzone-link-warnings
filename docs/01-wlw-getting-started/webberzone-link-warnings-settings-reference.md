@@ -248,15 +248,30 @@ The number of seconds before the page automatically redirects to the external UR
 
 A list of domains (one per line) that should be treated as internal. Links pointing to these domains are not processed by the plugin, even if they would otherwise be classified as external.
 
-Enter domain names without the protocol. For example:
+Enter domain names without the protocol. Two entry formats are supported:
+
+**Plain entry** — matches that exact domain only:
 
 ``` wp-block-code
 example.com
-subdomain.example.com
-trusted-partner.org
 ```
 
-The matching is substring-based: if the link’s host contains the excluded domain string, it is treated as internal.
+`example.com` matches `https://example.com/` but not `https://sub.example.com/`.
+
+**Wildcard entry** — matches subdomains only, not the base domain:
+
+``` wp-block-code
+*.example.com
+```
+
+`*.example.com` matches `https://sub.example.com/` and `https://deep.sub.example.com/` but not `https://example.com/`.
+
+To exclude a domain and all its subdomains, add both entries:
+
+``` wp-block-code
+example.com
+*.example.com
+```
 
 **Default:** empty\
 **Setting key:** `excluded_domains`

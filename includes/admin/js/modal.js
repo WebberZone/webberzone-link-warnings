@@ -142,11 +142,25 @@
 			return false;
 		}
 		try {
-			const host = new URL(href, window.location.href).hostname;
+			const host = new URL(href, window.location.href).hostname.toLowerCase().replace(/\.$/, '');
 			if (!host) {
 				return false;
 			}
-			return host.toLowerCase().replace(/\.$/, '') !== settings.siteHost;
+			if (host === settings.siteHost) {
+				return false;
+			}
+			const excludedDomains = settings.excludedDomains || [];
+			for (const domain of excludedDomains) {
+				if (domain.startsWith('*.')) {
+					const base = domain.slice(2);
+					if (base && host.endsWith('.' + base)) {
+						return false;
+					}
+				} else if (host === domain) {
+					return false;
+				}
+			}
+			return true;
 		} catch (e) {
 			return false;
 		}

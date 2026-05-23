@@ -188,8 +188,8 @@ Filters the list of excluded domains before the external link check runs. Use th
 
 ``` wp-block-code
 add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_host ): array {
-    $domains[] = 'cdn.example.com';
-    $domains[] = 'assets.example.com';
+    $domains[] = 'cdn.example.com';   // Exact match — cdn.example.com only.
+    $domains[] = '*.example.com';     // Wildcard — all subdomains of example.com.
     return $domains;
 }, 10, 2 );
 ```
@@ -309,12 +309,17 @@ The plugin exposes two JavaScript objects on the frontend, depending on the acti
 Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wzlw-modal` handle.
 
 ``` wp-block-code
-wzlwSettings.modalTitle    // Modal heading text.
-wzlwSettings.modalMessage  // Modal body text.
-wzlwSettings.continueText  // Continue button label.
-wzlwSettings.cancelText    // Cancel button label.
-wzlwSettings.warningMethod // Active warning method string.
+wzlwSettings.siteHost        // Lowercase site hostname (e.g. "example.com").
+wzlwSettings.excludedDomains // Array of normalised excluded domain strings.
+wzlwSettings.scope           // "external" or "both".
+wzlwSettings.warningMethod   // Active warning method string.
+wzlwSettings.modalTitle      // Modal heading text.
+wzlwSettings.modalMessage    // Modal body text.
+wzlwSettings.continueText    // Continue button label.
+wzlwSettings.cancelText      // Cancel button label.
 ```
+
+Entries in `excludedDomains` follow the same format as the admin setting: plain strings (e.g. `"example.com"`) match that exact host; strings prefixed with `*.` (e.g. `"*.example.com"`) match subdomains only.
 
 ### `wzlwRedirect`
 

@@ -509,7 +509,13 @@ class Content_Processor {
 		$excluded_domains = apply_filters( 'wzlw_excluded_domains', $excluded_domains, $link_host ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 		foreach ( $excluded_domains as $domain ) {
-			if ( $link_host === $domain || substr( $link_host, -( strlen( $domain ) + 1 ) ) === '.' . $domain ) {
+			if ( 0 === strpos( $domain, '*.' ) ) {
+				// *.example.com — matches subdomains only, not the base domain itself.
+				$base = substr( $domain, 2 );
+				if ( $base && substr( $link_host, -( strlen( $base ) + 1 ) ) === '.' . $base ) {
+					return false;
+				}
+			} elseif ( $link_host === $domain ) {
 				return false;
 			}
 		}

@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -204,6 +204,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= 1.4.0 (23 May 2026) =
+
+**New Features**
+
+* Excluded domains now support wildcard entries: `*.example.com` matches any subdomain of `example.com` but not the base domain itself. Plain entries (e.g. `example.com`) match that exact domain only. Add both to exclude a domain and all its subdomains.
+* Excluded domains are now honoured by the sitewide JavaScript scan, not just PHP content processing. Previously, links excluded in settings could still be flagged as external by the JS scan on navigation menus, footers, and widgets.
+
 = 1.3.0 (1 May 2026) =
 
 [Version 1.3.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-3-0/)
@@ -256,11 +263,5 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Upgrade Notice ==
 
-= 1.3.0 =
-Links in navigation menus, footers, sidebars, and widgets are now processed sitewide via JavaScript alongside post content.
-
-= 1.2.0 =
-Adds `wzlw-force-external` class support, makes the `wzlw-no-icon` / `wzlw-no-icon-wrapper` class names configurable, and fixes an open-redirect vulnerability in the redirect endpoint.
-
-= 1.1.0 =
-Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.
+= 1.4.0 =
+Excluded domains now support wildcard subdomains (`*.example.com`) and are honoured by the sitewide JS scan. Plain entries now match the exact domain only — add `*.example.com` alongside `example.com` if you also want subdomains excluded.

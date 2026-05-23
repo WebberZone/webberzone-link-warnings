@@ -69,11 +69,31 @@ class Frontend_Handler {
 		$site_url_parts = wp_parse_url( home_url() );
 		$site_host      = strtolower( rtrim( (string) ( $site_url_parts['host'] ?? '' ), '.' ) );
 
+		$excluded_domains_raw = $settings['excluded_domains'] ?? '';
+		if ( is_string( $excluded_domains_raw ) ) {
+			$excluded_domains_raw = array_filter( array_map( 'trim', explode( "\n", $excluded_domains_raw ) ) );
+		}
+		$excluded_domains_js = array_values(
+			array_filter(
+				array_map(
+					function ( $domain ) {
+						$parsed = wp_parse_url( $domain );
+						if ( ! empty( $parsed['host'] ) ) {
+							return strtolower( $parsed['host'] );
+						}
+						return strtolower( strtok( rtrim( $domain, '/' ), '/' ) );
+					},
+					$excluded_domains_raw
+				)
+			)
+		);
+
 		wp_localize_script(
 			'wzlw-modal',
 			'wzlwSettings',
 			array(
 				'siteHost'                  => $site_host,
+				'excludedDomains'           => $excluded_domains_js,
 				'scope'                     => $settings['scope'] ?? 'external',
 				'warningMethod'             => $method,
 				'noIconClass'               => isset( $settings['no_icon_class'] ) ? trim( $settings['no_icon_class'] ) : 'wzlw-no-icon',

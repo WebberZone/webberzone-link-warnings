@@ -453,7 +453,7 @@ class Settings {
 			'excluded_domains'             => array(
 				'id'      => 'excluded_domains',
 				'name'    => esc_html__( 'Excluded Domains', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Enter one domain per line (e.g., example.com). These domains will be treated as internal.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Enter one domain per line. These domains will be treated as internal (no warning shown). Plain entries (e.g. example.com) match that exact domain only. Use a wildcard entry (e.g. *.example.com) to also exclude subdomains. Add both to exclude everything under a domain.', 'webberzone-link-warnings' ),
 				'type'    => 'textarea',
 				'default' => '',
 			),

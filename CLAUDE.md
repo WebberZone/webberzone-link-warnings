@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Plugin Overview
 
-**WebberZone Link Warnings** (v1.3.0) adds configurable warnings to external links, affiliate links, or any URL pattern — displaying a modal countdown or inline icon before the visitor leaves the site. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
+**WebberZone Link Warnings** (v1.4.0) adds configurable warnings to external links, affiliate links, or any URL pattern — displaying a modal countdown or inline icon before the visitor leaves the site. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
 
 Settings prefix/key: `wzlw` / `wzlw_settings` (wp_options). Access via `wzlw_get_option($key)` / `wzlw_get_settings()`.
 
@@ -71,6 +71,7 @@ After adding or significantly editing any `.css` or `.js` file, run `npm run bui
 - Link exclusion: Links with the configured no-icon class (default `wzlw-no-icon`, setting `no_icon_class`) have visual indicators suppressed. Links inside elements with the configured wrapper class (default `wzlw-no-icon-wrapper`, setting `no_icon_wrapper_class`) are also suppressed. All three special class names are configurable under Advanced settings.
 - Force external: Links with the configured force-external class (default `wzlw-force-external`, setting `force_external_class`) placed directly on an `<a>` tag are treated as external. Adding the wrapper class (default `wzlw-force-external-wrapper`, setting `force_external_wrapper_class`) to any container forces all descendant links to be treated as external.
 - Both exclusion and force-external use a depth counter (`$skip_depth`, `$force_external_depth`) in `Content_Processor::process_content()` to track nesting across the `WP_HTML_Tag_Processor` token stream.
+- Excluded domains: Plain entries (e.g. `example.com`) match that exact domain only. Wildcard entries (e.g. `*.example.com`) match only subdomains — not the base domain. To exclude both, add both entries. The same logic runs in PHP (`Content_Processor::is_external_link`) and JS (`isExternalHref` in `modal.js`). Excluded domains are passed to JS via `wzlwSettings.excludedDomains`.
 - Content processing uses WordPress's native `WP_HTML_Tag_Processor` (requires WordPress 6.6+, PHP 7.4+).
 - All admin components are loaded conditionally (only on admin pages) within `Admin\Admin`.
 - The redirect endpoint uses WordPress rewrite rules managed by `Redirect_Handler`.

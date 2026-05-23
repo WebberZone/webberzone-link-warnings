@@ -269,13 +269,4 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 
 = 1.4.0 =
-Excluded domains now support wildcard subdomains (`*.example.com`) and are honoured by the sitewide JS scan. Plain entries now match the exact domain only — add `*.example.com` alongside `example.com` if you also want subdomains excluded.
-
-= 1.3.0 =
-Links in navigation menus, footers, sidebars, and widgets are now processed sitewide via JavaScript alongside post content.
-
-= 1.2.0 =
-Adds `wzlw-force-external` class support, makes the `wzlw-no-icon` / `wzlw-no-icon-wrapper` class names configurable, and fixes an open-redirect vulnerability in the redirect endpoint.
-
-= 1.1.0 =
-Adds support for excluding links inside wrapper elements using the `wzlw-no-icon-wrapper` class.
+Excluded domains now support wildcard subdomains (`*.example.com`) and are honoured by the sitewide JS scan. Plain entries now match the exact domain only — add `*.example.com` alongside `example.com` if you also want subdomains excluded. All four CSS class settings now accept comma-separated values.

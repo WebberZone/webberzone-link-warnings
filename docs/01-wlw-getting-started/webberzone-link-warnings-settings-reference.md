@@ -276,6 +276,42 @@ example.com
 **Default:** empty\
 **Setting key:** `excluded_domains`
 
+### Suppress Icon Class
+
+The CSS class name that suppresses the visual indicator when added directly to an `<a>` tag. The icon and modal are hidden for that link; screen reader text is still added if the link opens in a new tab.
+
+Accepts a comma-separated list of class names. A link carrying any of the listed classes is treated as a match.
+
+**Default:** `wzlw-no-icon`\
+**Setting key:** `no_icon_class`
+
+### Suppress Icon Wrapper Class
+
+The CSS class name that suppresses visual indicators on all links inside a wrapper element. Add it to any containing element to exclude every link inside it.
+
+Accepts a comma-separated list of class names.
+
+**Default:** `wzlw-no-icon-wrapper`\
+**Setting key:** `no_icon_wrapper_class`
+
+### Force External Class
+
+The CSS class name that forces a specific link to be treated as external, regardless of its URL. Add it directly to an `<a>` tag.
+
+Accepts a comma-separated list of class names.
+
+**Default:** `wzlw-force-external`\
+**Setting key:** `force_external_class`
+
+### Force External Wrapper Class
+
+The CSS class name that forces all links inside a wrapper element to be treated as external. Add it to any containing element.
+
+Accepts a comma-separated list of class names.
+
+**Default:** `wzlw-force-external-wrapper`\
+**Setting key:** `force_external_wrapper_class`
+
 ## Programmatic access
 
 All settings can be read and modified programmatically using the wrapper functions defined in `includes/options-api.php`:

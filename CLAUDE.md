@@ -68,10 +68,15 @@ After adding or significantly editing any `.css` or `.js` file, run `npm run bui
 
 ## Key Conventions
 
-- Link exclusion: Links with the configured no-icon class (default `wzlw-no-icon`, setting `no_icon_class`) have visual indicators suppressed. Links inside elements with the configured wrapper class (default `wzlw-no-icon-wrapper`, setting `no_icon_wrapper_class`) are also suppressed. All three special class names are configurable under Advanced settings.
+- Link exclusion: Links with the configured no-icon class (default `wzlw-no-icon`, setting `no_icon_class`) have visual indicators suppressed. Links inside elements with the configured wrapper class (default `wzlw-no-icon-wrapper`, setting `no_icon_wrapper_class`) are also suppressed. All four class settings accept comma-separated values (e.g. `wzlw-no-icon, my-no-icon`) — PHP parses them via `Content_Processor::parse_class_setting()` and JS receives them as arrays via `wzlwSettings`.
 - Force external: Links with the configured force-external class (default `wzlw-force-external`, setting `force_external_class`) placed directly on an `<a>` tag are treated as external. Adding the wrapper class (default `wzlw-force-external-wrapper`, setting `force_external_wrapper_class`) to any container forces all descendant links to be treated as external.
 - Both exclusion and force-external use a depth counter (`$skip_depth`, `$force_external_depth`) in `Content_Processor::process_content()` to track nesting across the `WP_HTML_Tag_Processor` token stream.
 - Excluded domains: Plain entries (e.g. `example.com`) match that exact domain only. Wildcard entries (e.g. `*.example.com`) match only subdomains — not the base domain. To exclude both, add both entries. The same logic runs in PHP (`Content_Processor::is_external_link`) and JS (`isExternalHref` in `modal.js`). Excluded domains are passed to JS via `wzlwSettings.excludedDomains`.
 - Content processing uses WordPress's native `WP_HTML_Tag_Processor` (requires WordPress 6.6+, PHP 7.4+).
 - All admin components are loaded conditionally (only on admin pages) within `Admin\Admin`.
 - The redirect endpoint uses WordPress rewrite rules managed by `Redirect_Handler`.
+
+## Settings API Field Widths
+
+- Full-width text input: `'size' => 'large'` → renders as `input.large-text` (WordPress admin CSS: `width: 99%`)
+- Do NOT use `'field_class' => 'widefat'` for text inputs — the appended `-text` suffix class overrides it

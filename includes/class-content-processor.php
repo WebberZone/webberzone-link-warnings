@@ -159,9 +159,9 @@ class Content_Processor {
 				$new_class .= ' wzlw-external';
 			}
 			if ( $skip_depth > 0 ) {
-				$no_icon_class = isset( $this->settings['no_icon_class'] ) ? trim( $this->settings['no_icon_class'] ) : 'wzlw-no-icon';
-				if ( '' !== $no_icon_class ) {
-					$new_class .= ' ' . $no_icon_class;
+				$no_icon_classes = $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' );
+				if ( ! empty( $no_icon_classes ) ) {
+					$new_class .= ' ' . implode( ' ', $no_icon_classes );
 				}
 			}
 			$processor->set_attribute( 'class', $new_class );
@@ -226,9 +226,9 @@ class Content_Processor {
 	 * @return bool True if the class is present.
 	 */
 	private function has_skip_wrapper_class( $class_name ) {
-		$wrapper_class = isset( $this->settings['no_icon_wrapper_class'] ) ? trim( $this->settings['no_icon_wrapper_class'] ) : 'wzlw-no-icon-wrapper';
+		$wrapper_classes = $this->parse_class_setting( 'no_icon_wrapper_class', 'wzlw-no-icon-wrapper' );
 
-		if ( '' === $wrapper_class ) {
+		if ( empty( $wrapper_classes ) ) {
 			return false;
 		}
 
@@ -238,7 +238,7 @@ class Content_Processor {
 			return false;
 		}
 
-		return in_array( $wrapper_class, $classes, true );
+		return ! empty( array_intersect( $wrapper_classes, $classes ) );
 	}
 
 	/**
@@ -270,9 +270,9 @@ class Content_Processor {
 	 * @return bool True if the class is present.
 	 */
 	private function has_force_external_wrapper_class( $class_name ) {
-		$wrapper_class = isset( $this->settings['force_external_wrapper_class'] ) ? trim( $this->settings['force_external_wrapper_class'] ) : 'wzlw-force-external-wrapper';
+		$wrapper_classes = $this->parse_class_setting( 'force_external_wrapper_class', 'wzlw-force-external-wrapper' );
 
-		if ( '' === $wrapper_class ) {
+		if ( empty( $wrapper_classes ) ) {
 			return false;
 		}
 
@@ -282,7 +282,7 @@ class Content_Processor {
 			return false;
 		}
 
-		return in_array( $wrapper_class, $classes, true );
+		return ! empty( array_intersect( $wrapper_classes, $classes ) );
 	}
 
 	/**
@@ -293,9 +293,9 @@ class Content_Processor {
 	 * @return bool True if the class is present.
 	 */
 	private function link_has_force_external_class( \WP_HTML_Tag_Processor $processor ) {
-		$force_class = isset( $this->settings['force_external_class'] ) ? trim( $this->settings['force_external_class'] ) : 'wzlw-force-external';
+		$force_classes = $this->parse_class_setting( 'force_external_class', 'wzlw-force-external' );
 
-		if ( '' === $force_class ) {
+		if ( empty( $force_classes ) ) {
 			return false;
 		}
 
@@ -311,7 +311,7 @@ class Content_Processor {
 			return false;
 		}
 
-		return in_array( $force_class, $classes, true );
+		return ! empty( array_intersect( $force_classes, $classes ) );
 	}
 
 	/**
@@ -364,11 +364,11 @@ class Content_Processor {
 
 		// Check if link has the no-icon class — suppress visual indicator but
 		// still add screen reader text for target="_blank" links.
-		$no_icon_class     = isset( $this->settings['no_icon_class'] ) ? trim( $this->settings['no_icon_class'] ) : 'wzlw-no-icon';
+		$no_icon_classes   = $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' );
 		$has_no_icon_class = false;
-		if ( '' !== $no_icon_class && preg_match( '/class="([^"]*)"/', $link_html, $class_attr_match ) ) {
+		if ( ! empty( $no_icon_classes ) && preg_match( '/class="([^"]*)"/', $link_html, $class_attr_match ) ) {
 			$link_classes      = preg_split( '/\s+/', trim( $class_attr_match[1] ) );
-			$has_no_icon_class = is_array( $link_classes ) && in_array( $no_icon_class, $link_classes, true );
+			$has_no_icon_class = is_array( $link_classes ) && ! empty( array_intersect( $no_icon_classes, $link_classes ) );
 		}
 		if ( $has_no_icon_class ) {
 			if ( strpos( $link_html, 'target="_blank"' ) !== false ) {
@@ -544,6 +544,19 @@ class Content_Processor {
 			default:
 				return $is_external;
 		}
+	}
+
+	/**
+	 * Parse a comma-separated class setting into a trimmed array of class names.
+	 *
+	 * @since 1.5.0
+	 * @param string $setting_key Setting key.
+	 * @param string $fallback    Fallback value if setting is not set.
+	 * @return string[]
+	 */
+	private function parse_class_setting( string $setting_key, string $fallback ): array {
+		$raw = isset( $this->settings[ $setting_key ] ) ? $this->settings[ $setting_key ] : $fallback;
+		return array_values( array_filter( array_map( 'trim', explode( ',', $raw ) ) ) );
 	}
 
 	/**

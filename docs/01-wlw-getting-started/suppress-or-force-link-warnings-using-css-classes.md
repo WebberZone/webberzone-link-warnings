@@ -108,6 +108,14 @@ Product A gets the warning. Product B is excluded from the warning even though i
 
 The default class names (`wzlw-no-icon`, `wzlw-no-icon-wrapper`, `wzlw-force-external`, `wzlw-force-external-wrapper`) can be changed under **Settings → Link Warnings → Advanced**. If you have changed them, use your custom class names wherever this guide shows the defaults.
 
+Each setting also accepts a comma-separated list of class names. This lets you honour multiple class conventions at once — for example, if you have an existing theme class you want to reuse alongside the plugin default:
+
+``` wp-block-code
+wzlw-no-icon, my-theme-no-icon
+```
+
+Any link carrying **any** of the listed classes will be treated as a match. The same applies to the wrapper and force-external settings.
+
 ## Adding class names to navigation menus
 
 If you’re using **Appearances \> Menus** to manage your navigation menus, you can add the wrapper classes above to force external links and/or hide the icon. You will need to enable viewing this via Screen Options dropdown that you can find in the top right of the page.

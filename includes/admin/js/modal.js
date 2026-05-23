@@ -65,10 +65,10 @@
 			return;
 		}
 
-		const noIconWrapperClass        = settings.noIconWrapperClass || '';
-		const forceExternalWrapperClass = settings.forceExternalWrapperClass || '';
-		const forceExternalClass        = settings.forceExternalClass || '';
-		const noIconClass               = settings.noIconClass || '';
+		const noIconWrapperClasses        = Array.isArray(settings.noIconWrapperClass) ? settings.noIconWrapperClass : (settings.noIconWrapperClass ? [settings.noIconWrapperClass] : []);
+		const forceExternalWrapperClasses = Array.isArray(settings.forceExternalWrapperClass) ? settings.forceExternalWrapperClass : (settings.forceExternalWrapperClass ? [settings.forceExternalWrapperClass] : []);
+		const forceExternalClasses        = Array.isArray(settings.forceExternalClass) ? settings.forceExternalClass : (settings.forceExternalClass ? [settings.forceExternalClass] : []);
+		const noIconClasses               = Array.isArray(settings.noIconClass) ? settings.noIconClass : (settings.noIconClass ? [settings.noIconClass] : []);
 		const isInlineMethod            = ['inline', 'inline_modal', 'inline_redirect'].includes(method);
 		const needsDataAttrs            = ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(method);
 		const needsRedirectUrl          = ['redirect', 'inline_redirect'].includes(method);
@@ -81,10 +81,10 @@
 				return;
 			}
 
-			const inNoIconWrapper   = noIconWrapperClass && link.closest('.' + CSS.escape(noIconWrapperClass));
-			const inForceExtWrapper = forceExternalWrapperClass && link.closest('.' + CSS.escape(forceExternalWrapperClass));
-			const hasForceExtClass  = forceExternalClass && link.classList.contains(forceExternalClass);
-			const hasNoIconClass    = noIconClass && link.classList.contains(noIconClass);
+			const inNoIconWrapper   = noIconWrapperClasses.length && noIconWrapperClasses.some(function (c) { return link.closest('.' + CSS.escape(c)); });
+			const inForceExtWrapper = forceExternalWrapperClasses.length && forceExternalWrapperClasses.some(function (c) { return link.closest('.' + CSS.escape(c)); });
+			const hasForceExtClass  = forceExternalClasses.length && forceExternalClasses.some(function (c) { return link.classList.contains(c); });
+			const hasNoIconClass    = noIconClasses.length && noIconClasses.some(function (c) { return link.classList.contains(c); });
 
 			const isExternal = !!(inForceExtWrapper || hasForceExtClass || isExternalHref(href));
 			const hasTarget  = '_blank' === link.getAttribute('target');
@@ -100,8 +100,8 @@
 			if (isExternal) {
 				link.classList.add('wzlw-external');
 			}
-			if (inNoIconWrapper && noIconClass) {
-				link.classList.add(noIconClass);
+			if (inNoIconWrapper && noIconClasses.length) {
+				noIconClasses.forEach(function (c) { link.classList.add(c); });
 			}
 
 			appendAriaLabel(link);

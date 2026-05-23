@@ -460,30 +460,34 @@ class Settings {
 			'no_icon_class'                => array(
 				'id'      => 'no_icon_class',
 				'name'    => esc_html__( 'Suppress Icon Class', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'CSS class that suppresses the visual indicator on a specific link. Add this class directly to an &lt;a&gt; tag.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that suppresses the visual indicator on a specific link. Add this class directly to an &lt;a&gt; tag. Separate multiple classes with commas.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
 				'default' => 'wzlw-no-icon',
+				'size'    => 'large',
 			),
 			'no_icon_wrapper_class'        => array(
 				'id'      => 'no_icon_wrapper_class',
 				'name'    => esc_html__( 'Suppress Icon Wrapper Class', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'CSS class that suppresses visual indicators on all links inside a wrapper element. Add this class to any containing element.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that suppresses visual indicators on all links inside a wrapper element. Add this class to any containing element. Separate multiple classes with commas.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
 				'default' => 'wzlw-no-icon-wrapper',
+				'size'    => 'large',
 			),
 			'force_external_class'         => array(
 				'id'      => 'force_external_class',
 				'name'    => esc_html__( 'Force External Class', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'CSS class that forces a specific link to be treated as external. Add this class directly to an &lt;a&gt; tag.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that forces a specific link to be treated as external. Add this class directly to an &lt;a&gt; tag. Separate multiple classes with commas.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
 				'default' => 'wzlw-force-external',
+				'size'    => 'large',
 			),
 			'force_external_wrapper_class' => array(
 				'id'      => 'force_external_wrapper_class',
 				'name'    => esc_html__( 'Force External Wrapper Class', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'CSS class that forces all links inside a wrapper element to be treated as external. Add this class to any containing element.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'CSS class that forces all links inside a wrapper element to be treated as external. Add this class to any containing element. Separate multiple classes with commas.', 'webberzone-link-warnings' ),
 				'type'    => 'text',
 				'default' => 'wzlw-force-external-wrapper',
+				'size'    => 'large',
 			),
 		);
 

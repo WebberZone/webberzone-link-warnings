@@ -4,6 +4,7 @@ slug: webberzone-link-warnings-settings-reference
 title: "WebberZone Link Warnings Settings Reference"
 products: [link-warnings]
 sections: [01-wlw-getting-started]
+tags: [link-warnings,settings]
 status: publish
 order: 0
 ---

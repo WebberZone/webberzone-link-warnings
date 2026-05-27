@@ -4,6 +4,7 @@ slug: suppress-or-force-link-warnings-using-css-classes
 title: "Suppress or force link warnings using CSS classes"
 products: [link-warnings]
 sections: [01-wlw-getting-started]
+tags: [link-warnings]
 status: publish
 order: 0
 ---

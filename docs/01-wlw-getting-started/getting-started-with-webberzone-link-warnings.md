@@ -4,6 +4,7 @@ slug: getting-started-with-webberzone-link-warnings
 title: "Getting Started with WebberZone Link Warnings"
 products: [link-warnings]
 sections: [01-wlw-getting-started]
+tags: [installation,link-warnings]
 status: publish
 order: 0
 ---

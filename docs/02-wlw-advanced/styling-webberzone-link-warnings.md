@@ -4,6 +4,7 @@ slug: styling-webberzone-link-warnings
 title: "Styling WebberZone Link Warnings"
 products: [link-warnings]
 sections: [02-wlw-advanced]
+tags: [link-warnings,styles]
 status: publish
 order: 0
 ---

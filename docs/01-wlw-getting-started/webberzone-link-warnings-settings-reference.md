@@ -9,9 +9,7 @@ status: publish
 order: 0
 ---
 
-<div class="wp-block-kadence-tableofcontents">
-
-</div>
+[kbtoc]
 
 This document describes all available settings for the WebberZone Link Warnings plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
 

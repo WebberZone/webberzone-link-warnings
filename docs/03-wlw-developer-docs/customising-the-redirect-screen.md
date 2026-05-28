@@ -9,9 +9,7 @@ status: publish
 order: 0
 ---
 
-<div class="wp-block-kadence-tableofcontents">
-
-</div>
+[kbtoc]
 
 This article is intended for advanced users and developers who want to modify the behaviour of the Redirect screen in <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a>.
 

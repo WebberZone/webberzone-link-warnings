@@ -9,9 +9,7 @@ status: publish
 order: 0
 ---
 
-<div class="wp-block-kadence-tableofcontents">
-
-</div>
+[kbtoc]
 
 <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
 

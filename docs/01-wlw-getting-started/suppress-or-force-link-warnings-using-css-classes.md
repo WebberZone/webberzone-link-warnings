@@ -9,9 +9,7 @@ status: publish
 order: 0
 ---
 
-<div class="wp-block-kadence-tableofcontents">
-
-</div>
+[kbtoc]
 
 <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> gives you two sets of CSS classes you can add directly to links (or their containers) in your content. One set suppresses the warning icon or modal on specific links. The other set treats links as external even when they point to your own domain.
 

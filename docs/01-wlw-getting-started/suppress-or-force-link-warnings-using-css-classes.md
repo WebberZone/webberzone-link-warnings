@@ -1,5 +1,4 @@
 ---
-id: 9925
 slug: suppress-or-force-link-warnings-using-css-classes
 title: "Suppress or force link warnings using CSS classes"
 products: [link-warnings]

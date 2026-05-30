@@ -1,5 +1,4 @@
 ---
-id: 9740
 slug: customising-the-redirect-screen
 title: "Customising the Redirect Screen in WebberZone Link Warnings"
 products: [link-warnings]
@@ -11,7 +10,7 @@ order: 0
 
 [kbtoc]
 
-This article is intended for advanced users and developers who want to modify the behaviour of the Redirect screen in <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a>.
+This article is intended for advanced users and developers who want to modify the behavior of the Redirect screen in <a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a>.
 
 When the warning method is set to **Redirect screen** or **Inline indicators + Redirect screen**, clicking an external link opens an interstitial page before the user reaches the external destination. This page shows the destination URL, a message, and a countdown timer.
 
@@ -142,7 +141,7 @@ get_footer();
 
 The countdown JavaScript targets `.wzlw-countdown-number` to update the displayed number. If you remove or rename this class, the visual countdown will stop updating, though the redirect itself still fires after the configured duration.
 
-## Countdown behaviour
+## Countdown behavior
 
 The countdown is handled by `redirect.js`, which is enqueued automatically on the redirect page. It reads its configuration from a localised JavaScript object:
 

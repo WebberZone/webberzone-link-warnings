@@ -1,5 +1,4 @@
 ---
-id: 9738
 slug: styling-webberzone-link-warnings
 title: "Styling WebberZone Link Warnings"
 products: [link-warnings]
@@ -11,9 +10,9 @@ order: 0
 
 [kbtoc]
 
-<a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> uses CSS custom properties (variables) for all colours, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
+<a href="https://webberzone.com/plugins/webberzone-link-warnings/" data-type="page" data-id="9512">WebberZone Link Warnings</a> uses CSS custom properties (variables) for all colors, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
 
-This guide covers the CSS class reference, custom property reference, and common customisation recipes — including replacing the default external link icon.
+This guide covers the CSS class reference, custom property reference, and common customization recipes — including replacing the default external link icon.
 
 ## CSS classes added to links
 
@@ -80,7 +79,7 @@ Add the `wzlw-no-icon` class to any link to suppress its icon:
 
 ## CSS custom properties
 
-The plugin defines all visual tokens as CSS custom properties on `:root`. Override them in your theme to change colours and spacing globally.
+The plugin defines all visual tokens as CSS custom properties on `:root`. Override them in your theme to change colors and spacing globally.
 
 ### Frontend (indicators and modal)
 
@@ -137,7 +136,7 @@ Defined in `includes/assets/css/redirect.css`:
 
 ## Overriding custom properties
 
-Add overrides in your theme’s stylesheet (or via the Customiser’s Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
+Add overrides in your theme’s stylesheet (or via the Customizer’s Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
 
 ``` wp-block-code
 :root {
@@ -148,7 +147,7 @@ Add overrides in your theme’s stylesheet (or via the Customiser’s Additional
 }
 ```
 
-This changes the modal button colour, indicator text colour, and border radius across all plugin elements.
+This changes the modal button color, indicator text color, and border radius across all plugin elements.
 
 ## Replacing the default icon
 
@@ -258,7 +257,7 @@ Example — wider modal with a darker overlay:
 
 ## Styling the redirect screen
 
-The redirect page uses a centred card layout. Key classes:
+The redirect page uses a centered card layout. Key classes:
 
 <figure class="wp-block-table">
 <table class="has-fixed-layout">

@@ -1,5 +1,4 @@
 ---
-id: 9731
 slug: getting-started-with-webberzone-link-warnings
 title: "Getting Started with WebberZone Link Warnings"
 products: [link-warnings]
@@ -44,7 +43,7 @@ You can dismiss the wizard and configure settings manually at any time.
 
 ## Manual configuration
 
-All settings are available at **Settings \> Link Warnings**. The settings page is organised into three tabs:
+All settings are available at **Settings \> Link Warnings**. The settings page is organized into three tabs:
 
 - **General** — warning method, link scope, and enabled post types.
 - **Display** — inline indicator options, modal dialog text, and redirect screen text.
@@ -75,7 +74,7 @@ The plugin uses WordPress’s native `WP_HTML_Tag_Processor` class for HTML pars
 <thead>
 <tr>
 <th>Method</th>
-<th>Behaviour</th>
+<th>Behavior</th>
 </tr>
 </thead>
 <tbody>

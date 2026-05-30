@@ -1,5 +1,4 @@
 ---
-id: 9735
 slug: webberzone-link-warnings-settings-reference
 title: "WebberZone Link Warnings Settings Reference"
 products: [link-warnings]
@@ -11,7 +10,7 @@ order: 0
 
 [kbtoc]
 
-This document describes all available settings for the WebberZone Link Warnings plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organised into three tabs: General, Display, and Advanced.
+This document describes all available settings for the WebberZone Link Warnings plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organized into three tabs: General, Display, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
@@ -27,7 +26,7 @@ Controls how users are warned about external links.
 <tr>
 <th>Value</th>
 <th>Label</th>
-<th>Behaviour</th>
+<th>Behavior</th>
 </tr>
 </thead>
 <tbody>
@@ -73,7 +72,7 @@ Determines which links receive inline indicators. Modal and redirect warnings al
 <tr>
 <th>Value</th>
 <th>Label</th>
-<th>Behaviour</th>
+<th>Behavior</th>
 </tr>
 </thead>
 <tbody>
@@ -164,14 +163,14 @@ A custom icon character or symbol, used only when Icon Style is set to “Custom
 
 #### Icon Color
 
-The colour for the icon.
+The color for the icon.
 
 **Default:** `#595959`\
 **Setting key:** `icon_color`
 
 #### Icon Background Color
 
-Background colour for the icon. Leave empty for transparent.
+Background color for the icon. Leave empty for transparent.
 
 **Default:** empty\
 **Setting key:** `icon_background`

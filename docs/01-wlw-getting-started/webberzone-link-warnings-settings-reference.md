@@ -250,7 +250,7 @@ Enter domain names without the protocol. Two entry formats are supported:
 
 **Plain entry** — matches that exact domain only:
 
-``` wp-block-code
+```text
 example.com
 ```
 
@@ -258,7 +258,7 @@ example.com
 
 **Wildcard entry** — matches subdomains only, not the base domain:
 
-``` wp-block-code
+```text
 *.example.com
 ```
 
@@ -266,7 +266,7 @@ example.com
 
 To exclude a domain and all its subdomains, add both entries:
 
-``` wp-block-code
+```text
 example.com
 *.example.com
 ```
@@ -314,7 +314,7 @@ Accepts a comma-separated list of class names.
 
 All settings can be read and modified programmatically using the wrapper functions defined in `includes/options-api.php`:
 
-``` wp-block-code
+```php
 // Get all settings (merged with defaults).
 $settings = wzlw_get_settings();
 

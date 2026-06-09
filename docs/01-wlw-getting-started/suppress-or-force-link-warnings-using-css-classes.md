@@ -108,7 +108,7 @@ The default class names (`wzlw-no-icon`, `wzlw-no-icon-wrapper`, `wzlw-force-ext
 
 Each setting also accepts a comma-separated list of class names. This lets you honour multiple class conventions at once — for example, if you have an existing theme class you want to reuse alongside the plugin default:
 
-``` wp-block-code
+```text
 wzlw-no-icon, my-theme-no-icon
 ```
 

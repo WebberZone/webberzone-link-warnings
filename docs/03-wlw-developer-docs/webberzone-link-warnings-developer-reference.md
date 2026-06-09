@@ -18,7 +18,7 @@ These global functions are defined in `includes/options-api.php` and are availab
 
 Returns the full settings array, merged with defaults.
 
-``` wp-block-code
+```php
 $settings = wzlw_get_settings();
 ```
 
@@ -28,7 +28,7 @@ $settings = wzlw_get_settings();
 
 Returns a single setting value. Falls back to the registered default if the key is not set. If `$default_value` is provided, it takes priority over the registered default.
 
-``` wp-block-code
+```php
 $method = wzlw_get_option( 'warning_method', 'inline' );
 ```
 
@@ -43,7 +43,7 @@ $method = wzlw_get_option( 'warning_method', 'inline' );
 
 Updates a single setting in the database and the in-memory cache.
 
-``` wp-block-code
+```php
 wzlw_update_option( 'warning_method', 'modal' );
 ```
 
@@ -58,7 +58,7 @@ wzlw_update_option( 'warning_method', 'modal' );
 
 Removes a single key from the settings array.
 
-``` wp-block-code
+```php
 wzlw_delete_option( 'excluded_domains' );
 ```
 
@@ -68,7 +68,7 @@ wzlw_delete_option( 'excluded_domains' );
 
 Replaces or merges the entire settings array.
 
-``` wp-block-code
+```php
 // Merge new values into existing settings.
 wzlw_update_settings( array( 'warning_method' => 'redirect' ) );
 
@@ -88,7 +88,7 @@ wzlw_update_settings( $new_settings, false );
 
 Returns the default settings array as derived from the registered settings fields.
 
-``` wp-block-code
+```php
 $defaults = wzlw_settings_defaults();
 ```
 
@@ -98,7 +98,7 @@ $defaults = wzlw_settings_defaults();
 
 Returns the default value for a specific setting key.
 
-``` wp-block-code
+```php
 $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 ```
 
@@ -108,7 +108,7 @@ $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 
 Resets all settings to their defaults.
 
-``` wp-block-code
+```php
 wzlw_settings_reset();
 ```
 
@@ -120,7 +120,7 @@ wzlw_settings_reset();
 
 Filters the full settings array after it is retrieved and merged with defaults.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_get_settings', function ( array $settings ): array {
     // Force modal method on all sites.
     $settings['warning_method'] = 'modal';
@@ -136,7 +136,7 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 
 Filters the value of any individual setting when retrieved via `wzlw_get_option()`.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
     if ( 'redirect_countdown' === $key ) {
         return 10; // Override countdown to 10 seconds.
@@ -155,7 +155,7 @@ add_filter( 'wzlw_get_option', function ( $value, string $key, $default ) {
 
 Key-specific variant of the above filter. Fires only for the named key.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_get_option_warning_method', function ( $value ) {
     if ( wp_is_mobile() ) {
         return 'inline'; // Use inline-only on mobile devices.
@@ -168,7 +168,7 @@ add_filter( 'wzlw_get_option_warning_method', function ( $value ) {
 
 Filters a setting value before saving it to the database.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_update_option', function ( $value, string $key ) {
     if ( 'redirect_countdown' === $key ) {
         return max( 3, (int) $value ); // Enforce minimum 3 seconds.
@@ -186,7 +186,7 @@ add_filter( 'wzlw_update_option', function ( $value, string $key ) {
 
 Filters the list of excluded domains before the external link check runs. Use this to add domains programmatically without modifying the settings.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_host ): array {
     $domains[] = 'cdn.example.com';   // Exact match — cdn.example.com only.
     $domains[] = '*.example.com';     // Wildcard — all subdomains of example.com.
@@ -203,7 +203,7 @@ add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_hos
 
 Filters the default settings array. Useful for changing defaults in a must-use plugin or theme.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
     $defaults['warning_method'] = 'redirect';
     $defaults['redirect_countdown'] = 10;
@@ -215,7 +215,7 @@ add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
 
 Filters the registered settings array. Use this to add, remove, or modify settings fields on the admin page.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_registered_settings', function ( array $settings ): array {
     // Remove the redirect countdown field.
     unset( $settings['display']['redirect_countdown'] );
@@ -227,7 +227,7 @@ add_filter( 'wzlw_registered_settings', function ( array $settings ): array {
 
 Filters the settings page tab definitions.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_settings_sections', function ( array $sections ): array {
     $sections['custom'] = esc_html__( 'Custom', 'my-plugin' );
     return $sections;
@@ -242,7 +242,7 @@ Each settings section has its own filter, fired when the section’s fields are 
 - `wzlw_settings_display` — Display tab fields.
 - `wzlw_settings_advanced` — Advanced tab fields.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_settings_advanced', function ( array $settings ): array {
     $settings['my_custom_field'] = array(
         'id'      => 'my_custom_field',
@@ -259,7 +259,7 @@ add_filter( 'wzlw_settings_advanced', function ( array $settings ): array {
 
 Filters the settings array immediately before it is saved. Runs on every settings save.
 
-``` wp-block-code
+```php
 add_filter( 'wzlw_settings_sanitize', function ( array $settings ): array {
     // Ensure countdown is never below 3.
     if ( isset( $settings['redirect_countdown'] ) ) {
@@ -273,7 +273,7 @@ add_filter( 'wzlw_settings_sanitize', function ( array $settings ): array {
 
 The main plugin singleton is accessible via the `wzlw()` function:
 
-``` wp-block-code
+```php
 $plugin = wzlw();
 
 // Access sub-components.
@@ -294,7 +294,7 @@ The high priority ensures the plugin runs after most other content filters. If y
 
 To prevent the plugin from processing specific content, you can remove the filter temporarily:
 
-``` wp-block-code
+```php
 remove_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
 echo apply_filters( 'the_content', $my_content );
 add_filter( 'the_content', array( wzlw()->content_processor, 'process_content' ), 999 );
@@ -308,7 +308,7 @@ The plugin exposes two JavaScript objects on the frontend, depending on the acti
 
 Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wzlw-modal` handle.
 
-``` wp-block-code
+```js
 wzlwSettings.siteHost        // Lowercase site hostname (e.g. "example.com").
 wzlwSettings.excludedDomains // Array of normalised excluded domain strings.
 wzlwSettings.scope           // "external" or "both".
@@ -325,7 +325,7 @@ Entries in `excludedDomains` follow the same format as the admin setting: plain 
 
 Available on the redirect interstitial page only. Localised on the `wzlw-redirect` handle.
 
-``` wp-block-code
+```js
 wzlwRedirect.destination // The external URL.
 wzlwRedirect.countdown   // Countdown duration in seconds.
 ```

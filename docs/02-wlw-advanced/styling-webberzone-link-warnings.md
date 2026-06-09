@@ -49,7 +49,7 @@ When an inline warning method is active (`inline`, `inline_modal`, or `inline_re
 
 The icon is rendered via a CSS `::before` pseudo-element using a CSS variable. The HTML is an empty span:
 
-``` wp-block-code
+```html
 <span class="wzlw-icon" aria-hidden="true"></span>
 ```
 
@@ -57,7 +57,7 @@ The displayed character is controlled by the `--wzlw-icon-content` CSS variable,
 
 ### Text indicator
 
-``` wp-block-code
+```html
 <span class="wzlw-text" aria-hidden="true">(opens in new window)</span>
 ```
 
@@ -65,7 +65,7 @@ The displayed character is controlled by the `--wzlw-icon-content` CSS variable,
 
 Always added to processed links, regardless of the visual indicator setting:
 
-``` wp-block-code
+```html
 <span class="screen-reader-text">Opens in a new window</span>
 ```
 
@@ -73,7 +73,7 @@ Always added to processed links, regardless of the visual indicator setting:
 
 Add the `wzlw-no-icon` class to any link to suppress its icon:
 
-``` wp-block-code
+```html
 <a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
@@ -85,7 +85,7 @@ The plugin defines all visual tokens as CSS custom properties on `:root`. Overri
 
 Defined in `includes/assets/css/frontend.css`:
 
-``` wp-block-code
+```css
 :root {
     --wzlw-color-text: #1a1a1a;
     --wzlw-color-text-muted: #4a4a4a;
@@ -112,7 +112,7 @@ Defined in `includes/assets/css/frontend.css`:
 
 Defined in `includes/assets/css/redirect.css`:
 
-``` wp-block-code
+```css
 :root {
     --wzlw-color-text: #3a3a3a;
     --wzlw-color-text-muted: #666;
@@ -138,7 +138,7 @@ Defined in `includes/assets/css/redirect.css`:
 
 Add overrides in your theme’s stylesheet (or via the Customizer’s Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
 
-``` wp-block-code
+```css
 :root {
     --wzlw-color-link: #0073aa;
     --wzlw-color-link-hover: #005177;
@@ -155,7 +155,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 ### Use a background image
 
-``` wp-block-code
+```css
 .wzlw-icon::before {
     content: '';
     display: inline-block;
@@ -168,7 +168,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 ### Use a different Unicode character
 
-``` wp-block-code
+```css
 .wzlw-icon::before {
     content: '\1F517'; /* Link emoji, or any Unicode code point. */
     font-size: 0.875em;
@@ -179,7 +179,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 If your theme already loads an icon font, you can reference a glyph:
 
-``` wp-block-code
+```css
 .wzlw-icon::before {
     font-family: 'dashicons';
     content: '\f504'; /* Dashicons external link glyph. */
@@ -245,7 +245,7 @@ Key classes for the modal:
 
 Example — wider modal with a darker overlay:
 
-``` wp-block-code
+```css
 .wzlw-modal-container {
     width: 640px;
 }
@@ -330,7 +330,7 @@ The redirect page uses a centered card layout. Key classes:
 
 Example — dark redirect page:
 
-``` wp-block-code
+```css
 :root {
     --wzlw-color-page-bg: #1a1a2e;
     --wzlw-color-surface: #1e1e2f;
@@ -351,7 +351,7 @@ The plugin ships with RTL-specific stylesheets (`frontend-rtl.css`, `redirect-rt
 
 The plugin stylesheet is enqueued with the handle `wzlw-frontend`. If you need to ensure your overrides load after the plugin, declare a dependency:
 
-``` wp-block-code
+```php
 wp_enqueue_style(
     'my-theme-wzlw-overrides',
     get_stylesheet_directory_uri() . '/css/wzlw-overrides.css',

@@ -5,7 +5,7 @@
  * A reusable API class for creating multi-step settings wizards.
  * This class provides the framework for creating guided setup experiences.
  *
- * @package    WebberZone\Link_Warnings
+ * @package WebberZone\Link_Warnings
  */
 
 namespace WebberZone\Link_Warnings\Admin\Settings;

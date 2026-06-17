@@ -306,20 +306,31 @@ The plugin exposes two JavaScript objects on the frontend, depending on the acti
 
 ### `wzlwSettings`
 
-Available when the warning method includes a modal or redirect component. Localised via `wp_localize_script()` on the `wzlw-modal` handle.
+Available when the warning method includes a modal or redirect component. Localized via `wp_localize_script()` on the `wzlw-modal` handle.
 
 ```js
-wzlwSettings.siteHost        // Lowercase site hostname (e.g. "example.com").
-wzlwSettings.excludedDomains // Array of normalised excluded domain strings.
-wzlwSettings.scope           // "external" or "both".
-wzlwSettings.warningMethod   // Active warning method string.
-wzlwSettings.modalTitle      // Modal heading text.
-wzlwSettings.modalMessage    // Modal body text.
-wzlwSettings.continueText    // Continue button label.
-wzlwSettings.cancelText      // Cancel button label.
+wzlwSettings.siteHost                  // Lowercase site hostname (e.g. "example.com").
+wzlwSettings.excludedDomains           // Array of normalised excluded domain strings.
+wzlwSettings.scope                     // "external" or "both".
+wzlwSettings.warningMethod             // Active warning method string.
+wzlwSettings.noIconClass               // Array of class names that suppress the indicator.
+wzlwSettings.noIconWrapperClass        // Array of class names that suppress indicators inside an element.
+wzlwSettings.forceExternalClass        // Array of class names that force a link to be treated as external.
+wzlwSettings.forceExternalWrapperClass // Array of class names that force all links inside an element to be treated as external.
+wzlwSettings.visualIndicator           // "icon", "text", "both", or "none".
+wzlwSettings.indicatorText             // Visible text appended to the link when text indicator is enabled.
+wzlwSettings.screenReaderText          // Hidden text added for assistive technology.
+wzlwSettings.modalTitle                // Modal heading text.
+wzlwSettings.modalMessage              // Modal body text.
+wzlwSettings.continueText              // Continue button label.
+wzlwSettings.cancelText                // Cancel button label.
+wzlwSettings.ajaxUrl                   // WordPress admin-ajax.php URL.
+wzlwSettings.nonce                     // Nonce for the wzlw_sign_urls AJAX action.
 ```
 
 Entries in `excludedDomains` follow the same format as the admin setting: plain strings (e.g. `"example.com"`) match that exact host; strings prefixed with `*.` (e.g. `"*.example.com"`) match subdomains only.
+
+The class arrays are derived from the comma-separated settings `no_icon_class`, `no_icon_wrapper_class`, `force_external_class`, and `force_external_wrapper_class`, normalised to lowercase arrays by the plugin.
 
 ### `wzlwRedirect`
 
@@ -340,26 +351,65 @@ The plugin adds the following `data-` attributes to processed external links whe
 <tr>
 <th>Attribute</th>
 <th>Value</th>
+<th>Added by</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>data-wzlw-external</code></td>
 <td><code>"true"</code> — marks the link as an external link handled by the plugin.</td>
+<td>PHP and JS</td>
+</tr>
+<tr>
+<td><code>data-wzlw-blank</code></td>
+<td><code>"true"</code> — marks the link as an internal link that opens in a new tab (only added when scope is <code>both</code>).</td>
+<td>JS only</td>
 </tr>
 <tr>
 <td><code>data-wzlw-url</code></td>
 <td>The escaped external URL.</td>
+<td>PHP and JS</td>
 </tr>
 <tr>
 <td><code>data-wzlw-redirect-url</code></td>
 <td>The full redirect interstitial URL for this destination.</td>
+<td>PHP and JS</td>
 </tr>
 </tbody>
 </table>
 </figure>
 
-The frontend JavaScript uses `data-wzlw-external` as the selector for click delegation.
+The frontend JavaScript uses `a[data-wzlw-external], a[data-wzlw-blank]` as the selector for click delegation.
+
+## Modal markup hooks
+
+The frontend JavaScript binds behavior to data attributes inside the rendered modal HTML. If you are customizing the modal markup, preserve these attributes:
+
+<figure class="wp-block-table">
+<table class="has-fixed-layout">
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Element</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data-wzlw-continue</code></td>
+<td>The continue button.</td>
+<td>Opens the destination URL when clicked.</td>
+</tr>
+<tr>
+<td><code>data-wzlw-close</code></td>
+<td>Any close element.</td>
+<td>Closes the modal without navigating.</td>
+</tr>
+</tbody>
+</table>
+</figure>
+
+The continue button is also targeted by the JavaScript as `#wzlw-modal-title`, `#wzlw-modal-message`, `.wzlw-modal-url-value`, and `.wzlw-modal-cancel` so its content can be updated from `wzlwSettings`.
 
 ## CSS handles
 

@@ -10,7 +10,7 @@ order: 0
 
 [kbtoc]
 
-This document describes all available settings for the WebberZone Link Warnings plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organized into three tabs: General, Display, and Advanced.
+This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings \> Link Warnings**. The settings page is organized into three tabs: General, Display, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
@@ -328,4 +328,4 @@ wzlw_update_option( 'warning_method', 'modal' );
 wzlw_settings_reset();
 ```
 
-See the [Developer Reference](developer-reference.md) for the full list of functions and filter hooks.
+See the [Developer Reference](https://webberzone.com/support/knowledgebase/webberzone-link-warnings-developer-reference/) for the full list of functions and filter hooks.

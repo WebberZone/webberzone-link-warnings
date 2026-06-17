@@ -1,6 +1,6 @@
 ---
 slug: customising-the-redirect-screen
-title: "Customising the Redirect Screen in WebberZone Link Warnings"
+title: "Customizing the Redirect Screen in WebberZone Link Warnings"
 products: [link-warnings]
 sections: [03-wlw-developer-docs]
 tags: [developer,link-warnings]
@@ -16,11 +16,11 @@ When the warning method is set to **Redirect screen** or **Inline indicators + R
 
 ## How the redirect screen works
 
-1.  The plugin registers a rewrite rule that maps `external-redirect/` to a custom query variable.
-2.  When a user clicks a processed external link, the frontend JavaScript navigates to `yoursite.com/external-redirect/?url=<encoded-url>`.
-3.  On `template_redirect`, the plugin validates the destination URL, confirms it is external, and renders the redirect template.
-4.  A separate JavaScript file (`redirect.js`) starts a countdown timer. When the countdown reaches zero, the browser automatically redirects to the external URL.
-5.  If the user clicks anywhere on the page (except the “Continue to site” button) or presses any key (except Tab), the automatic countdown is cancelled.
+1. The plugin registers a rewrite rule that maps `external-redirect/` to a custom query variable.
+2. When a user clicks a processed external link, the frontend JavaScript navigates to `yoursite.com/external-redirect/?url=<encoded-url>`.
+3. On `template_redirect`, the plugin validates the destination URL, confirms it is external, and renders the redirect template.
+4. A separate JavaScript file (`redirect.js`) starts a countdown timer. When the countdown reaches zero, the browser automatically redirects to the external URL.
+5. If the user clicks anywhere on the page (except the “Continue to site” button) or presses any key (except Tab), the automatic countdown is cancelled.
 
 ## Redirect URL structure
 
@@ -57,9 +57,9 @@ your-theme/webberzone-link-warnings/redirect-screen.php
 
 The plugin checks for the template in the following order:
 
-1.  `your-theme/webberzone-link-warnings/redirect-screen.php`
-2.  `your-theme/webberzone-link-warnings/redirect.php`
-3.  The plugin’s built-in template.
+1. `your-theme/webberzone-link-warnings/redirect-screen.php`
+2. `your-theme/webberzone-link-warnings/redirect.php`
+3. The plugin’s built-in template.
 
 This uses WordPress’s `locate_template()`, so child themes take priority over parent themes.
 
@@ -143,7 +143,7 @@ The countdown JavaScript targets `.wzlw-countdown-number` to update the displaye
 
 ## Countdown behavior
 
-The countdown is handled by `redirect.js`, which is enqueued automatically on the redirect page. It reads its configuration from a localised JavaScript object:
+The countdown is handled by `redirect.js`, which is enqueued automatically on the redirect page. It reads its configuration from a localized JavaScript object:
 
 ```js
 wzlwRedirect.destination // The external URL.

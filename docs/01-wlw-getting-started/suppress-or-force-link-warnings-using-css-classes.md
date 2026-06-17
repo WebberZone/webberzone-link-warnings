@@ -22,7 +22,7 @@ Use these when the plugin adds a warning icon or modal to a link you do not want
 
 Add the class `wzlw-no-icon` directly to the `<a>` tag.
 
-``` markup
+```html
 <a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
@@ -32,7 +32,7 @@ The visual indicator (icon and/or text) is suppressed. The modal or redirect war
 
 Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every link inside that element will have its icon and modal suppressed.
 
-``` markup
+```html
 <div class="wzlw-no-icon-wrapper">
   <a href="https://partner-a.com">Partner A</a>
   <a href="https://partner-b.com">Partner B</a>
@@ -45,10 +45,10 @@ This is useful for a sponsor block, an icon grid, or any section where you want 
 
 **Block editor (Gutenberg):**
 
-1.  Select the link or the block that wraps your links.
-2.  Open the block settings panel on the right.
-3.  Under **Advanced**, find the **Additional CSS class(es)** field.
-4.  Type `wzlw-no-icon` (for a single link block) or `wzlw-no-icon-wrapper` (for a group).
+1. Select the link or the block that wraps your links.
+2. Open the block settings panel on the right.
+3. Under **Advanced**, find the **Additional CSS class(es)** field.
+4. Type `wzlw-no-icon` (for a single link block) or `wzlw-no-icon-wrapper` (for a group).
 
 **Classic editor:**
 
@@ -66,7 +66,7 @@ Use these when a link points to your own domain, but should still show a warning
 
 Add the class `wzlw-force-external` directly to the `<a>` tag.
 
-``` markup
+```html
 <a href="/go/affiliate-product/" class="wzlw-force-external">Buy now</a>
 ```
 
@@ -76,7 +76,7 @@ The link will be processed exactly like an external link — it gets the warning
 
 Add the class `wzlw-force-external-wrapper` to any element that wraps the links.
 
-``` markup
+```html
 <div class="wzlw-force-external-wrapper">
   <a href="/go/product-a/">Product A</a>
   <a href="/go/product-b/">Product B</a>
@@ -93,7 +93,7 @@ The steps are identical to the exclusion classes above. Add `wzlw-force-external
 
 You can use exclusion and force-external classes together. For example, you could force all links in an affiliate section to be treated as external, then exclude one specific link inside that section:
 
-``` markup
+```html
 <div class="wzlw-force-external-wrapper">
   <a href="/go/product-a/">Product A</a>
   <a href="/go/product-b/" class="wzlw-no-icon">Product B (no warning)</a>
@@ -106,7 +106,7 @@ Product A gets the warning. Product B is excluded from the warning even though i
 
 The default class names (`wzlw-no-icon`, `wzlw-no-icon-wrapper`, `wzlw-force-external`, `wzlw-force-external-wrapper`) can be changed under **Settings → Link Warnings → Advanced**. If you have changed them, use your custom class names wherever this guide shows the defaults.
 
-Each setting also accepts a comma-separated list of class names. This lets you honour multiple class conventions at once — for example, if you have an existing theme class you want to reuse alongside the plugin default:
+Each setting also accepts a comma-separated list of class names. This lets you honor multiple class conventions at once — for example, if you have an existing theme class you want to reuse alongside the plugin default:
 
 ```text
 wzlw-no-icon, my-theme-no-icon

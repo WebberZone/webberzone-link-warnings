@@ -19,27 +19,27 @@ WebberZone Link Warnings adds accessible warnings to external links and `target=
 
 ### From the WordPress dashboard
 
-1.  Navigate to **Plugins \> Add New**.
-2.  Search for “WebberZone Link Warnings”.
-3.  Click **Install Now**, then **Activate**.
+1. Navigate to **Plugins \> Add New**.
+2. Search for “WebberZone Link Warnings”.
+3. Click **Install Now**, then **Activate**.
 
 ### Manual upload
 
-1.  Download the plugin archive from [GitHub releases](https://github.com/WebberZone/webberzone-link-warnings/releases) or [WordPress.org](https://wordpress.org/plugins/webberzone-link-warnings/).
-2.  Upload the `webberzone-link-warnings` folder to `/wp-content/plugins/`.
-3.  Activate the plugin from the **Plugins** screen.
+1. Download the plugin archive from [GitHub releases](https://github.com/WebberZone/webberzone-link-warnings/releases) or [WordPress.org](https://wordpress.org/plugins/webberzone-link-warnings/).
+2. Upload the `webberzone-link-warnings` folder to `/wp-content/plugins/`.
+3. Activate the plugin from the **Plugins** screen.
 
 ## First-run wizard
 
-On first activation, an admin notice appears offering a guided setup wizard. It walks through the core decisions:
+On first activation, an admin notice appears offering a guided setup wizard. It runs through five sequential steps:
 
-1.  **Warning method** — inline indicators, modal dialog, redirect screen, or a combined approach.
-2.  **Link scope** — external links only, or external links plus internal links opening in a new tab.
-3.  **Visual indicator** — icon, text, both, or screen-reader-only.
-4.  **Modal settings** — title, message, and button text (if using a modal method).
-5.  **Redirect settings** — message and countdown duration (if using a redirect method).
+1. **Welcome** — introduction and the option to skip the wizard.
+2. **General Settings** — warning method and link scope.
+3. **Visual Indicators** — icon, text, both, or screen-reader-only, plus screen reader text.
+4. **Modal Dialog** — title, message, and button text (shown when the warning method includes a modal component).
+5. **Redirect Screen** — message and countdown duration (shown when the warning method includes a redirect component).
 
-You can dismiss the wizard and configure settings manually at any time.
+You can dismiss the wizard at any time and configure settings manually.
 
 ## Manual configuration
 

@@ -61,6 +61,7 @@ class Hook_Registry {
 			return false;
 		}
 
+		// Store the hook details.
 		self::$hooks[ $key ] = array(
 			'type'       => $hook_type,
 			'name'       => $hook_name,
@@ -70,6 +71,7 @@ class Hook_Registry {
 			'closure_id' => $closure_id,
 		);
 
+		// Register with WordPress.
 		if ( 'action' === $hook_type ) {
 			add_action( $hook_name, $callback, $priority, $args );
 		} else {
@@ -122,6 +124,7 @@ class Hook_Registry {
 	public static function remove( $hook_type, $hook_name, $callback, $priority = 10 ) {
 		$closure_id = '';
 		if ( $callback instanceof \Closure ) {
+			// Find the closure_id for this callback.
 			foreach ( self::$hooks as $hook ) {
 				if ( $hook['name'] === $hook_name &&
 					$hook['priority'] === $priority &&

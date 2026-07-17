@@ -57,7 +57,7 @@ Build requires Node.js with `clean-css-cli`, `terser`, `rtlcss`, and `@wordpress
 
 ## Asset Pipeline
 
-The `build-assets.js` script (run via `npm run build:assets`) recursively finds all `.css` and `.js` files (excluding `node_modules`, `vendor`, `*.min.*`, `*-rtl.css`, `build-assets.js`), then:
+The `build-assets.js` script (run via `npm run build:assets`) recursively finds all `.css` and `.js` files, excluding directories `node_modules`, `vendor`, `freemius`, `build`, `.git` and file patterns `*-rtl.css`, `build-assets.js` (note: `.min` files are intentionally NOT excluded so they can be re-minified), then:
 
 1. Minifies CSS → `*.min.css`
 2. Minifies JS → `*.min.js`

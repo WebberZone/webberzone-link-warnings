@@ -268,4 +268,15 @@ class Settings_Wizard extends Settings_Wizard_API {
 	protected function get_completion_redirect_url() {
 		return $this->settings_page_url;
 	}
+
+	/**
+	 * Get the version for cache busting.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @return string Version number.
+	 */
+	protected function get_version() {
+		return WZLW_VERSION;
+	}
 }

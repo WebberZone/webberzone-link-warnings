@@ -76,6 +76,9 @@ class Admin {
 		return array(
 			'capability' => 'manage_options',
 			'prefix'     => 'wzlw',
+			'style'      => array(
+				'version' => WZLW_VERSION,
+			),
 			'screen_ids' => array(
 				'settings_page_wzlw-settings',
 				'options-general_page_wzlw-settings',

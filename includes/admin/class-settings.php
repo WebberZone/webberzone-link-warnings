@@ -186,7 +186,10 @@ class Settings {
 			'save_changes'         => esc_html__( 'Save Changes', 'webberzone-link-warnings' ),
 			'reset_settings'       => esc_html__( 'Reset all settings', 'webberzone-link-warnings' ),
 			'reset_button_confirm' => esc_html__( 'Do you really want to reset all these settings to their default values?', 'webberzone-link-warnings' ),
-			'checkbox_modified'    => esc_html__( 'Modified from default setting', 'webberzone-link-warnings' ),
+			'modified_field'       => esc_html__( 'Modified from default setting', 'webberzone-link-warnings' ),
+			'modified_legend'      => esc_html__( 'Setting modified from its default value', 'webberzone-link-warnings' ),
+			'default_label'        => esc_html__( 'Default', 'webberzone-link-warnings' ),
+			'default_none'         => esc_html__( 'None', 'webberzone-link-warnings' ),
 			'button_label'         => esc_html__( 'Choose File', 'webberzone-link-warnings' ),
 			'previous_saved'       => esc_html__( 'Previously saved', 'webberzone-link-warnings' ),
 		);

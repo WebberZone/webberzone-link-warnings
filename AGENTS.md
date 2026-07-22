@@ -80,3 +80,21 @@ After adding or significantly editing any `.css` or `.js` file, run `npm run bui
 
 - Full-width text input: `'size' => 'large'` → renders as `input.large-text` (WordPress admin CSS: `width: 99%`)
 - Do NOT use `'field_class' => 'widefat'` for text inputs — the appended `-text` suffix class overrides it
+
+## Shared framework files: `@since` convention
+
+The Settings API (`includes/admin/settings/*.php`) and the Admin Banner (`includes/admin/class-admin-banner.php`) are copy-pasted, shared framework files whose canonical source is the `Settings_API` repo. To keep `@since` tags meaningful and stable across syncs, these files follow special rules:
+
+- Each file carries **exactly one** `@since` tag, on its **class docblock**, set to the plugin version at which that class was **first introduced into this plugin**. This is per-file (the wizard, metabox and banner classes were generally added later than the core Settings API classes).
+- **Do not** add `@since` to methods, functions or properties in these files.
+- When syncing/updating these files from another plugin or the canonical `Settings_API` repo, **do not overwrite the class-level `@since`** — it is plugin-specific. Re-apply the values below after any sync.
+
+| File | `@since` |
+|---|---|
+| `includes/admin/settings/class-settings-api.php` | 1.0.0 |
+| `includes/admin/settings/class-settings-form.php` | 1.0.0 |
+| `includes/admin/settings/class-settings-sanitize.php` | 1.0.0 |
+| `includes/admin/settings/class-settings-wizard-api.php` | 1.0.0 |
+| `includes/admin/settings/class-metabox-api.php` | 1.0.0 |
+| `includes/admin/class-admin-banner.php` | 1.0.0 |
+

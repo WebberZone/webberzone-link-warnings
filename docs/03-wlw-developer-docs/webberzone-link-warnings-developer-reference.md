@@ -123,7 +123,7 @@ Filters the full settings array after it is retrieved and merged with defaults.
 ```php
 add_filter( 'wzlw_get_settings', function ( array $settings ): array {
     // Force modal method on all sites.
-    $settings[['warning_method']] = 'modal';
+    $settings['warning_method'] = 'modal';
     return $settings;
 } );
 ```

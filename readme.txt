@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -246,133 +246,48 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
+= 1.6.1 =
+
+Release date: 13 September 2026
+
+**Fixed**
+
+* Redirect screens triggered deprecated header and footer template notices on block themes and other themes without `header.php` or `footer.php`.
+
 = 1.6.0 =
 
-[Version 1.6.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-6/)
+Release date: 6 September 2026
+Release post: https://webberzone.com/announcements/link-warnings-v1-6/
 
-* New: Download warnings now cover links whose URL path ends in a configured file extension, including files hosted on the current site. The default extensions are `pdf, zip, doc, docx, xls, xlsx, exe, dmg`.
-* New: Added the **Download Links** section under Advanced with the **Downloadable File Extensions** setting, plus separate **Download Modal Title** and **Download Modal Message** settings under Modal Dialog.
-* New: Download links use a distinct download indicator icon when icons are enabled. Query strings and URL fragments are ignored when matching file extensions.
-* New: Server-side filters process widget output, navigation menus, comment text, and block-theme template parts. Each source can be enabled or disabled separately under General > External Content. All four are enabled after updating, so links in these areas start showing warnings straight away.
-* Fix: External links written without a scheme, such as `//example.com/page`, were treated as internal and received no warning.
-* Fix: Redirect screen destinations containing `&`, `#` or `+` failed the signature check and sent visitors to the home page.
-* Fix: Under the redirect methods, force-external links and internal `target="_blank"` links pointing at your own site also sent visitors to the home page instead of the warning screen.
-* Fix: A no-icon, force-external or affiliate wrapper containing an `<iframe>`, `<script>`, `<textarea>` or similar element suppressed every link after it on the page.
-* Fix: Links written with an uppercase `</A>` closing tag received no icon or screen reader text.
-* Fix: Excluded domains are now marked in the markup, so the JavaScript scan honors the same decision as PHP for links outside post content.
-* Improvement: Hardened the modal and redirect scripts against malformed link markup — a destination or redirect URL that does not match the link is now ignored.
-* Improvement: Activation no longer writes a duplicate copy of the default settings.
+**Added**
 
-= 1.5.1 =
+* Added warnings for configured downloadable file extensions, including files hosted on the current site.
+* Added Downloadable File Extensions, Download Modal Title, and Download Modal Message settings.
+* Added a distinct download indicator icon and ignored query strings and fragments when matching file extensions.
+* Added server-side processing for widgets, navigation menus, comments, and block-theme template parts, with all four sources enabled by default under General > External Content.
 
-* Improvement: Setting defaults are now resolved from a single lightweight list instead of building every settings field, so reading an option early in the page load no longer risks a "translation loading triggered too early" notice.
-* Fix: Fixed settings on a multisite network reading another site's values in the same request after a `switch_to_blog()` call, such as during network activation or deactivation.
-* Fix: Fixed the settings wizard silently dropping repeater field rows on save.
-* Fix: Fixed settings not saving when the referer check was bypassed, and hardened the settings sanitizer's array handling.
-* Updated the Patchstack VDP link to the plugin-specific URL.
-* Tested up to WordPress 7.1.
+**Changed**
 
-= 1.5.0 (4 August 2026) =
-
-[Version 1.5.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-5-0/)
-
-**New Features**
-
-* New **Link Attributes** section under Settings > WebberZone Link Warnings > Advanced adds `rel` and `target` attributes to your links automatically. Pick any combination of `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"`, "Open in a new tab" (`target="_blank"`), `rel="noopener"` and `rel="noreferrer"`, configured separately for external links and for affiliate links.
-* Existing `rel` values are preserved rather than overwritten, and matching ignores case. A link with `rel="me author"` becomes `rel="me author nofollow"`, and a link that already has `rel="NoFollow"` is not given a duplicate.
-* `noopener` and `noreferrer` are separate options and are only added to links that actually open in a new tab — either because the link already carries `target="_blank"` or because you enabled the new-tab option. They are kept apart because `noreferrer` also stops the referrer being sent, which can break referrer-based affiliate attribution, while `noopener` is a pure security hint.
-* New **Affiliate Link Class** (default `wzlw-affiliate`) and **Affiliate Link Wrapper Class** (default `wzlw-affiliate-wrapper`) settings mark a single link, or every link inside a container, as an affiliate link. Both accept comma-separated values, and affiliate links receive both the external and the affiliate attribute sets.
-* Links marked as affiliate links are also treated as external for warning purposes, so an internal cloaked URL such as `/go/product/` shows the same modal, redirect screen or indicator as a genuine outbound link. This mirrors how the force-external class already behaves and takes precedence over the excluded domains list.
-* Attributes are applied by both processing layers — `WP_HTML_Tag_Processor` for post content, and the sitewide JavaScript scan for navigation menus, footers, sidebars, widgets and other theme output.
-* Repeat visitors can now dismiss the modal instead of confirming every external link. Set **Modal Frequency** under Settings > WebberZone Link Warnings > Display to "Once per browser session" or "Once every N days" and the modal gains a "Don't show again" checkbox. Tick it, click Continue, and the modal is skipped on later clicks. The default remains "Always show the modal", so existing sites behave exactly as before.
-* New **Dismissal Scope** setting decides whether a dismissal applies only to the destination domain the visitor dismissed, or to every external link on the site.
-* New **Remember Dismissal For** setting sets how many days a dismissal lasts, from 1 to 365.
-* The checkbox label is configurable via **Don't Show Again Label** and is registered for WPML string translation.
-* Dismissals are stored in the visitor's own browser using `sessionStorage` or `localStorage`. No cookies are set and nothing is written to your database.
-
-**Improvements**
-
-* The Advanced tab is now split under two headings, **Link Attributes** and **Exclusions and Classes**, so the domain exclusion and class settings are no longer grouped under the attribute options.
-
-**Bug Fixes**
-
-* **Internal `target="_blank"` links inside post content never triggered a warning.** Under the "External links and internal links opening in a new tab" scope, PHP marked these links as processed but wrote no data attributes, so the JavaScript scan skipped them as well. The identical link in a navigation menu or widget did get a warning. PHP now mirrors the JavaScript logic and emits `data-wzlw-blank` for internal new-tab links.
-* The signed redirect URL is no longer added to every processed link when the warning method is modal only. It is emitted for the redirect and inline redirect methods alone, which drops an unused attribute from the rendered HTML and skips a per-link HMAC on modal pages.
-
-= 1.4.0 (23 May 2026) =
-
-[Version 1.4.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-4-0/)
-
-**New Features**
-
-* Excluded domains now support wildcard entries: `*.example.com` matches any subdomain of `example.com` but not the base domain itself. Plain entries (e.g. `example.com`) match that exact domain only. Add both to exclude a domain and all its subdomains.
-* Excluded domains are now honoured by the sitewide JavaScript scan, not just PHP content processing. Previously, links excluded in settings could still be flagged as external by the JS scan on navigation menus, footers, and widgets.
-* All four class settings (Suppress Icon Class, Suppress Icon Wrapper Class, Force External Class, Force External Wrapper Class) now accept comma-separated values, allowing multiple class names per setting.
-
-**Bug Fixes**
-
-* Excluded domains with `target="_blank"` in scope=both mode no longer incorrectly show a modal or redirect warning when processed by the JavaScript scanner. ARIA attributes are still applied for screen reader accessibility.
-
-= 1.3.0 (1 May 2026) =
-
-[Version 1.3.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-3-0/)
-
-**New Features**
-
-* Sitewide link processing: JavaScript now scans the full rendered page on load and applies warnings to links in navigation menus, footers, sidebars, widgets, and any other theme output — not just post content. All four CSS class rules (`wzlw-force-external`, `wzlw-force-external-wrapper`, `wzlw-no-icon`, `wzlw-no-icon-wrapper`) work everywhere on the page.
-
-**Bug Fixes**
-
-* Links inside `wzlw-no-icon-wrapper` now correctly receive `data-wzlw-*` attributes so the redirect/modal warning still fires; only the visual icon is suppressed.
-
-= 1.2.0 (14 April 2026) =
-
-[Version 1.2.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-2-0/)
-
-**New Features**
-
-* Add `wzlw-force-external` / `wzlw-force-external-wrapper` class support to force links to be treated as external regardless of automatic detection. Both class names are configurable under Settings > Advanced.
-* The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > Advanced.
+* Marked excluded domains in the markup so the JavaScript scan honored the same exclusions as PHP.
+* Stopped activation from writing a duplicate copy of the default settings.
 
 **Security**
 
-* Redirect endpoint now requires an HMAC signature on every URL. Unsigned or tampered URLs are rejected, preventing open-redirect abuse.
+* Hardened modal and redirect scripts against malformed link markup and mismatched destination URLs.
 
-**Bug Fixes**
+**Fixed**
 
-* Redirect URLs with HMAC signatures were broken due to double-encoding of the `&` separator in HTML output.
-* Redundant URL encoding in `get_redirect_url()` caused malformed redirect URLs.
-* Same-host check now normalises hostnames before comparison, so variants like `EXAMPLE.COM` or `example.com.` are treated as internal.
-* Excluded domains now match correctly when entered with a scheme or trailing path.
+* External links without a scheme, such as `//example.com/page`, were treated as internal and received no warning.
+* Redirect destinations containing `&`, `#`, or `+` failed signature checks and sent visitors to the home page.
+* Force-external links and internal `target="_blank"` links sent visitors to the home page instead of the redirect warning screen.
+* No-icon, force-external, or affiliate wrappers containing an `<iframe>`, `<script>`, `<textarea>`, or similar element suppressed warnings on subsequent links.
+* Links with an uppercase `</A>` closing tag received no icon or screen reader text.
 
-= 1.1.0 (14 March 2026) =
+= Earlier versions =
 
-[Version 1.1.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
-
-**New Features**
-
-* Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
-
-**Improvements**
-
-* Enhanced modal accessibility: background content is now hidden from screen readers when the modal is open, URL display includes a screen reader label, buttons have fallback accessible names, and the Continue button announces "opens in a new window" for `target="_blank"` links.
-
-= 1.0.0 (7 March 2026) =
-
-[Version 1.0.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
-
-* Initial release.
+For the changelog of earlier versions, please refer to the [releases page on GitHub](https://github.com/WebberZone/webberzone-link-warnings/releases).
 
 == Upgrade Notice ==
 
-= 1.6.0 =
-Adds warnings for configured downloadable file types and server-side processing for widget output, navigation menus, comments, and block-theme template parts. It also fixes external links written as `//example.com/page` getting no warning, redirect screens sending visitors to the home page instead of the destination, and wrappers containing an `<iframe>` or `<script>` suppressing every link after them. All four content sources are enabled after updating — review them under General > External Content if you do not want warnings in those areas.
-
-= 1.5.1 =
-Fixes settings not saving correctly on multisite (values leaking between sites) and in the settings wizard (repeater rows silently dropped). No action needed.
-
-= 1.5.0 =
-New Link Attributes settings under Advanced add `rel="nofollow"`, `sponsored`, `ugc`, `target="_blank"`, `noopener` and `noreferrer` to external and affiliate links automatically, keeping any `rel` values your links already have. New `wzlw-affiliate` and `wzlw-affiliate-wrapper` classes mark affiliate links; note that affiliate-marked links are also treated as external for warnings, which overrides the excluded domains list for those links. Repeat visitors can also now dismiss the modal — set Modal Frequency to "Once per browser session" or "Once every N days" to add a "Don't show again" checkbox; the default keeps the modal showing every time. Also fixes internal `target="_blank"` links in post content not triggering a warning under the "external links and internal new tab links" scope.
-
-= 1.4.0 =
-Excluded domains now support wildcard subdomains (`*.example.com`) and are honoured by the sitewide JS scan. Plain entries now match the exact domain only — add `*.example.com` alongside `example.com` if you also want subdomains excluded. All four CSS class settings now accept comma-separated values.
+= 1.6.1 =
+Update to prevent redirect screens from triggering deprecated header and footer template notices on block themes and themes without those PHP templates.

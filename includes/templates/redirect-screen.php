@@ -16,7 +16,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-get_header();
+$wzlw_has_theme_header = file_exists( trailingslashit( get_stylesheet_directory() ) . 'header.php' ) || file_exists( trailingslashit( get_template_directory() ) . 'header.php' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+if ( $wzlw_has_theme_header ) {
+	get_header();
+} else {
+	?>
+	<!DOCTYPE html>
+	<html <?php language_attributes(); ?>>
+	<head>
+		<meta charset="<?php bloginfo( 'charset' ); ?>">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<?php wp_head(); ?>
+	</head>
+	<body <?php body_class( 'wzlw-redirect-page' ); ?>>
+		<?php wp_body_open(); ?>
+	<?php
+}
 ?>
 <div class="wzlw-redirect-container">
 	<div class="wzlw-redirect-content">
@@ -76,4 +92,14 @@ get_header();
 	</div>
 </div>
 <?php
-get_footer();
+$wzlw_has_theme_footer = file_exists( trailingslashit( get_stylesheet_directory() ) . 'footer.php' ) || file_exists( trailingslashit( get_template_directory() ) . 'footer.php' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
+if ( $wzlw_has_theme_footer ) {
+	get_footer();
+} else {
+	wp_footer();
+	?>
+	</body>
+</html>
+	<?php
+}

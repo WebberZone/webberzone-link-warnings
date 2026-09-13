@@ -1,0 +1,101 @@
+== Changelog ==
+
+= 1.5.1 =
+
+* Improvement: Setting defaults are now resolved from a single lightweight list instead of building every settings field, so reading an option early in the page load no longer risks a "translation loading triggered too early" notice.
+* Fix: Fixed settings on a multisite network reading another site's values in the same request after a `switch_to_blog()` call, such as during network activation or deactivation.
+* Fix: Fixed the settings wizard silently dropping repeater field rows on save.
+* Fix: Fixed settings not saving when the referer check was bypassed, and hardened the settings sanitizer's array handling.
+* Updated the Patchstack VDP link to the plugin-specific URL.
+* Tested up to WordPress 7.1.
+
+= 1.5.0 (4 August 2026) =
+
+[Version 1.5.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-5-0/)
+
+**New Features**
+
+* New **Link Attributes** section under Settings > WebberZone Link Warnings > Advanced adds `rel` and `target` attributes to your links automatically. Pick any combination of `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"`, "Open in a new tab" (`target="_blank"`), `rel="noopener"` and `rel="noreferrer"`, configured separately for external links and for affiliate links.
+* Existing `rel` values are preserved rather than overwritten, and matching ignores case. A link with `rel="me author"` becomes `rel="me author nofollow"`, and a link that already has `rel="NoFollow"` is not given a duplicate.
+* `noopener` and `noreferrer` are separate options and are only added to links that actually open in a new tab — either because the link already carries `target="_blank"` or because you enabled the new-tab option. They are kept apart because `noreferrer` also stops the referrer being sent, which can break referrer-based affiliate attribution, while `noopener` is a pure security hint.
+* New **Affiliate Link Class** (default `wzlw-affiliate`) and **Affiliate Link Wrapper Class** (default `wzlw-affiliate-wrapper`) settings mark a single link, or every link inside a container, as an affiliate link. Both accept comma-separated values, and affiliate links receive both the external and the affiliate attribute sets.
+* Links marked as affiliate links are also treated as external for warning purposes, so an internal cloaked URL such as `/go/product/` shows the same modal, redirect screen or indicator as a genuine outbound link. This mirrors how the force-external class already behaves and takes precedence over the excluded domains list.
+* Attributes are applied by both processing layers — `WP_HTML_Tag_Processor` for post content, and the sitewide JavaScript scan for navigation menus, footers, sidebars, widgets and other theme output.
+* Repeat visitors can now dismiss the modal instead of confirming every external link. Set **Modal Frequency** under Settings > WebberZone Link Warnings > Display to "Once per browser session" or "Once every N days" and the modal gains a "Don't show again" checkbox. Tick it, click Continue, and the modal is skipped on later clicks. The default remains "Always show the modal", so existing sites behave exactly as before.
+* New **Dismissal Scope** setting decides whether a dismissal applies only to the destination domain the visitor dismissed, or to every external link on the site.
+* New **Remember Dismissal For** setting sets how many days a dismissal lasts, from 1 to 365.
+* The checkbox label is configurable via **Don't Show Again Label** and is registered for WPML string translation.
+* Dismissals are stored in the visitor's own browser using `sessionStorage` or `localStorage`. No cookies are set and nothing is written to your database.
+
+**Improvements**
+
+* The Advanced tab is now split under two headings, **Link Attributes** and **Exclusions and Classes**, so the domain exclusion and class settings are no longer grouped under the attribute options.
+
+**Bug Fixes**
+
+* **Internal `target="_blank"` links inside post content never triggered a warning.** Under the "External links and internal links opening in a new tab" scope, PHP marked these links as processed but wrote no data attributes, so the JavaScript scan skipped them as well. The identical link in a navigation menu or widget did get a warning. PHP now mirrors the JavaScript logic and emits `data-wzlw-blank` for internal new-tab links.
+* The signed redirect URL is no longer added to every processed link when the warning method is modal only. It is emitted for the redirect and inline redirect methods alone, which drops an unused attribute from the rendered HTML and skips a per-link HMAC on modal pages.
+
+= 1.4.0 (23 May 2026) =
+
+[Version 1.4.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-4-0/)
+
+**New Features**
+
+* Excluded domains now support wildcard entries: `*.example.com` matches any subdomain of `example.com` but not the base domain itself. Plain entries (e.g. `example.com`) match that exact domain only. Add both to exclude a domain and all its subdomains.
+* Excluded domains are now honoured by the sitewide JavaScript scan, not just PHP content processing. Previously, links excluded in settings could still be flagged as external by the JS scan on navigation menus, footers, and widgets.
+* All four class settings (Suppress Icon Class, Suppress Icon Wrapper Class, Force External Class, Force External Wrapper Class) now accept comma-separated values, allowing multiple class names per setting.
+
+**Bug Fixes**
+
+* Excluded domains with `target="_blank"` in scope=both mode no longer incorrectly show a modal or redirect warning when processed by the JavaScript scanner. ARIA attributes are still applied for screen reader accessibility.
+
+= 1.3.0 (1 May 2026) =
+
+[Version 1.3.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-3-0/)
+
+**New Features**
+
+* Sitewide link processing: JavaScript now scans the full rendered page on load and applies warnings to links in navigation menus, footers, sidebars, widgets, and any other theme output — not just post content. All four CSS class rules (`wzlw-force-external`, `wzlw-force-external-wrapper`, `wzlw-no-icon`, `wzlw-no-icon-wrapper`) work everywhere on the page.
+
+**Bug Fixes**
+
+* Links inside `wzlw-no-icon-wrapper` now correctly receive `data-wzlw-*` attributes so the redirect/modal warning still fires; only the visual icon is suppressed.
+
+= 1.2.0 (14 April 2026) =
+
+[Version 1.2.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-2-0/)
+
+**New Features**
+
+* Add `wzlw-force-external` / `wzlw-force-external-wrapper` class support to force links to be treated as external regardless of automatic detection. Both class names are configurable under Settings > Advanced.
+* The `wzlw-no-icon` and `wzlw-no-icon-wrapper` class names are now configurable under Settings > Advanced.
+
+**Security**
+
+* Redirect endpoint now requires an HMAC signature on every URL. Unsigned or tampered URLs are rejected, preventing open-redirect abuse.
+
+**Bug Fixes**
+
+* Redirect URLs with HMAC signatures were broken due to double-encoding of the `&` separator in HTML output.
+* Redundant URL encoding in `get_redirect_url()` caused malformed redirect URLs.
+* Same-host check now normalises hostnames before comparison, so variants like `EXAMPLE.COM` or `example.com.` are treated as internal.
+* Excluded domains now match correctly when entered with a scheme or trailing path.
+
+= 1.1.0 (14 March 2026) =
+
+[Version 1.1.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-1-0/)
+
+**New Features**
+
+* Add `wzlw-no-icon-wrapper` class support — add it to any wrapper element to exclude all links inside it from visual indicators.
+
+**Improvements**
+
+* Enhanced modal accessibility: background content is now hidden from screen readers when the modal is open, URL display includes a screen reader label, buttons have fallback accessible names, and the Continue button announces "opens in a new window" for `target="_blank"` links.
+
+= 1.0.0 (7 March 2026) =
+
+[Version 1.0.0 Release Post](https://webberzone.com/announcements/link-warnings-v1-0-0/)
+
+* Initial release.

@@ -390,24 +390,24 @@ msgstr ""
 msgid "Close dialog"
 msgstr ""
 
-#: includes/templates/redirect-screen.php:32
+#: includes/templates/redirect-screen.php:48
 msgid "Leaving this site"
 msgstr ""
 
-#: includes/templates/redirect-screen.php:41
+#: includes/templates/redirect-screen.php:57
 msgid "Destination:"
 msgstr ""
 
-#: includes/templates/redirect-screen.php:53
+#: includes/templates/redirect-screen.php:69
 msgid "Continue to site"
 msgstr ""
 
-#: includes/templates/redirect-screen.php:57
+#: includes/templates/redirect-screen.php:73
 msgid "Go back"
 msgstr ""
 
 #. translators: %s: countdown number
-#: includes/templates/redirect-screen.php:65
+#: includes/templates/redirect-screen.php:81
 #, php-format
 msgid "Redirecting automatically in %s seconds..."
 msgstr ""

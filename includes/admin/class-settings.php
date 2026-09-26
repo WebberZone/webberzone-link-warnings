@@ -197,6 +197,9 @@ class Settings {
 			'default_none'         => esc_html__( 'None', 'webberzone-link-warnings' ),
 			'button_label'         => esc_html__( 'Choose File', 'webberzone-link-warnings' ),
 			'previous_saved'       => esc_html__( 'Previously saved', 'webberzone-link-warnings' ),
+			'repeater_move_up'     => esc_html__( 'Move item up', 'webberzone-link-warnings' ),
+			'repeater_move_down'   => esc_html__( 'Move item down', 'webberzone-link-warnings' ),
+			'repeater_remove_item' => esc_html__( 'Remove item', 'webberzone-link-warnings' ),
 		);
 
 		return apply_filters( self::$prefix . '_translation_strings', $strings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound

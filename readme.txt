@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -246,6 +246,15 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
+= 1.6.2 =
+
+Release date: 8 October 2026
+
+**Fixed**
+
+* Settings page and setup wizard field labels were not linked to their fields, so clicking a label did not focus the field and screen readers did not announce the label.
+* Saving or deleting an individual setting failed with a PHP error when the stored settings option was not an array.
+
 = 1.6.1 =
 
 Release date: 13 September 2026
@@ -261,10 +270,10 @@ Release post: https://webberzone.com/announcements/link-warnings-v1-6/
 
 **Added**
 
-* Added warnings for configured downloadable file extensions, including files hosted on the current site.
-* Added Downloadable File Extensions, Download Modal Title, and Download Modal Message settings.
-* Added a distinct download indicator icon and ignored query strings and fragments when matching file extensions.
-* Added server-side processing for widgets, navigation menus, comments, and block-theme template parts, with all four sources enabled by default under General > External Content.
+* Warnings for configured downloadable file extensions, including files hosted on the current site.
+* Downloadable File Extensions, Download Modal Title, and Download Modal Message settings.
+* Distinct download indicator icon, with query strings and fragments ignored when matching file extensions.
+* Server-side processing for widgets, navigation menus, comments, and block-theme template parts, with all four sources enabled by default under General > External Content.
 
 **Changed**
 
@@ -289,5 +298,5 @@ For the changelog of earlier versions, please refer to the [releases page on Git
 
 == Upgrade Notice ==
 
-= 1.6.1 =
-Update to prevent redirect screens from triggering deprecated header and footer template notices on block themes and themes without those PHP templates.
+= 1.6.2 =
+Fixes settings and setup wizard labels for screen readers and a PHP error when saving settings that were stored in the wrong format. No action needed.

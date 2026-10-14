@@ -544,7 +544,8 @@ class Content_Processor {
 		$link_html = $matches[0];
 
 		// The same HTML can pass through more than one supported content filter.
-		$has_indicator = preg_match( '/\bclass=["\'][^"\']*\b(?:wzlw-icon|wzlw-text)\b[^"\']*["\']/i', $link_html );
+		$has_indicator = preg_match( '/\bclass=["\'][^"\']*\b(?:wzlw-icon|wzlw-text)\b[^"\']*["\']/i', $link_html )
+			|| false !== stripos( $link_html, $this->get_screen_reader_text() );
 		if ( ! $has_indicator && 'none' === ( $this->settings['visual_indicator'] ?? 'icon' ) ) {
 			$has_indicator = preg_match( '/<span\b[^>]*class=["\'][^"\']*\bscreen-reader-text\b[^"\']*["\'][^>]*>/i', $link_html );
 		}
@@ -567,6 +568,11 @@ class Content_Processor {
 			return $link_html;
 		}
 
+		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.
+		if ( ! $this->link_has_visible_text( $matches[1] ?? '' ) ) {
+			return str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
+		}
+
 		$is_download = (bool) preg_match( '/\bclass=["\'][^"\']*\bwzlw-download\b[^"\']*["\']/i', $link_html );
 		$indicator   = $this->get_visual_indicator( $is_download );
 
@@ -578,6 +584,21 @@ class Content_Processor {
 		$link_html = str_ireplace( '</a>', $indicator . '</a>', $link_html );
 
 		return $link_html;
+	}
+
+	/**
+	 * Check whether a link's inner HTML contains visible text.
+	 *
+	 * @since 1.6.3
+	 * @param string $inner_html Link inner HTML.
+	 * @return bool True if the link has visible text.
+	 */
+	private function link_has_visible_text( $inner_html ) {
+		$inner_html = preg_replace( '/<svg\b.*?<\/svg>/is', '', $inner_html );
+		$inner_html = preg_replace( '/<span\b[^>]*class=["\'][^"\']*\bscreen-reader-text\b[^"\']*["\'][^>]*>.*?<\/span>/is', '', (string) $inner_html );
+		$text       = html_entity_decode( wp_strip_all_tags( (string) $inner_html ), ENT_QUOTES, 'UTF-8' );
+
+		return '' !== trim( $text, " \t\n\r\0\x0B\xC2\xA0" );
 	}
 
 	/**

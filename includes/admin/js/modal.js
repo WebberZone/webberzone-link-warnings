@@ -154,7 +154,7 @@
 			}
 
 			if (isInlineMethod) {
-				const indicator = buildIndicatorHtml(!!(inNoIconWrapper || hasNoIconClass), hasTarget, isDownload);
+				const indicator = buildIndicatorHtml(!!(inNoIconWrapper || hasNoIconClass), hasTarget, isDownload, !hasVisibleText(link));
 				if (indicator) {
 					link.insertAdjacentHTML('beforeend', indicator);
 				}
@@ -361,14 +361,20 @@
 	 * @param {boolean} suppress  True when the link has the no-icon class or is in a no-icon wrapper.
 	 * @param {boolean} hasTarget True when the link has target="_blank".
 	 * @param {boolean} isDownload True when the link points to a configured download extension.
+	 * @param {boolean} iconOnly   True when the link has no visible text.
 	 * @return {string}
 	 */
-	function buildIndicatorHtml(suppress, hasTarget, isDownload) {
+	function buildIndicatorHtml(suppress, hasTarget, isDownload, iconOnly) {
 		const srText = settings.screenReaderText || '';
 		const srSpan = srText ? '<span class="screen-reader-text">' + escHtml(srText) + '</span>' : '';
 
 		if (suppress) {
 			return hasTarget ? srSpan : '';
+		}
+
+		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.
+		if (iconOnly) {
+			return srSpan;
 		}
 
 		const visual = settings.visualIndicator || 'icon';
@@ -383,6 +389,18 @@
 		}
 
 		return html;
+	}
+
+	/**
+	 * Return true if the link contains visible text, mirroring PHP's link_has_visible_text().
+	 *
+	 * @param {HTMLAnchorElement} link Link to test.
+	 * @return {boolean}
+	 */
+	function hasVisibleText(link) {
+		const clone = link.cloneNode(true);
+		clone.querySelectorAll('svg, .screen-reader-text').forEach(function (el) { el.remove(); });
+		return '' !== clone.textContent.replace(/[\s\u00a0]+/g, '');
 	}
 
 	/**

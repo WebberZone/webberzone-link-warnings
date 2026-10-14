@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -246,6 +246,16 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
+= 1.6.3 =
+
+Release date: 14 October 2026
+
+**Fixed**
+
+* Links with no visible text, such as social icons or linked images, received a visual indicator that broke fixed-size icon layouts. Screen reader text is still added.
+* The visual indicator could wrap onto a line of its own, for example inside a narrow header button.
+* Links with the no-icon class and `target="_blank"` received duplicate screen reader text when the same content passed through more than one filter.
+
 = 1.6.2 =
 
 Release date: 8 October 2026
@@ -298,5 +308,5 @@ For the changelog of earlier versions, please refer to the [releases page on Git
 
 == Upgrade Notice ==
 
-= 1.6.2 =
-Fixes settings and setup wizard labels for screen readers and a PHP error in the settings API when the stored settings were not an array. No action needed.
+= 1.6.3 =
+Fixes visual indicators breaking icon and image links such as social buttons, and wrapping onto their own line inside narrow buttons. No action needed.

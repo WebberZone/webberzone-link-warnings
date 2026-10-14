@@ -29,14 +29,14 @@ msgid "https://webberzone.com/"
 msgstr ""
 
 #: includes/admin/class-settings.php:484
-#: includes/class-content-processor.php:686
+#: includes/class-content-processor.php:707
 #: includes/class-frontend-handler.php:127
 msgid "(opens in new window)"
 msgstr ""
 
 #: includes/admin/class-settings.php:491
-#: includes/class-content-processor.php:700
-#: includes/class-content-processor.php:712
+#: includes/class-content-processor.php:721
+#: includes/class-content-processor.php:733
 #: includes/class-frontend-handler.php:128
 msgid "Opens in a new window"
 msgstr ""

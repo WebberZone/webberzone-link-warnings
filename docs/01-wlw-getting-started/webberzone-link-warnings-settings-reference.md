@@ -34,7 +34,7 @@ Controls how users are warned about external links.
 
 ### Inline Indicator Scope
 
-Determines which links receive inline indicators. Modal and redirect warnings always apply to external links only.
+Determines which links receive warnings. With `both`, modal and redirect warnings also apply to internal links that open in a new tab.
 
 | Value | Label | Behavior |
 | --- | --- | --- |
@@ -140,7 +140,7 @@ The visible text displayed next to links when the visual indicator is set to “
 
 #### Screen Reader Text
 
-Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. This is always added to processed links regardless of the visual indicator setting.
+Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. It is added to processed links that open in a new tab (`target="_blank"`), regardless of the visual indicator setting. Links that open in the same tab do not get it.
 
 **Default:** `Opens in a new window`
 **Setting key:** `screen_reader_text`

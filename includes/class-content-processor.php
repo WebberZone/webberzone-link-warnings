@@ -197,10 +197,12 @@ class Content_Processor {
 				}
 			}
 
-			// Add ARIA attributes for accessibility.
-			$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
-			if ( $aria_label ) {
-				$processor->set_attribute( 'aria-label', $aria_label );
+			// Add ARIA attributes for accessibility. Same-tab links don't open a new window.
+			if ( $has_target ) {
+				$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
+				if ( $aria_label ) {
+					$processor->set_attribute( 'aria-label', $aria_label );
+				}
 			}
 
 			// Add class for styling.
@@ -553,6 +555,8 @@ class Content_Processor {
 			return $link_html;
 		}
 
+		$has_target = (bool) preg_match( '/\btarget\s*=\s*(?:"_blank"|\'_blank\'|_blank)/i', $link_html );
+
 		// Check if link has the no-icon class — suppress visual indicator but
 		// still add screen reader text for target="_blank" links.
 		$no_icon_classes   = $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' );
@@ -562,7 +566,7 @@ class Content_Processor {
 			$has_no_icon_class = is_array( $link_classes ) && ! empty( array_intersect( $no_icon_classes, $link_classes ) );
 		}
 		if ( $has_no_icon_class ) {
-			if ( preg_match( '/\btarget\s*=\s*(?:"_blank"|\'_blank\'|_blank)/i', $link_html ) ) {
+			if ( $has_target ) {
 				$link_html = str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
 			}
 			return $link_html;
@@ -570,11 +574,11 @@ class Content_Processor {
 
 		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.
 		if ( ! $this->link_has_visible_text( $matches[1] ?? '' ) ) {
-			return str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
+			return $has_target ? str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html ) : $link_html;
 		}
 
 		$is_download = (bool) preg_match( '/\bclass=["\'][^"\']*\bwzlw-download\b[^"\']*["\']/i', $link_html );
-		$indicator   = $this->get_visual_indicator( $is_download );
+		$indicator   = $this->get_visual_indicator( $is_download, $has_target );
 
 		if ( empty( $indicator ) ) {
 			return $link_html;
@@ -682,19 +686,21 @@ class Content_Processor {
 	 *
 	 * @since 1.0.0
 	 * @param bool $is_download Whether the link points to a configured download extension.
+	 * @param bool $has_target  Whether the link opens in a new tab.
 	 * @return string Indicator HTML.
 	 */
-	private function get_visual_indicator( $is_download = false ) {
-		$visual = $this->settings['visual_indicator'] ?? 'icon';
+	private function get_visual_indicator( $is_download = false, $has_target = true ) {
+		$visual             = $this->settings['visual_indicator'] ?? 'icon';
+		$screen_reader_text = $has_target ? $this->get_screen_reader_text() : '';
 
 		if ( 'none' === $visual ) {
-			return $this->get_screen_reader_text();
+			return $screen_reader_text;
 		}
 
 		$indicator = '';
 
 		// Add screen reader text.
-		$indicator .= $this->get_screen_reader_text();
+		$indicator .= $screen_reader_text;
 
 		// Add visual elements.
 		if ( 'icon' === $visual || 'both' === $visual ) {

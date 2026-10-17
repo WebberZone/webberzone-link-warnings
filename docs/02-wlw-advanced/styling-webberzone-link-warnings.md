@@ -65,7 +65,7 @@ The download icon uses the `--wzlw-download-icon-content` CSS variable. The defa
 
 ### Screen reader text
 
-Always added to processed links, regardless of the visual indicator setting:
+Added to processed links that open in a new tab (`target="_blank"`), regardless of the visual indicator setting:
 
 ```html
 <span class="screen-reader-text">Opens in a new window</span>

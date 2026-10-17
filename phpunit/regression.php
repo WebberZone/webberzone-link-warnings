@@ -257,7 +257,8 @@ namespace {
 		expect( 1 === substr_count( $second, 'class="wzlw-icon"' ), 'A processed link received duplicate indicators.' );
 
 		settings( array( 'visual_indicator' => 'none' ) );
-		$first  = apply_filters( 'render_block', $content, $block );
+		$content = '<a href="https://outside.test/repeated/" target="_blank">external link</a>';
+		$first   = apply_filters( 'render_block', $content, $block );
 		$second = apply_filters( 'render_block', $first, $block );
 		expect( 1 === substr_count( $second, 'screen-reader-text' ), 'A screen-reader-only indicator was duplicated.' );
 	};
@@ -272,7 +273,7 @@ namespace {
 	};
 	$tests['repeated classification does not duplicate classes or ARIA labels'] = static function () {
 		settings();
-		$content = '<a aria-label="Product page" href="https://outside.test/repeat/">go</a>';
+		$content = '<a aria-label="Product page" href="https://outside.test/repeat/" target="_blank">go</a>';
 		$block   = array( 'blockName' => 'core/template-part' );
 		$first   = apply_filters( 'render_block', $content, $block );
 		$second  = apply_filters( 'render_block', $first, $block );
@@ -410,11 +411,25 @@ namespace {
 	};
 	$tests['uppercase closing tags receive indicators and screen-reader text'] = static function () {
 		settings();
-		$html = process( wp_kses_post( '<A href="https://outside.test/">test</A>' ) );
+		$html = process( wp_kses_post( '<A href="https://outside.test/" target="_blank">test</A>' ) );
 		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'Uppercase link has no icon.' );
 		expect( 1 === substr_count( $html, 'class="screen-reader-text"' ), 'Uppercase link has no screen-reader text.' );
 		$html = process( wp_kses_post( '<A class="wzlw-no-icon" href="https://outside.test/" target="_blank">test</A>' ) );
 		expect( false === strpos( $html, 'class="wzlw-icon"' ) && 1 === substr_count( $html, 'class="screen-reader-text"' ), 'Suppressed uppercase link lost its screen-reader text.' );
+	};
+	$tests['same-tab links get no new-window screen reader text'] = static function () {
+		foreach ( array( 'icon', 'text', 'both', 'none' ) as $visual ) {
+			settings( array( 'visual_indicator' => $visual ) );
+			$html = process( '<a aria-label="Docs" href="https://outside.test/same/">same</a><a href="https://outside.test/icon/"><svg></svg></a><a class="wzlw-no-icon" href="https://outside.test/quiet/">quiet</a>' );
+			expect( false === strpos( $html, 'screen-reader-text' ), 'Same-tab link received new-window screen reader text with the ' . $visual . ' indicator.' );
+			expect( 'Docs' === link_attributes( $html, 'https://outside.test/same/' )['aria-label'], 'Same-tab link ARIA label was changed with the ' . $visual . ' indicator.' );
+			expect( 'true' === link_attributes( $html, 'https://outside.test/same/' )['data-wzlw-external'], 'Same-tab link lost its warning attributes.' );
+		}
+		settings();
+		$html = process( '<a href="https://outside.test/same/">same</a>' );
+		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'Same-tab external link lost its icon.' );
+		$html = process( '<a href="https://outside.test/new/" target="_blank">new</a><a href="https://outside.test/icon/" target="_blank"><svg></svg></a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'New-tab links lost their screen reader text.' );
 	};
 	$tests['no-icon target detection accepts single-quoted attributes'] = static function () {
 		settings();

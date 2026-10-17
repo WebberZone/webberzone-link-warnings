@@ -293,7 +293,7 @@ msgid "Inline Indicator Scope"
 msgstr ""
 
 #: includes/admin/class-settings.php:358
-msgid "Choose which links show inline indicators. Modal and redirect warnings always apply to external links only."
+msgid "Choose which links get warnings. With the second option, modal and redirect warnings also apply to internal links that open in a new tab."
 msgstr ""
 
 #: includes/admin/class-settings.php:362

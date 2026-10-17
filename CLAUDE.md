@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Plugin Overview
 
-**WebberZone Link Warnings** (v1.6.0) adds configurable warnings to external/affiliate links or any URL pattern, showing a modal countdown or inline icon before the visitor leaves. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
+**WebberZone Link Warnings** (v1.6.3) adds configurable warnings to external/affiliate links or any URL pattern, showing a modal countdown or inline icon before the visitor leaves. Namespace: `WebberZone\Link_Warnings`. Constants: `WZLW_VERSION`, `WZLW_PLUGIN_FILE`, `WZLW_PLUGIN_DIR`, `WZLW_PLUGIN_URL`, `WZLW_PLUGIN_BASENAME`. Requires WordPress 6.6+, PHP 7.4+. No Freemius.
 
 Settings prefix/key: `wzlw` / `wzlw_settings` (wp_options). Access via `wzlw_get_option($key)` / `wzlw_get_settings()`.
 
@@ -66,7 +66,7 @@ Build requires Node.js with `clean-css-cli`, `terser`, `rtlcss`, and `@wordpress
 | Class | File | Purpose |
 |-------|------|---------|
 | `Main` | `includes/class-main.php` | Bootstrap, singleton, registers all hooks |
-| `Content_Processor` | `includes/class-content-processor.php` | Hooks into `the_content`/`the_excerpt` (priority 999); parses and modifies links using `WP_HTML_Tag_Processor` |
+| `Content_Processor` | `includes/class-content-processor.php` | Hooks into `the_content`, `the_excerpt`, `widget_block_content`, `widget_text`, `widget_text_content`, `widget_custom_html_content`, `wp_nav_menu`, `comment_text` and `render_block` (template parts only), all at priority 999; parses and modifies links using `WP_HTML_Tag_Processor` |
 | `Frontend_Handler` | `includes/class-frontend-handler.php` | Enqueues frontend assets, renders modal HTML |
 | `Redirect_Handler` | `includes/class-redirect-handler.php` | Handles redirect endpoint and countdown |
 | `Options_API` | `includes/class-options-api.php` | Settings storage wrapper |
@@ -92,6 +92,8 @@ After adding/significantly editing a `.css` or `.js` file, run `pnpm run build:a
 
 - Link exclusion: links with the no-icon class (default `wzlw-no-icon`, setting `no_icon_class`) suppress visual indicators; links inside the wrapper class (default `wzlw-no-icon-wrapper`, setting `no_icon_wrapper_class`) too. All four class settings accept comma-separated values (e.g. `wzlw-no-icon, my-no-icon`) — PHP parses via `Content_Processor::parse_class_setting()`, JS gets them as arrays via `wzlwSettings`.
 - Force external: an `<a>` tag with the force-external class (default `wzlw-force-external`, setting `force_external_class`) is treated as external; the wrapper class (default `wzlw-force-external-wrapper`, setting `force_external_wrapper_class`) on a container forces all descendant links external.
+- Screen reader text (`screen_reader_text`) and the `aria-label` suffix are only added to links with `target="_blank"`. Same-tab links keep their visual indicator but get no "Opens in a new window" text. Same logic in PHP (`Content_Processor::add_indicator_to_link()`) and JS (`buildIndicatorHtml()` in `modal.js`).
+- Scope `both`: internal `target="_blank"` links get `data-wzlw-blank`, so modal and redirect warnings apply to them as well as to external links.
 - Both exclusion and force-external track nesting across the `WP_HTML_Tag_Processor` token stream via depth counters (`$skip_depth`, `$force_external_depth`) in `Content_Processor::process_content()`.
 - Excluded domains: plain entries (e.g. `example.com`) match only that exact domain; wildcard entries (e.g. `*.example.com`) match only subdomains, not the base — add both to exclude both. Same logic in PHP (`Content_Processor::is_external_link`) and JS (`isExternalHref` in `modal.js`); passed to JS via `wzlwSettings.excludedDomains`.
 - Content processing uses WordPress's native `WP_HTML_Tag_Processor` (WordPress 6.6+, PHP 7.4+).

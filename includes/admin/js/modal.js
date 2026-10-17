@@ -136,7 +136,10 @@
 				noIconClasses.forEach(function (c) { link.classList.add(c); });
 			}
 
-			appendAriaLabel(link);
+			// Same-tab links don't open a new window.
+			if (hasTarget) {
+				appendAriaLabel(link);
+			}
 
 			if (needsDataAttrs) {
 				link.setAttribute('data-wzlw-url', href);
@@ -366,10 +369,10 @@
 	 */
 	function buildIndicatorHtml(suppress, hasTarget, isDownload, iconOnly) {
 		const srText = settings.screenReaderText || '';
-		const srSpan = srText ? '<span class="screen-reader-text">' + escHtml(srText) + '</span>' : '';
+		const srSpan = srText && hasTarget ? '<span class="screen-reader-text">' + escHtml(srText) + '</span>' : '';
 
 		if (suppress) {
-			return hasTarget ? srSpan : '';
+			return srSpan;
 		}
 
 		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.

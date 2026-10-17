@@ -74,7 +74,7 @@ class Link_Rules {
 				'id'        => sanitize_key( (string) ( $row['row_id'] ?? 'rule_' . $index ) ),
 				'pattern'   => $pattern,
 				'action'    => $action,
-				'message'   => trim( (string) ( $fields['message'] ?? '' ) ),
+				'message'   => trim( (string) ( $fields['message'] ?? '' ), " \t\n\r\0\x0B" ),
 				'regex'     => self::compile( $pattern ),
 				'host_only' => $host_only,
 			);
@@ -253,7 +253,7 @@ class Link_Rules {
 	 * @return array|null Array with host and path keys, or null when the link cannot be matched.
 	 */
 	public static function get_subject( $href, $site_host ) {
-		$href = trim( $href );
+		$href = trim( $href, " \t\n\r\0\x0B" );
 
 		if ( 0 === strpos( $href, '//' ) ) {
 			$rest = substr( $href, 2 );

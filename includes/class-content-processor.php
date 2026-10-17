@@ -79,7 +79,8 @@ class Content_Processor {
 		}
 
 		// Load fresh settings on each content processing.
-		$this->settings = wzlw_get_settings();
+		$this->settings    = wzlw_get_settings();
+		$warnings_disabled = wzlw_is_disabled_for_current_user();
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor            = new \WP_HTML_Tag_Processor( $content );
@@ -156,6 +157,9 @@ class Content_Processor {
 				$processor->remove_attribute( 'data-wzlw-excluded' );
 			}
 			$this->apply_link_attributes( $processor, $is_external, $is_affiliate );
+			if ( $warnings_disabled ) {
+				continue;
+			}
 			$has_target     = '_blank' === $processor->get_attribute( 'target' );
 			$should_process = $this->should_process_link( $is_external, $has_target, $is_download );
 
@@ -222,7 +226,7 @@ class Content_Processor {
 		$processed_content = $processor->get_updated_html();
 
 		// Add visual indicators if inline method is used.
-		if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
+		if ( ! $warnings_disabled && in_array( $this->settings['warning_method'] ?? 'none', array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
 			$processed_content = $this->add_visual_indicators( $processed_content );
 		}
 

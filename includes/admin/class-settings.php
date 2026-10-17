@@ -252,6 +252,7 @@ class Settings {
 			'process_nav_menus'            => 1,
 			'process_comments'             => 1,
 			'process_template_parts'       => 1,
+			'disable_for'                  => '',
 
 			// Display — Inline Indicators.
 			'visual_indicator'             => 'icon',
@@ -412,9 +413,36 @@ class Settings {
 				'type'    => 'checkbox',
 				'default' => $defaults['process_template_parts'],
 			),
+			'disable_for'             => array(
+				'id'      => 'disable_for',
+				'name'    => esc_html__( 'Disable Warnings For', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Hide warnings from these logged-in users, for example while you edit your own site. Link attributes are still added. Visitors who are not logged in always see warnings.', 'webberzone-link-warnings' ),
+				'type'    => 'multicheck',
+				'default' => $defaults['disable_for'],
+				'options' => self::get_disable_for_options(),
+			),
 		);
 
 		return apply_filters( self::$prefix . '_settings_general', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+	}
+
+	/**
+	 * Get the options for the Disable Warnings For setting.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array Option labels keyed by value.
+	 */
+	public static function get_disable_for_options() {
+		$options = array(
+			'logged_in' => esc_html__( 'All logged-in users', 'webberzone-link-warnings' ),
+		);
+
+		foreach ( wp_roles()->get_names() as $role => $name ) {
+			$options[ 'role:' . $role ] = esc_html( translate_user_role( $name ) );
+		}
+
+		return $options;
 	}
 
 	/**

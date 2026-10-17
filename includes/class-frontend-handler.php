@@ -114,6 +114,7 @@ class Frontend_Handler {
 				'excludedDomains'           => $excluded_domains_js,
 				'downloadExtensions'        => $download_extensions,
 				'downloadScope'             => $settings['download_scope'] ?? 'all',
+				'warningsDisabled'          => wzlw_is_disabled_for_current_user(),
 				'scope'                     => $settings['scope'] ?? 'external',
 				'warningMethod'             => $method,
 				'noIconClass'               => array_values( array_filter( array_map( 'trim', explode( ',', isset( $settings['no_icon_class'] ) ? $settings['no_icon_class'] : 'wzlw-no-icon' ) ) ) ),
@@ -152,7 +153,7 @@ class Frontend_Handler {
 		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline_modal';
 
-		if ( ! in_array( $method, array( 'modal', 'inline_modal' ), true ) ) {
+		if ( ! in_array( $method, array( 'modal', 'inline_modal' ), true ) || wzlw_is_disabled_for_current_user() ) {
 			return;
 		}
 

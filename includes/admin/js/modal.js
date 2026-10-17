@@ -109,6 +109,9 @@
 			const isExternal = isForced || (!isExcluded && isExternalHref(href));
 			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(href);
 			applyLinkAttributes(link, isExternal, isAffiliate);
+			if (settings.warningsDisabled) {
+				return;
+			}
 			const hasTarget = '_blank' === link.getAttribute('target');
 
 			if (!shouldProcess(isExternal, hasTarget, isDownload)) {

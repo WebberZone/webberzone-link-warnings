@@ -208,6 +208,13 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		const page = boot(script, { href: '/wp-content/uploads/a.pdf' }, { downloadExtensions: ['pdf'], downloadScope: 'all' });
 		assert.equal(page.link.getAttribute('data-wzlw-download'), 'true');
 	});
+	test(`${filename}: disabled warnings still apply link attributes`, () => {
+		const page = boot(script, { href: 'https://outside.test/off/' }, { warningsDisabled: true, linkAttributesExternal: ['nofollow'] });
+		assert.equal(page.link.getAttribute('rel'), 'nofollow');
+		assert.equal(page.link.getAttribute('data-wzlw-external'), null);
+		assert.equal(page.link.markup, '');
+		assert.equal(page.click(), false);
+	});
 	test(`${filename}: file extension in a query string is ignored`, () => {
 		const page = boot(script, { href: '/download?file=report.pdf' }, { downloadExtensions: ['pdf'] });
 		assert.equal(page.link.getAttribute('data-wzlw-download'), null);

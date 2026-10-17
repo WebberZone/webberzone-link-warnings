@@ -47,6 +47,12 @@ namespace {
 	function is_admin() {
 		return ! empty( $GLOBALS['wzlw_test_is_admin'] );
 	}
+	function is_user_logged_in() {
+		return ! empty( $GLOBALS['wzlw_test_roles'] );
+	}
+	function wp_get_current_user() {
+		return (object) array( 'roles' => $GLOBALS['wzlw_test_roles'] ?? array() );
+	}
 	function is_singular() {
 		return true;
 	}
@@ -109,6 +115,7 @@ namespace {
 		);
 		$GLOBALS['wzlw_test_updates']  = array();
 		$GLOBALS['wzlw_test_is_admin'] = false;
+		$GLOBALS['wzlw_test_roles']    = array();
 		$GLOBALS['wzlw_test_is_rest']  = false;
 		Options_API::flush_cache();
 	}
@@ -223,6 +230,32 @@ namespace {
 		settings( array( 'download_scope' => 'all' ) );
 		$html = process( '<a href="/wp-content/uploads/a.pdf">root-relative</a>' );
 		expect( 'true' === link_attributes( $html, '/wp-content/uploads/a.pdf' )['data-wzlw-download'], 'Download scope "all" skipped a site file.' );
+	};
+	$tests['warnings can be disabled for logged-in users and roles'] = static function () {
+		$content = '<a href="https://outside.test/role/" target="_blank">go</a>';
+		$cases   = array(
+			array( 'logged_in', array(), false ),
+			array( 'logged_in', array( 'subscriber' ), true ),
+			array( 'role:administrator', array( 'subscriber' ), false ),
+			array( 'role:administrator', array( 'editor', 'administrator' ), true ),
+			array( '', array( 'administrator' ), false ),
+		);
+		foreach ( $cases as $case ) {
+			list( $disable_for, $roles, $disabled ) = $case;
+			settings(
+				array(
+					'disable_for'              => $disable_for,
+					'link_attributes_external' => array( 'nofollow' ),
+				)
+			);
+			$GLOBALS['wzlw_test_roles'] = $roles;
+			$html                       = process( $content );
+			$attrs                      = link_attributes( $html, 'https://outside.test/role/' );
+			$label                      = '"' . $disable_for . '" with roles [' . implode( ',', $roles ) . ']';
+			expect( $disabled === ( null === $attrs['data-wzlw-external'] ), 'Wrong warning state for ' . $label . '.' );
+			expect( $disabled === ( false === strpos( $html, 'wzlw-icon' ) ), 'Wrong indicator state for ' . $label . '.' );
+			expect( 'nofollow' === $attrs['rel'], 'Link attributes were not applied for ' . $label . '.' );
+		}
 	};
 	$tests['download indicators use a distinct icon class'] = static function () {
 		settings();

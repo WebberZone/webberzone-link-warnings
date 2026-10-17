@@ -24,6 +24,10 @@ function element(attributes = {}, innerMarkup = '') {
 		},
 		addEventListener: (name, listener) => { listeners[name] = listener; },
 		insertAdjacentHTML(_, html) { this.markup += html; },
+		// Mocked links carry visible text unless a test says otherwise.
+		cloneNode() {
+			return { textContent: attrs['data-test-text'] ?? 'link text', querySelectorAll: () => [] };
+		},
 		querySelector(selector) {
 			const names = selector.split(',').map((name) => name.trim().replace(/^\./, ''));
 			return names.some((name) => this.markup.includes(name)) ? element() : null;

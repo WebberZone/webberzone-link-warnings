@@ -175,7 +175,7 @@ namespace {
 			parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 			$received = esc_url_raw( $query['url'] ?? '' );
 			expect( $destination === $received, 'Destination changed during request decoding.' );
-			expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature no longer matches.' );
+			expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature no longer matches.' );
 			expect( is_valid_url( $received ), 'Redirect endpoint rejects a URL it signed itself.' );
 		};
 	}
@@ -432,12 +432,64 @@ namespace {
 		parse_str( (string) wp_parse_url( $confirm, PHP_URL_QUERY ), $confirm_query );
 		expect( '1' === ( $confirm_query['wzlw_confirm'] ?? '' ) && ! isset( $full_query['wzlw_confirm'] ), 'The confirm-only flag is missing or misplaced.' );
 		expect( $full_query['wzlw_sig'] !== $confirm_query['wzlw_sig'], 'A confirm-only signature equals the full signature, so the flag could be dropped.' );
+		expect( hash_hmac( 'sha256', 'https://evil.example/', wp_salt( 'auth' ) ) !== $full_query['wzlw_sig'], 'Full signatures still match the pre-1.7.0 format.' );
 
 		$link    = '<a href="https://evil.example/">x</a><a href="/go/deal/">y</a>';
 		$comment = apply_filters( 'comment_text', $link, null, array() );
 		$post    = process( $link );
 		expect( 1 === substr_count( $comment, 'wzlw_confirm=1' ), 'Only the external comment link should be confirm-only: ' . $comment );
 		expect( false === strpos( $post, 'wzlw_confirm' ), 'Post content links were signed confirm-only.' );
+	};
+	$tests['the redirect countdown only runs for visitors arriving from this site'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'allows_countdown' );
+		$method->setAccessible( true );
+		$cases = array(
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', true ),
+			array( 'https://evil.example/', false, null, false ),
+			array( 'https://evil.example/', false, 'https://mail.example/inbox', false ),
+			array( 'https://evil.example/', false, 'https://site.test.evil.example/', false ),
+			array( 'https://evil.example/', false, 'https://site.test:9999/', false ),
+			array( 'https://evil.example/', true, 'https://site.test/blog/post/', false ),
+			array( '/go/deal/', false, null, true ),
+			array( 'https://site.test/x', false, null, true ),
+		);
+		foreach ( $cases as $case ) {
+			list( $destination, $confirm_only, $referer, $expected ) = $case;
+			if ( null === $referer ) {
+				unset( $_SERVER['HTTP_REFERER'] );
+			} else {
+				$_SERVER['HTTP_REFERER'] = $referer;
+			}
+			expect( $expected === $method->invoke( $handler, $destination, $confirm_only ), 'Wrong countdown decision for ' . $destination . ' from ' . var_export( $referer, true ) . '.' );
+		}
+		unset( $_SERVER['HTTP_REFERER'] );
+	};
+	$tests['same-site checks respect ports and look-alike hosts'] = static function () {
+		$cases = array(
+			'/x'                         => true,
+			'https://site.test/x'        => true,
+			'https://SITE.test./x'       => true,
+			'https://site.test:443/x'    => true,
+			'//site.test/x'              => true,
+			'https://site.test:9999/x'   => false,
+			'//site.test@evil.example/'  => false,
+			'https://site.test.evil.ex/' => false,
+			'/\\evil.example/'         => false,
+			''                           => false,
+		);
+		foreach ( $cases as $url => $expected ) {
+			expect( $expected === Redirect_Handler::is_same_site( (string) $url ), 'Wrong same-site result for ' . $url . '.' );
+		}
+	};
+	$tests['confirm-only signatures are never upgraded and ugc links are untrusted'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$comment = apply_filters( 'comment_text', '<a href="https://evil.example/">x</a>', null, array() );
+		$again   = apply_filters( 'render_block', $comment, array( 'blockName' => 'core/template-part' ) );
+		expect( 1 === substr_count( $again, 'wzlw_confirm=1' ), 'A template-part pass upgraded a comment link signature: ' . $again );
+		$ugc = process( '<a rel="external nofollow ugc" href="https://author.example/">author</a>' );
+		expect( 1 === substr_count( $ugc, 'wzlw_confirm=1' ), 'A rel="ugc" link got a full signature.' );
 	};
 	$tests['author-written rule attributes are removed'] = static function () {
 		settings( array( 'warning_method' => 'modal' ) );
@@ -627,7 +679,7 @@ namespace {
 		parse_str( (string) wp_parse_url( $signed, PHP_URL_QUERY ), $query );
 		$received = esc_url_raw( $query['url'] ?? '' );
 		expect( is_valid_url( $received ), 'Signed network-path destination was rejected by the endpoint.' );
-		expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for network-path destination.' );
+		expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for network-path destination.' );
 	};
 	$tests['every signed link in redirect mode is accepted by the endpoint'] = static function () {
 		settings( array( 'warning_method' => 'redirect', 'scope' => 'both' ) );
@@ -649,7 +701,7 @@ namespace {
 			parse_str( (string) wp_parse_url( $signed, PHP_URL_QUERY ), $query );
 			$received = esc_url_raw( $query['url'] ?? '' );
 			expect( is_valid_url( $received ), 'Endpoint rejects a URL it signed: ' . $processor->get_attribute( 'href' ) );
-			expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for ' . $processor->get_attribute( 'href' ) );
+			expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for ' . $processor->get_attribute( 'href' ) );
 		}
 		expect( 5 === $checked, 'Expected 5 signed links, saw ' . $checked . '.' );
 	};

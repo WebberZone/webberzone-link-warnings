@@ -278,7 +278,7 @@ Release date: 3 November 2026
 
 **Security**
 
-* Hardened the redirect screen so it no longer redirects automatically to destinations from comments or signing requests. Visitors now click Continue for those links.
+* Hardened the redirect screen so the countdown only runs for visitors arriving from your own site. Opened from anywhere else, for links from comments or previews, and for redirect links signed by earlier versions, it waits for the visitor to click Continue. The screen is no longer cached.
 
 **Fixed**
 

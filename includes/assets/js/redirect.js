@@ -27,8 +27,11 @@
 			return;
 		}
 
-		// Start countdown.
-		countdown = wzlwRedirect.countdown || 5;
+		// Start countdown. Zero or anything that is not a number means no automatic redirect.
+		countdown = parseInt(wzlwRedirect.countdown, 10);
+		if (!(countdown > 0)) {
+			return;
+		}
 		startCountdown();
 	}
 

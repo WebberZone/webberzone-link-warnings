@@ -66,8 +66,7 @@ class Frontend_Handler {
 			true
 		);
 
-		$site_url_parts = wp_parse_url( home_url() );
-		$site_host      = strtolower( rtrim( (string) ( $site_url_parts['host'] ?? '' ), '.' ) );
+		$site_host = Link_Rules::site_host();
 
 		$excluded_domains_raw = $settings['excluded_domains'] ?? '';
 		if ( is_string( $excluded_domains_raw ) ) {

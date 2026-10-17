@@ -141,9 +141,11 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	for (const destination of ['javascript:void(0)', 'https://outside.test/', 'https://site.test/blog/other/', redirectUrl('https://different.test/')]) {
 		test(`${filename}: rejects forged redirect attribute: ${destination}`, () => {
 			const page = boot(script, { href: '/safe/', class: 'wzlw-processed', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': destination }, { warningMethod: 'redirect' });
-			assert.equal(page.click(), false);
+			// Fail closed: the click is stopped and the link is signed again.
+			assert.equal(page.click(), true);
 			assert.equal(page.location.href, 'https://site.test/blog/post/');
 			assert.equal(page.opened.length, 0);
+			assert.equal(page.link.getAttribute('data-wzlw-signing'), 'true');
 		});
 	}
 	for (const target of ['', '_blank']) {
@@ -241,7 +243,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	test(`${filename}: a rule processes an internal link and shows its own message`, () => {
 		const rules = [{ id: 'go', pattern: 'site.test/go/*', hostOnly: false, action: 'inline_modal', message: 'Affiliate link ahead' }];
 		const page = boot(script, { href: '/go/product/' }, { linkRules: rules, warningMethod: 'none', modalMessage: 'Global message' });
-		assert.equal(page.link.getAttribute('data-wzlw-url'), '/go/product/');
+		assert.equal(page.link.getAttribute('data-wzlw-url'), 'https://site.test/go/product/');
 		assert.equal(page.link.getAttribute('data-wzlw-external'), null);
 		assert.match(page.link.markup, /wzlw-icon/);
 		assert.equal(page.click(), true);
@@ -330,6 +332,26 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.click(), true, 'the rule modal was hidden by an unrelated dismissal');
 		assert.equal(page.message.textContent, 'Disclosure');
 	});
+	test(`${filename}: a redirect link whose signing failed asks before opening`, async () => {
+		const asked = [];
+		const extras = { confirm: (text) => { asked.push(text); return true; } };
+		const page = boot(script, { href: 'https://brace.test/a{b}' }, { warningMethod: 'redirect', modalMessage: 'Leaving?' }, '', extras);
+		assert.equal(page.link.getAttribute('data-wzlw-url'), 'https://brace.test/a%7Bb%7D');
+		assert.equal(page.click(), true, 'the click went through while signing ran');
+		assert.equal(asked.length, 0);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		assert.equal(page.link.getAttribute('data-wzlw-signing'), null);
+		assert.equal(page.click(), true);
+		assert.equal(asked.length, 1);
+		assert.match(asked[0], /Leaving\?/);
+		assert.equal(page.location.href, 'https://brace.test/a%7Bb%7D');
+	});
+	test(`${filename}: an excluded marker cannot cancel a rule's warning`, () => {
+		const rules = [{ id: 'aff', pattern: 'evil.example/*', hostOnly: false, action: 'modal', message: 'Affiliate disclosure' }];
+		const page = boot(script, { href: 'https://evil.example/x', 'data-wzlw-excluded': 'true' }, { linkRules: rules });
+		assert.equal(page.click(), true);
+		assert.equal(page.message.textContent, 'Affiliate disclosure');
+	});
 	test(`${filename}: clicks do nothing when warnings are disabled`, () => {
 		const page = boot(script, { href: 'https://out.test/', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://out.test/' }, { warningsDisabled: true });
 		assert.equal(page.click(), false);
@@ -379,3 +401,30 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.opened.length, 0);
 	});
 }
+
+const redirectScript = readFileSync(join(__dirname, '../includes/assets/js/redirect.js'), 'utf8');
+for (const countdown of ['0', 0, '', 'x', -3]) {
+	test(`redirect.js: countdown ${JSON.stringify(countdown)} never redirects, even with a countdown element`, () => {
+		const location = { href: 'https://site.test/external-redirect/' };
+		const timers = [];
+		const element = { textContent: '' };
+		const context = {
+			wzlwRedirect: { destination: 'https://evil.example/', countdown },
+			window: { location },
+			document: {
+				readyState: 'complete',
+				querySelector: (selector) => ('.wzlw-countdown-number' === selector ? element : null),
+				querySelectorAll: () => [],
+				addEventListener: () => {},
+			},
+			setInterval: (fn) => { timers.push(fn); return timers.length; },
+			clearInterval: () => {},
+		};
+		vm.runInNewContext(redirectScript, context);
+		for (let i = 0; i < 10; i++) {
+			timers.forEach((fn) => fn());
+		}
+		assert.equal(location.href, 'https://site.test/external-redirect/');
+	});
+}
+

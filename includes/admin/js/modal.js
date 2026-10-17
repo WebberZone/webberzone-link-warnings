@@ -101,8 +101,9 @@
 			const warningsDisabled = !!settings.warningsDisabled;
 			const ruleMethod = rule && 'exclude' !== rule.action ? rule.action : '';
 			let isExcluded = !isForced && !ruleMethod && (!!rule || isExcludedHref(checkHref));
+			// A rule overrides exclusions, so an excluded marker cannot cancel a rule's warning.
 			if (link.hasAttribute('data-wzlw-excluded')) {
-				if (!isForced) {
+				if (!isForced && !ruleMethod) {
 					return;
 				}
 				link.removeAttribute('data-wzlw-excluded');
@@ -162,7 +163,7 @@
 			}
 
 			if (needsDataAttrs) {
-				link.setAttribute('data-wzlw-url', checkHref);
+				link.setAttribute('data-wzlw-url', toSignableUrl(checkHref));
 				if (isExternal) {
 					link.setAttribute('data-wzlw-external', 'true');
 				} else if (hasTarget) {
@@ -184,9 +185,34 @@
 			}
 		});
 
+		// Links signed by PHP in a form the browser parses differently, such as an href with
+		// braces that esc_url_raw() strips, fail validation on click; sign them again.
+		document.querySelectorAll('a[data-wzlw-redirect-url]').forEach(function (link) {
+			if (settings.warningsDisabled || !link.hasAttribute('data-wzlw-redirect-url')) {
+				return;
+			}
+			const destination = parseHttpUrl(link.getAttribute('href'));
+			if (destination && !getRedirectUrl(link, destination) && !linksNeedingRedirectUrl.includes(link)) {
+				link.setAttribute('data-wzlw-url', destination.href);
+				linksNeedingRedirectUrl.push(link);
+			}
+		});
+
 		if (linksNeedingRedirectUrl.length) {
 			fetchRedirectUrls(linksNeedingRedirectUrl);
 		}
+	}
+
+	/**
+	 * Get the URL to send for signing: the href as the browser parses it, so the
+	 * signed destination matches what a click would open.
+	 *
+	 * @param {string} href
+	 * @return {string}
+	 */
+	function toSignableUrl(href) {
+		const url = parseHttpUrl(href);
+		return url ? url.href : href;
 	}
 
 	/**
@@ -616,6 +642,9 @@
 	 * @param {HTMLElement[]} links
 	 */
 	function fetchRedirectUrls(links) {
+		links.forEach(function (link) {
+			link.setAttribute('data-wzlw-signing', 'true');
+		});
 		const formData = new FormData();
 		formData.append('action', 'wzlw_sign_urls');
 		formData.append('nonce', settings.nonce || '');
@@ -642,7 +671,12 @@
 					}
 				});
 			})
-			.catch(function () { });
+			.catch(function () { })
+			.then(function () {
+				links.forEach(function (link) {
+					link.removeAttribute('data-wzlw-signing');
+				});
+			});
 	}
 
 	// ─── Dismissal ("Don't show again") ───────────────────────────────────────
@@ -807,7 +841,7 @@
 			return;
 		}
 		const link = e.target.closest('a[data-wzlw-external], a[data-wzlw-blank], a[data-wzlw-download], a[data-wzlw-rule]');
-		if (!link || link.hasAttribute('data-wzlw-excluded')) {
+		if (!link) {
 			return;
 		}
 		const destination = parseHttpUrl(link.getAttribute('href'));
@@ -815,6 +849,9 @@
 			return;
 		}
 		const rule = getLinkRule(link);
+		if (!rule && link.hasAttribute('data-wzlw-excluded')) {
+			return;
+		}
 		// A data-wzlw-rule attribute alone is not enough: the href must match a rule.
 		if (!rule && !['data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download'].some(function (name) { return link.hasAttribute(name); })) {
 			return;
@@ -822,16 +859,19 @@
 		const linkMethod = rule ? rule.action : method;
 
 		if ('redirect' === linkMethod || 'inline_redirect' === linkMethod) {
+			// Fail closed: a redirect link never opens without a warning.
+			e.preventDefault();
 			const redirectUrl = getRedirectUrl(link, destination);
 			if (redirectUrl) {
-				e.preventDefault();
-				if (opensNewTab(link)) {
-					window.open(redirectUrl, '_blank', windowOpenFeatures(link));
-				} else {
-					window.location.href = redirectUrl;
+				openUrl(redirectUrl, link);
+			} else if (!link.hasAttribute('data-wzlw-signing')) {
+				// Signing failed. While it is still running, the click is ignored.
+				const message = rule && rule.message ? rule.message : (settings.modalMessage || '');
+				if (window.confirm(message + '\n\n' + destination.href)) {
+					openUrl(destination.href, link);
 				}
-				return;
 			}
+			return;
 		}
 
 		if ('modal' === linkMethod || 'inline_modal' === linkMethod) {
@@ -843,6 +883,20 @@
 			currentLink = link;
 			currentRule = rule;
 			showModal(link, rule);
+		}
+	}
+
+	/**
+	 * Open a URL the way a link would: in a new tab for target="_blank" links.
+	 *
+	 * @param {string} url
+	 * @param {HTMLElement} link
+	 */
+	function openUrl(url, link) {
+		if (opensNewTab(link)) {
+			window.open(url, '_blank', windowOpenFeatures(link));
+		} else {
+			window.location.href = url;
 		}
 	}
 

@@ -63,7 +63,7 @@ class Content_Processor {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
+		$this->site_host = Link_Rules::site_host();
 
 		Hook_Registry::add_filter( 'the_content', array( $this, 'process_content' ), 999 );
 		Hook_Registry::add_filter( 'the_excerpt', array( $this, 'process_content' ), 999 );
@@ -231,8 +231,14 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					// Links from untrusted sources must not become automatic open redirects.
-					$confirm_only = $this->untrusted_source && ! Redirect_Handler::allows_auto_redirect( $check_href, $rules );
+					// Links from untrusted sources must not become automatic open redirects. Comment
+					// and user links carry rel="ugc", previews show unpublished content, and a
+					// confirm-only signature from an earlier pass is never upgraded.
+					$untrusted    = $this->untrusted_source
+						|| ( function_exists( 'is_preview' ) && is_preview() )
+						|| in_array( 'ugc', preg_split( '/\s+/', strtolower( (string) $processor->get_attribute( 'rel' ) ) ), true )
+						|| false !== strpos( (string) $processor->get_attribute( 'data-wzlw-redirect-url' ), 'wzlw_confirm=1' );
+					$confirm_only = $untrusted && ! Redirect_Handler::allows_auto_redirect( $check_href, $rules );
 					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $check_href, $confirm_only ) );
 				}
 			}

@@ -93,7 +93,7 @@ class Redirect_Handler {
 		}
 
 		// Get and validate destination URL.
-		$destination = isset( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$destination = isset( $_GET['url'] ) && is_string( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( empty( $destination ) || ! $this->is_valid_url( $destination ) ) {
 			wp_safe_redirect( home_url() );
@@ -102,12 +102,16 @@ class Redirect_Handler {
 
 		// Verify HMAC signature to prevent open redirect abuse. A confirm-only signature
 		// has its own HMAC input, so it cannot be turned into an auto-redirecting one.
-		$confirm_only = '1' === ( isset( $_GET['wzlw_confirm'] ) ? sanitize_key( wp_unslash( $_GET['wzlw_confirm'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$provided_sig = isset( $_GET['wzlw_sig'] ) ? sanitize_text_field( wp_unslash( $_GET['wzlw_sig'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$expected_sig = self::sign( $destination, $confirm_only );
-		if ( ! hash_equals( $expected_sig, $provided_sig ) ) {
-			wp_safe_redirect( home_url() );
-			exit;
+		$confirm_only = isset( $_GET['wzlw_confirm'] ) && '1' === $_GET['wzlw_confirm']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$provided_sig = isset( $_GET['wzlw_sig'] ) && is_string( $_GET['wzlw_sig'] ) ? sanitize_text_field( wp_unslash( $_GET['wzlw_sig'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! hash_equals( self::sign( $destination, $confirm_only ), $provided_sig ) ) {
+			// Signatures from before 1.7.0 used the bare destination and anyone could get
+			// one. They still work, so cached pages keep working, but only as confirm-only.
+			if ( $confirm_only || ! hash_equals( hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ), $provided_sig ) ) {
+				wp_safe_redirect( home_url() );
+				exit;
+			}
+			$confirm_only = true;
 		}
 
 		// The rule comes from the signed destination, never from the request.
@@ -117,8 +121,14 @@ class Redirect_Handler {
 			exit;
 		}
 
+		// The screen differs by referrer, so it must never be cached.
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		nocache_headers();
+
 		// Render redirect template.
-		$this->confirm_only = $confirm_only;
+		$this->confirm_only = ! $this->allows_countdown( $destination, $confirm_only );
 		$this->render_redirect_template( $destination, $rule ? $rule['message'] : '' );
 		exit;
 	}
@@ -133,6 +143,60 @@ class Redirect_Handler {
 	 */
 	protected function get_redirect_rule( $destination, $rules = null ) {
 		return self::find_redirect_rule( $destination, null === $rules ? Link_Rules::get_rules() : $rules );
+	}
+
+	/**
+	 * Check whether the redirect screen may count down and redirect automatically.
+	 *
+	 * A signed URL is a reusable token, so wherever it was signed, it only redirects
+	 * automatically for a visitor who arrives from a page on this site. Opened from an
+	 * email or another site, the screen waits for the visitor to click Continue.
+	 * Destinations on this site are always safe to redirect to.
+	 *
+	 * @since 1.7.0
+	 * @param string $destination  Destination URL.
+	 * @param bool   $confirm_only Whether the signature is confirm-only.
+	 * @return bool True if the countdown may run.
+	 */
+	protected function allows_countdown( $destination, $confirm_only ) {
+		if ( $confirm_only ) {
+			return false;
+		}
+
+		return self::is_same_site( $destination ) || self::is_same_site( isset( $_SERVER['HTTP_REFERER'] ) && is_string( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared, never output.
+	}
+
+	/**
+	 * Check whether a URL points to this site, including its port.
+	 *
+	 * @since 1.7.0
+	 * @param string $url URL.
+	 * @return bool True if the URL is on this site.
+	 */
+	public static function is_same_site( $url ) {
+		$url = Link_Rules::normalize_href( (string) $url );
+		if ( '' === $url ) {
+			return false;
+		}
+
+		$site_host = Link_Rules::site_host();
+		$subject   = Link_Rules::get_subject( $url, $site_host );
+		if ( ! $subject || $site_host !== $subject['host'] ) {
+			return false;
+		}
+
+		// Another port on the same host can be another service, so an explicit port must match.
+		$port = wp_parse_url( $url, PHP_URL_PORT );
+		if ( null === $port || false === $port ) {
+			return true;
+		}
+
+		$home_port = wp_parse_url( home_url(), PHP_URL_PORT );
+		if ( ! $home_port ) {
+			$home_port = 'http' === wp_parse_url( home_url(), PHP_URL_SCHEME ) ? 80 : 443;
+		}
+
+		return (int) $port === (int) $home_port;
 	}
 
 	/**
@@ -163,10 +227,7 @@ class Redirect_Handler {
 	 * @return bool True if the destination may redirect automatically.
 	 */
 	public static function allows_auto_redirect( $destination, array $rules ) {
-		$site_host = Link_Rules::site_host();
-		$subject   = Link_Rules::get_subject( (string) $destination, $site_host );
-
-		return ( $subject && $site_host === $subject['host'] ) || null !== self::find_redirect_rule( $destination, $rules );
+		return self::is_same_site( $destination ) || null !== self::find_redirect_rule( $destination, $rules );
 	}
 
 	/**
@@ -282,7 +343,7 @@ class Redirect_Handler {
 		);
 
 		// Pass destination URL to script.
-		$destination = isset( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$destination = isset( $_GET['url'] ) && is_string( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$settings  = wzlw_get_settings();
 		$countdown = isset( $settings['redirect_countdown'] ) ? absint( $settings['redirect_countdown'] ) : 5;
@@ -290,11 +351,12 @@ class Redirect_Handler {
 			$countdown = 0;
 		}
 
+		// Without a countdown the script has nothing to do, so it gets no destination.
 		wp_localize_script(
 			'wzlw-redirect',
 			'wzlwRedirect',
 			array(
-				'destination' => $destination,
+				'destination' => $this->confirm_only ? '' : $destination,
 				'countdown'   => $countdown,
 			)
 		);
@@ -320,13 +382,17 @@ class Redirect_Handler {
 		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
 		$rules           = Link_Rules::get_rules();
 
+		// Results are keyed by the URL as sent, so the script can find them whatever esc_url_raw() changes.
 		$result = array();
 		foreach ( $raw_urls as $raw_url ) {
-			$url = esc_url_raw( (string) $raw_url );
+			if ( ! is_string( $raw_url ) ) {
+				continue;
+			}
+			$url = esc_url_raw( $raw_url );
 			if ( ! $url || ! $this->is_valid_url( $url ) || ( ! $global_redirect && ! $this->get_redirect_rule( $url, $rules ) ) ) {
 				continue;
 			}
-			$result[ $url ] = self::get_redirect_url( $url, ! self::allows_auto_redirect( $url, $rules ) );
+			$result[ $raw_url ] = self::get_redirect_url( $url, ! self::allows_auto_redirect( $url, $rules ) );
 		}
 
 		wp_send_json_success( $result );
@@ -357,12 +423,15 @@ class Redirect_Handler {
 	/**
 	 * Sign a destination.
 	 *
+	 * Each kind of signature has its own HMAC input, so one can never be passed off
+	 * as another, and none matches the bare-destination signatures from before 1.7.0.
+	 *
 	 * @since 1.7.0
 	 * @param string $destination  Destination URL, as passed through esc_url_raw().
 	 * @param bool   $confirm_only Whether the signature is confirm-only.
 	 * @return string HMAC signature.
 	 */
 	private static function sign( $destination, $confirm_only ) {
-		return hash_hmac( 'sha256', ( $confirm_only ? 'confirm|' : '' ) . $destination, wp_salt( 'auth' ) );
+		return hash_hmac( 'sha256', ( $confirm_only ? 'confirm|' : 'full|v2|' ) . $destination, wp_salt( 'auth' ) );
 	}
 }

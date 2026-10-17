@@ -73,9 +73,6 @@
 		const affiliateWrapperClasses = Array.isArray(settings.affiliateWrapperClass) ? settings.affiliateWrapperClass : (settings.affiliateWrapperClass ? [settings.affiliateWrapperClass] : []);
 		const affiliateClasses = Array.isArray(settings.affiliateClass) ? settings.affiliateClass : (settings.affiliateClass ? [settings.affiliateClass] : []);
 		const noIconClasses = Array.isArray(settings.noIconClass) ? settings.noIconClass : (settings.noIconClass ? [settings.noIconClass] : []);
-		const isInlineMethod = ['inline', 'inline_modal', 'inline_redirect'].includes(method);
-		const needsDataAttrs = ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(method);
-		const needsRedirectUrl = ['redirect', 'inline_redirect'].includes(method);
 
 		const linksNeedingRedirectUrl = [];
 
@@ -98,7 +95,9 @@
 
 			const isAffiliate = !!(inAffiliateWrapper || hasAffiliateClass);
 			const isForced = !!(isAffiliate || inForceExtWrapper || hasForceExtClass);
-			let isExcluded = isExcludedHref(href);
+			const rule = matchRule(href);
+			const ruleMethod = rule && 'exclude' !== rule.action ? rule.action : '';
+			let isExcluded = !ruleMethod && (!!rule || isExcludedHref(href));
 			if (link.hasAttribute('data-wzlw-excluded')) {
 				if (!isForced) {
 					return;
@@ -106,7 +105,8 @@
 				link.removeAttribute('data-wzlw-excluded');
 				isExcluded = false;
 			}
-			const isExternal = isForced || (!isExcluded && isExternalHref(href));
+			// A rule overrides the excluded domains list, so only the site host makes its link internal.
+			const isExternal = isForced || (!isExcluded && isExternalHref(href, !!ruleMethod));
 			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(href);
 			applyLinkAttributes(link, isExternal, isAffiliate);
 			if (settings.warningsDisabled) {
@@ -114,7 +114,7 @@
 			}
 			const hasTarget = '_blank' === link.getAttribute('target');
 
-			if (!shouldProcess(isExternal, hasTarget, isDownload)) {
+			if (!ruleMethod && !shouldProcess(isExternal, hasTarget, isDownload)) {
 				if (inNoIconWrapper && hasTarget) {
 					appendAriaLabel(link);
 				}
@@ -126,6 +126,15 @@
 			if (!isExternal && !isDownload && hasTarget && isExcluded) {
 				appendAriaLabel(link);
 				return;
+			}
+
+			const linkMethod = ruleMethod || method;
+			const isInlineMethod = ['inline', 'inline_modal', 'inline_redirect'].includes(linkMethod);
+			const needsDataAttrs = ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(linkMethod);
+			const needsRedirectUrl = ['redirect', 'inline_redirect'].includes(linkMethod);
+			if (ruleMethod) {
+				link.setAttribute('data-wzlw-rule', rule.id);
+				link.setAttribute('data-wzlw-method', ruleMethod);
 			}
 
 			link.classList.add('wzlw-processed');
@@ -188,7 +197,7 @@
 			return false;
 		}
 
-		const stateAttributes = ['data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-excluded'];
+		const stateAttributes = ['data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-excluded', 'data-wzlw-method'];
 
 		return stateAttributes.some(function (name) { return link.hasAttribute(name); })
 			|| !!link.querySelector('.wzlw-icon, .wzlw-text, .screen-reader-text');
@@ -240,9 +249,10 @@
 	 * Determine if a URL points to an external host.
 	 *
 	 * @param {string} href
+	 * @param {boolean} ignoreExcluded True to skip the excluded domains list.
 	 * @return {boolean}
 	 */
-	function isExternalHref(href) {
+	function isExternalHref(href, ignoreExcluded) {
 		if ((href.startsWith('/') && !href.startsWith('//')) || href.startsWith('#') || href.startsWith('?')) {
 			return false;
 		}
@@ -254,7 +264,7 @@
 			if (host === settings.siteHost) {
 				return false;
 			}
-			const excludedDomains = settings.excludedDomains || [];
+			const excludedDomains = ignoreExcluded ? [] : (settings.excludedDomains || []);
 			for (const domain of excludedDomains) {
 				if (domain.startsWith('*.')) {
 					const base = domain.slice(2);
@@ -329,6 +339,103 @@
 		} catch (e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Build the string a link is matched against, mirroring PHP's Link_Rules::get_subject().
+	 *
+	 * @param {string} href
+	 * @return {{host: string, path: string}|null}
+	 */
+	function getRuleSubject(href) {
+		const trimmed = href.trim();
+		let rest;
+		if (trimmed.startsWith('//')) {
+			rest = trimmed.slice(2);
+		} else if (/^https?:\/\//i.test(trimmed)) {
+			rest = trimmed.replace(/^https?:\/\//i, '');
+		} else if (trimmed.startsWith('/')) {
+			rest = (settings.siteHost || '') + trimmed;
+		} else {
+			return null;
+		}
+
+		const hash = rest.indexOf('#');
+		if (-1 !== hash) {
+			rest = rest.slice(0, hash);
+		}
+
+		let split = rest.search(/[/?]/);
+		if (-1 === split) {
+			split = rest.length;
+		}
+		let host = rest.slice(0, split);
+		let path = rest.slice(split);
+
+		const at = host.lastIndexOf('@');
+		if (-1 !== at) {
+			host = host.slice(at + 1);
+		}
+		host = host.replace(/:\d*$/, '').replace(/\.+$/, '').toLowerCase();
+		if (!host) {
+			return null;
+		}
+
+		if ('' === path || '?' === path[0]) {
+			path = '/' + path;
+		}
+
+		return { host: host, path: path };
+	}
+
+	const compiledRules = (Array.isArray(settings.linkRules) ? settings.linkRules : []).map(function (rule) {
+		try {
+			return Object.assign({}, rule, { re: new RegExp(rule.regex, 'i') });
+		} catch (e) {
+			return null;
+		}
+	}).filter(Boolean);
+
+	/**
+	 * Find the first link rule that matches an href, mirroring PHP's Link_Rules::match().
+	 *
+	 * @param {string} href
+	 * @return {Object|null}
+	 */
+	function matchRule(href) {
+		if (!compiledRules.length) {
+			return null;
+		}
+		const subject = getRuleSubject(href);
+		if (!subject) {
+			return null;
+		}
+		for (const rule of compiledRules) {
+			if (rule.re.test(rule.hostOnly ? subject.host : subject.host + subject.path)) {
+				return rule;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find a link rule by ID.
+	 *
+	 * @param {string|null} id
+	 * @return {Object|null}
+	 */
+	function getRule(id) {
+		return id ? compiledRules.find(function (rule) { return rule.id === id; }) || null : null;
+	}
+
+	/**
+	 * Get a link's warning method: its rule's method, or the global one.
+	 *
+	 * @param {HTMLElement} link
+	 * @return {string}
+	 */
+	function getLinkMethod(link) {
+		return link.getAttribute('data-wzlw-method') || method;
 	}
 
 	/**
@@ -466,10 +573,18 @@
 					return;
 				}
 				links.forEach(function (link) {
-					const signed = data.data[link.getAttribute('data-wzlw-url')];
-					if (signed) {
-						link.setAttribute('data-wzlw-redirect-url', signed);
+					let signed = data.data[link.getAttribute('data-wzlw-url')];
+					if (!signed) {
+						return;
 					}
+					// The rule only picks the redirect screen's message, so it is added after signing.
+					const rule = getRule(link.getAttribute('data-wzlw-rule'));
+					if (rule && rule.message) {
+						const url = new URL(signed, document.baseURI);
+						url.searchParams.set('wzlw_rule', rule.id);
+						signed = url.href;
+					}
+					link.setAttribute('data-wzlw-redirect-url', signed);
 				});
 			})
 			.catch(function () { });
@@ -626,7 +741,7 @@
 	 * @param {Event} e Click event.
 	 */
 	function handleLinkClick(e) {
-		const link = e.target.closest('a[data-wzlw-external], a[data-wzlw-blank], a[data-wzlw-download]');
+		const link = e.target.closest('a[data-wzlw-external], a[data-wzlw-blank], a[data-wzlw-download], a[data-wzlw-rule]');
 		if (!link || link.hasAttribute('data-wzlw-excluded')) {
 			return;
 		}
@@ -634,8 +749,9 @@
 		if (!destination) {
 			return;
 		}
+		const linkMethod = getLinkMethod(link);
 
-		if ('redirect' === method || 'inline_redirect' === method) {
+		if ('redirect' === linkMethod || 'inline_redirect' === linkMethod) {
 			const redirectUrl = getRedirectUrl(link, destination);
 			if (redirectUrl) {
 				e.preventDefault();
@@ -648,7 +764,7 @@
 			}
 		}
 
-		if ('modal' === method || 'inline_modal' === method) {
+		if ('modal' === linkMethod || 'inline_modal' === linkMethod) {
 			// Previously dismissed: let the browser follow the link untouched.
 			if (!modal || isDismissed(destination.href)) {
 				return;
@@ -673,7 +789,8 @@
 		}
 		const isDownload = link.hasAttribute('data-wzlw-download');
 		modalTitle.textContent = isDownload ? (settings.downloadModalTitle || settings.modalTitle || '') : (settings.modalTitle || '');
-		modalMessage.textContent = isDownload ? (settings.downloadModalMessage || settings.modalMessage || '') : (settings.modalMessage || '');
+		const rule = getRule(link.getAttribute('data-wzlw-rule'));
+		modalMessage.textContent = rule && rule.message ? rule.message : (isDownload ? (settings.downloadModalMessage || settings.modalMessage || '') : (settings.modalMessage || ''));
 		modalUrl.textContent = url.href;
 		if (modalDismiss) {
 			modalDismiss.checked = false;

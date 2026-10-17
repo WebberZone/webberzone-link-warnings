@@ -61,6 +61,7 @@ class Redirect_Handler {
 	public function add_query_vars( $vars ) {
 		$vars[] = 'wzlw_redirect';
 		$vars[] = 'wzlw_sig';
+		$vars[] = 'wzlw_rule';
 		return $vars;
 	}
 
@@ -77,7 +78,7 @@ class Redirect_Handler {
 		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
-		if ( ! in_array( $method, array( 'redirect', 'inline_redirect' ), true ) ) {
+		if ( ! in_array( $method, array( 'redirect', 'inline_redirect' ), true ) && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ) ) ) {
 			return;
 		}
 
@@ -97,8 +98,11 @@ class Redirect_Handler {
 			exit;
 		}
 
+		// The rule only picks which configured message to show, so it is not signed.
+		$rule = Link_Rules::get_rule( sanitize_key( (string) get_query_var( 'wzlw_rule' ) ) );
+
 		// Render redirect template.
-		$this->render_redirect_template( $destination );
+		$this->render_redirect_template( $destination, $rule ? $rule['message'] : '' );
 		exit;
 	}
 
@@ -167,9 +171,10 @@ class Redirect_Handler {
 	 *
 	 * @since 1.0.0
 	 * @param string $destination Destination URL.
+	 * @param string $rule_message Optional message from the matching link rule.
 	 */
-	protected function render_redirect_template( $destination ) {
-		$message   = (string) wzlw_get_option( 'redirect_message', __( 'You are being redirected to an external site.', 'webberzone-link-warnings' ) );
+	protected function render_redirect_template( $destination, $rule_message = '' ) {
+		$message   = '' !== $rule_message ? $rule_message : (string) wzlw_get_option( 'redirect_message', __( 'You are being redirected to an external site.', 'webberzone-link-warnings' ) );
 		$countdown = absint( wzlw_get_option( 'redirect_countdown', 5 ) );
 
 		// Parse destination for display.
@@ -259,17 +264,20 @@ class Redirect_Handler {
 	 *
 	 * @since 1.0.0
 	 * @param string $destination Destination URL.
+	 * @param string $rule_id     Optional ID of the link rule whose message the redirect screen shows.
 	 * @return string Redirect URL.
 	 */
-	public static function get_redirect_url( $destination ) {
+	public static function get_redirect_url( $destination, $rule_id = '' ) {
 		$destination = esc_url_raw( $destination );
-
-		return add_query_arg(
-			array(
-				'url'      => rawurlencode( $destination ),
-				'wzlw_sig' => hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ),
-			),
-			home_url( 'external-redirect/' )
+		$args        = array(
+			'url'      => rawurlencode( $destination ),
+			'wzlw_sig' => hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ),
 		);
+
+		if ( '' !== $rule_id ) {
+			$args['wzlw_rule'] = sanitize_key( $rule_id );
+		}
+
+		return add_query_arg( $args, home_url( 'external-redirect/' ) );
 	}
 }

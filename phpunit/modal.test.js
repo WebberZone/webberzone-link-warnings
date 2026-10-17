@@ -34,7 +34,7 @@ function element(attributes = {}, innerMarkup = '') {
 		},
 		closest(selector) {
 			if (selector.startsWith('a[')) {
-				return this.hasAttribute('data-wzlw-external') || this.hasAttribute('data-wzlw-blank') || this.hasAttribute('data-wzlw-download') ? this : null;
+				return ['data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-rule'].some((name) => this.hasAttribute(name)) ? this : null;
 			}
 			return selector.startsWith('.') && classes.has(selector.slice(1)) ? this : null;
 		},
@@ -114,6 +114,8 @@ function redirectUrl(destination) {
 	url.searchParams.set('wzlw_sig', 'a'.repeat(64));
 	return url.href;
 }
+
+const ruleCases = JSON.parse(readFileSync(join(__dirname, 'fixtures/link-rules.json'), 'utf8'));
 
 for (const filename of ['modal.js', 'modal.min.js']) {
 	const script = readFileSync(join(__dirname, '../includes/admin/js', filename), 'utf8');
@@ -214,6 +216,58 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.link.getAttribute('data-wzlw-external'), null);
 		assert.equal(page.link.markup, '');
 		assert.equal(page.click(), false);
+	});
+	test(`${filename}: link rules match exactly as the shared fixture expects`, () => {
+		for (const ruleCase of ruleCases) {
+			const rules = [{ id: 'r1', regex: ruleCase.regex, hostOnly: ruleCase.hostOnly, action: 'inline', message: '' }];
+			const page = boot(script, { href: ruleCase.href }, { linkRules: rules, warningMethod: 'none' });
+			assert.equal(page.link.getAttribute('data-wzlw-rule') === 'r1', ruleCase.matches, `${ruleCase.pattern} vs ${ruleCase.href}`);
+		}
+	});
+	test(`${filename}: first matching rule wins and sets the link method`, () => {
+		const rules = [
+			{ id: 'a', regex: '^outside\\.test/first/.*$', hostOnly: false, action: 'modal', message: '' },
+			{ id: 'b', regex: '^outside\\.test$', hostOnly: true, action: 'redirect', message: '' },
+		];
+		const page = boot(script, { href: 'https://outside.test/first/x' }, { linkRules: rules, warningMethod: 'inline' });
+		assert.equal(page.link.getAttribute('data-wzlw-rule'), 'a');
+		assert.equal(page.link.getAttribute('data-wzlw-method'), 'modal');
+		assert.equal(page.link.markup, '');
+		assert.equal(page.click(), true);
+	});
+	test(`${filename}: a rule processes an internal link and shows its own message`, () => {
+		const rules = [{ id: 'go', regex: '^site\\.test/go/.*$', hostOnly: false, action: 'inline_modal', message: 'Affiliate link ahead' }];
+		const page = boot(script, { href: '/go/product/' }, { linkRules: rules, warningMethod: 'none', modalMessage: 'Global message' });
+		assert.equal(page.link.getAttribute('data-wzlw-url'), '/go/product/');
+		assert.equal(page.link.getAttribute('data-wzlw-external'), null);
+		assert.match(page.link.markup, /wzlw-icon/);
+		assert.equal(page.click(), true);
+		assert.equal(page.message.textContent, 'Affiliate link ahead');
+	});
+	test(`${filename}: a rule overrides an excluded domain`, () => {
+		const rules = [{ id: 't', regex: '^trusted\\.test$', hostOnly: true, action: 'modal', message: '' }];
+		const page = boot(script, { href: 'https://trusted.test/' }, { linkRules: rules, excludedDomains: ['trusted.test'] });
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+		assert.equal(page.click(), true);
+	});
+	test(`${filename}: exclude rule skips the link unless a force class is present`, () => {
+		const rules = [{ id: 'x', regex: '^outside\\.test$', hostOnly: true, action: 'exclude', message: '' }];
+		let page = boot(script, { href: 'https://outside.test/' }, { linkRules: rules });
+		assert.equal(page.link.classList.contains('wzlw-processed'), false);
+		assert.equal(page.click(), false);
+		page = boot(script, { href: 'https://outside.test/', class: 'wzlw-force-external' }, { linkRules: rules });
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+	});
+	test(`${filename}: a PHP-processed rule link is left alone and uses its own method`, () => {
+		const rules = [{ id: 'm', regex: '^outside\\.test$', hostOnly: true, action: 'modal', message: 'Rule message' }];
+		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-processed wzlw-external', 'data-wzlw-rule': 'm', 'data-wzlw-method': 'modal', 'data-wzlw-url': 'https://outside.test/', 'data-wzlw-external': 'true' }, { linkRules: rules, warningMethod: 'inline' });
+		assert.equal(page.link.markup, '');
+		assert.equal(page.click(), true);
+		assert.equal(page.message.textContent, 'Rule message');
+	});
+	test(`${filename}: an invalid rule regex is ignored`, () => {
+		const page = boot(script, { href: 'https://outside.test/' }, { linkRules: [{ id: 'bad', regex: '(', hostOnly: true, action: 'exclude', message: '' }] });
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
 	});
 	test(`${filename}: file extension in a query string is ignored`, () => {
 		const page = boot(script, { href: '/download?file=report.pdf' }, { downloadExtensions: ['pdf'] });

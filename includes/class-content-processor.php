@@ -81,6 +81,7 @@ class Content_Processor {
 		// Load fresh settings on each content processing.
 		$this->settings    = wzlw_get_settings();
 		$warnings_disabled = wzlw_is_disabled_for_current_user();
+		$rules             = Link_Rules::get_rules( $this->settings );
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor            = new \WP_HTML_Tag_Processor( $content );
@@ -144,24 +145,30 @@ class Content_Processor {
 			// Determine if link should be processed.
 			$is_affiliate = $affiliate_depth > 0 || $this->link_has_affiliate_class( $processor );
 			$is_forced    = $is_affiliate || $force_external_depth > 0 || $this->link_has_force_external_class( $processor );
-			$is_excluded  = ! $is_forced && $this->is_excluded_domain( $href );
+			$rule         = Link_Rules::match( $href, $this->site_host, $rules );
+			$rule_method  = ( $rule && 'exclude' !== $rule['action'] ) ? $rule['action'] : '';
+			$is_excluded  = ! $is_forced && '' === $rule_method && ( null !== $rule || $this->is_excluded_domain( $href ) );
 			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $href ) );
 			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $href );
 
 			if ( $is_excluded ) {
 				$processor->set_attribute( 'data-wzlw-excluded', 'true' );
-				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url' ) as $attribute ) {
+				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-rule', 'data-wzlw-method' ) as $attribute ) {
 					$processor->remove_attribute( $attribute );
 				}
 			} else {
 				$processor->remove_attribute( 'data-wzlw-excluded' );
+			}
+			if ( '' === $rule_method ) {
+				$processor->remove_attribute( 'data-wzlw-rule' );
+				$processor->remove_attribute( 'data-wzlw-method' );
 			}
 			$this->apply_link_attributes( $processor, $is_external, $is_affiliate );
 			if ( $warnings_disabled ) {
 				continue;
 			}
 			$has_target     = '_blank' === $processor->get_attribute( 'target' );
-			$should_process = $this->should_process_link( $is_external, $has_target, $is_download );
+			$should_process = '' !== $rule_method || $this->should_process_link( $is_external, $has_target, $is_download );
 
 			// Inside a skip wrapper, target="_blank" links still need ARIA for accessibility
 			// even when the visual icon/modal is suppressed.
@@ -184,8 +191,15 @@ class Content_Processor {
 				continue;
 			}
 
-			// Add data attributes for JavaScript handling.
+			// A matching rule sets this link's own warning method.
 			$warning_method = $this->settings['warning_method'] ?? 'none';
+			if ( '' !== $rule_method ) {
+				$warning_method = $rule_method;
+				$processor->set_attribute( 'data-wzlw-rule', $rule['id'] );
+				$processor->set_attribute( 'data-wzlw-method', $rule_method );
+			}
+
+			// Add data attributes for JavaScript handling.
 			if ( in_array( $warning_method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
 				$processor->set_attribute( 'data-wzlw-url', $href );
 				if ( $is_external ) {
@@ -197,7 +211,7 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href ) );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href, ( $rule && '' !== $rule['message'] ) ? $rule['id'] : '' ) );
 				}
 			}
 
@@ -225,8 +239,9 @@ class Content_Processor {
 
 		$processed_content = $processor->get_updated_html();
 
-		// Add visual indicators if inline method is used.
-		if ( ! $warnings_disabled && in_array( $this->settings['warning_method'] ?? 'none', array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
+		// Add visual indicators if the global method or any rule uses an inline method.
+		$inline_methods = array( 'inline', 'inline_modal', 'inline_redirect' );
+		if ( ! $warnings_disabled && ( in_array( $this->settings['warning_method'] ?? 'none', $inline_methods, true ) || Link_Rules::uses_action( $inline_methods, $rules ) ) ) {
 			$processed_content = $this->add_visual_indicators( $processed_content );
 		}
 
@@ -548,6 +563,15 @@ class Content_Processor {
 	 */
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
+
+		// A rule can give a link its own method; only inline methods get an indicator.
+		$warning_method = $this->settings['warning_method'] ?? 'none';
+		if ( preg_match( '/^<a\s[^>]*\bdata-wzlw-method=["\']([a-z_]+)["\']/i', $link_html, $method_match ) ) {
+			$warning_method = $method_match[1];
+		}
+		if ( ! in_array( $warning_method, array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
+			return $link_html;
+		}
 
 		// The same HTML can pass through more than one supported content filter.
 		$has_indicator = preg_match( '/\bclass=["\'][^"\']*\b(?:wzlw-icon|wzlw-text)\b[^"\']*["\']/i', $link_html )

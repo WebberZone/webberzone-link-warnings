@@ -168,13 +168,13 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.location.href, signed);
 	});
 	test(`${filename}: PHP exclusion marker is respected even with stale warning attributes`, () => {
-		const page = boot(script, { href: 'https://outside.test/', 'data-wzlw-excluded': 'true', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://outside.test/' }, { excludedDomains: ['outside.test'] });
+		const page = boot(script, { href: 'https://outside.test/', 'data-wzlw-excluded': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://outside.test/' }, { excludedDomains: ['outside.test'], excludedToken: 'tok' });
 		assert.equal(page.link.classList.contains('wzlw-processed'), false);
 		assert.equal(page.link.markup, '');
 		assert.equal(page.click(), false);
 	});
 	test(`${filename}: explicit force class still overrides exclusion`, () => {
-		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-force-external', 'data-wzlw-excluded': 'true' }, { excludedDomains: ['outside.test'] });
+		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-force-external', 'data-wzlw-excluded': 'tok' }, { excludedDomains: ['outside.test'], excludedToken: 'tok' });
 		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
 		assert.equal(page.link.hasAttribute('data-wzlw-excluded'), false);
 		assert.equal(page.click(), true);
@@ -345,6 +345,12 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(asked.length, 1);
 		assert.match(asked[0], /Leaving\?/);
 		assert.equal(page.location.href, 'https://brace.test/a%7Bb%7D');
+	});
+	test(`${filename}: an author-written excluded marker is ignored`, () => {
+		const page = boot(script, { href: 'https://outside.test/', 'data-wzlw-excluded': 'true' }, { excludedToken: 'tok' });
+		assert.equal(page.link.getAttribute('data-wzlw-excluded'), null);
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+		assert.equal(page.click(), true);
 	});
 	test(`${filename}: an excluded marker cannot cancel a rule's warning`, () => {
 		const rules = [{ id: 'aff', pattern: 'evil.example/*', hostOnly: false, action: 'modal', message: 'Affiliate disclosure' }];

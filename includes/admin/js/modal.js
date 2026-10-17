@@ -101,13 +101,16 @@
 			const warningsDisabled = !!settings.warningsDisabled;
 			const ruleMethod = rule && 'exclude' !== rule.action ? rule.action : '';
 			let isExcluded = !isForced && !ruleMethod && (!!rule || isExcludedHref(checkHref));
-			// A rule overrides exclusions, so an excluded marker cannot cancel a rule's warning.
+			// PHP's exclusion stands unless a force class or a rule overrides it. A marker
+			// without PHP's token was written by an author and is ignored.
 			if (link.hasAttribute('data-wzlw-excluded')) {
-				if (!isForced && !ruleMethod) {
-					return;
+				if (isPhpExcluded(link)) {
+					if (!isForced && !ruleMethod) {
+						return;
+					}
+					isExcluded = false;
 				}
 				link.removeAttribute('data-wzlw-excluded');
-				isExcluded = false;
 			}
 			// A rule overrides the excluded domains list, so only the site host makes its link internal.
 			const isExternal = isForced || (!isExcluded && isExternalHref(checkHref, !!ruleMethod));
@@ -235,6 +238,17 @@
 
 		return stateAttributes.some(function (name) { return link.hasAttribute(name); })
 			|| !!link.querySelector('.wzlw-icon, .wzlw-text, .screen-reader-text');
+	}
+
+	/**
+	 * Return true if PHP excluded this link. PHP marks it with a per-request token,
+	 * so a data-wzlw-excluded attribute written by a content author is ignored.
+	 *
+	 * @param {HTMLElement} link
+	 * @return {boolean}
+	 */
+	function isPhpExcluded(link) {
+		return !!settings.excludedToken && settings.excludedToken === link.getAttribute('data-wzlw-excluded');
 	}
 
 	/**
@@ -849,7 +863,7 @@
 			return;
 		}
 		const rule = getLinkRule(link);
-		if (!rule && link.hasAttribute('data-wzlw-excluded')) {
+		if (!rule && isPhpExcluded(link)) {
 			return;
 		}
 		// A data-wzlw-rule attribute alone is not enough: the href must match a rule.

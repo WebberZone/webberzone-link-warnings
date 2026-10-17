@@ -211,7 +211,7 @@ namespace {
 		settings( array( 'excluded_domains' => 'trusted.test' ) );
 		$html = process( '<a href="https://trusted.test/report.pdf">PDF</a>' );
 		$link = link_attributes( $html, 'https://trusted.test/report.pdf' );
-		expect( 'true' === $link['data-wzlw-excluded'] && null === $link['data-wzlw-download'], 'Excluded download link was processed.' );
+		expect( Content_Processor::get_exclusion_token() === $link['data-wzlw-excluded'] && null === $link['data-wzlw-download'], 'Excluded download link was processed.' );
 	};
 	$tests['download scope external skips files on the site'] = static function () {
 		settings( array( 'download_scope' => 'external' ) );
@@ -239,6 +239,7 @@ namespace {
 			array( 'logged_in', array( 'subscriber' ), true ),
 			array( 'role:administrator', array( 'subscriber' ), false ),
 			array( 'role:administrator', array( 'editor', 'administrator' ), true ),
+			array( 'role:shop manager,role:editor', array( 'shop manager' ), true ),
 			array( '', array( 'administrator' ), false ),
 		);
 		foreach ( $cases as $case ) {
@@ -337,7 +338,7 @@ namespace {
 		expect( 'inline_modal' === $cloaked['data-wzlw-method'] && '/go/product/' === $cloaked['data-wzlw-url'], 'Root-relative rule did not process an internal link.' );
 		expect( 'modal' === $trusted['data-wzlw-method'] && null === $trusted['data-wzlw-excluded'], 'A rule did not override the excluded domains list.' );
 		expect( 'true' === $trusted['data-wzlw-external'], 'A rule-matched excluded domain was not treated as external.' );
-		expect( 'true' === $skipped['data-wzlw-excluded'] && null === $skipped['data-wzlw-url'], 'Exclude rule did not exclude the link.' );
+		expect( Content_Processor::get_exclusion_token() === $skipped['data-wzlw-excluded'] && null === $skipped['data-wzlw-url'], 'Exclude rule did not exclude the link.' );
 		expect( null === $forced['data-wzlw-excluded'], 'Force-external class did not override an exclude rule.' );
 		expect( null === $plain['data-wzlw-method'] && null === $plain['data-wzlw-url'], 'An unmatched link did not use the global inline method.' );
 
@@ -454,6 +455,11 @@ namespace {
 			array( 'https://evil.example/', true, 'https://site.test/blog/post/', false ),
 			array( '/go/deal/', false, null, true ),
 			array( 'https://site.test/x', false, null, true ),
+			array( 'https://evil.example/', false, null, true, 'same-origin' ),
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', false, 'cross-site' ),
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', false, 'none' ),
+			array( 'https://evil.example/', false, null, false, 'same-site' ),
+			array( 'https://evil.example/', true, null, false, 'same-origin' ),
 		);
 		foreach ( $cases as $case ) {
 			list( $destination, $confirm_only, $referer, $expected ) = $case;
@@ -462,9 +468,14 @@ namespace {
 			} else {
 				$_SERVER['HTTP_REFERER'] = $referer;
 			}
-			expect( $expected === $method->invoke( $handler, $destination, $confirm_only ), 'Wrong countdown decision for ' . $destination . ' from ' . var_export( $referer, true ) . '.' );
+			if ( isset( $case[4] ) ) {
+				$_SERVER['HTTP_SEC_FETCH_SITE'] = $case[4];
+			} else {
+				unset( $_SERVER['HTTP_SEC_FETCH_SITE'] );
+			}
+			expect( $expected === $method->invoke( $handler, $destination, $confirm_only ), 'Wrong countdown decision for ' . $destination . ' from ' . var_export( $referer, true ) . ' / ' . ( $case[4] ?? 'no Sec-Fetch-Site' ) . '.' );
 		}
-		unset( $_SERVER['HTTP_REFERER'] );
+		unset( $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_SEC_FETCH_SITE'] );
 	};
 	$tests['same-site checks respect ports and look-alike hosts'] = static function () {
 		$cases = array(
@@ -605,7 +616,7 @@ namespace {
 			try {
 				$html = process( '<a href="https://outside.test/" target="_blank" aria-label="Example">test</a>' );
 				$link = link_attributes( $html, 'https://outside.test/' );
-				expect( 'true' === $link['data-wzlw-excluded'], 'PHP exclusion decision was not preserved.' );
+				expect( Content_Processor::get_exclusion_token() === $link['data-wzlw-excluded'], 'PHP exclusion decision was not preserved.' );
 				expect( null === $link['data-wzlw-url'] && null === $link['data-wzlw-blank'], 'Excluded link still has warning attributes.' );
 			} finally {
 				remove_filter( 'wzlw_excluded_domains', $filter, 10 );
@@ -621,7 +632,7 @@ namespace {
 			)
 		);
 		$html = process( '<a href="//sub.outside.test/" target="_blank">excluded</a><a href="//outside.test/">base</a><a class="wzlw-affiliate" href="https://sub.outside.test/">affiliate</a>' );
-		expect( 'true' === link_attributes( $html, '//sub.outside.test/' )['data-wzlw-excluded'], 'Wildcard exclusion failed.' );
+		expect( Content_Processor::get_exclusion_token() === link_attributes( $html, '//sub.outside.test/' )['data-wzlw-excluded'], 'Wildcard exclusion failed.' );
 		expect( 'true' === link_attributes( $html, '//outside.test/' )['data-wzlw-external'], 'Wildcard unexpectedly excluded its base domain.' );
 		$affiliate = link_attributes( $html, 'https://sub.outside.test/' );
 		expect( 'true' === $affiliate['data-wzlw-external'] && 'sponsored' === $affiliate['rel'], 'Affiliate did not override exclusion.' );

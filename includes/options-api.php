@@ -134,7 +134,9 @@ function wzlw_is_disabled_for_current_user() {
 	$disabled = false;
 
 	if ( is_user_logged_in() ) {
-		$disable_for = wp_parse_list( wzlw_get_option( 'disable_for', '' ) );
+		$disable_for = wzlw_get_option( 'disable_for', '' );
+		$disable_for = is_array( $disable_for ) ? $disable_for : explode( ',', (string) $disable_for );
+		$disable_for = array_map( 'trim', array_map( 'strval', $disable_for ) );
 
 		if ( in_array( 'logged_in', $disable_for, true ) ) {
 			$disabled = true;

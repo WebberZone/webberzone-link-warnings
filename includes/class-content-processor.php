@@ -174,7 +174,7 @@ class Content_Processor {
 			}
 
 			if ( $is_excluded ) {
-				$processor->set_attribute( 'data-wzlw-excluded', 'true' );
+				$processor->set_attribute( 'data-wzlw-excluded', self::get_exclusion_token() );
 				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-rule', 'data-wzlw-method' ) as $attribute ) {
 					$processor->remove_attribute( $attribute );
 				}
@@ -278,6 +278,27 @@ class Content_Processor {
 		}
 
 		return $processed_content;
+	}
+
+	/**
+	 * Get the token that marks a link as excluded by PHP.
+	 *
+	 * PHP can exclude domains through the wzlw_excluded_domains filter, which the
+	 * JavaScript scan cannot repeat, so the scan trusts PHP's marker. A random token
+	 * per request, also passed to the script, stops content authors from writing the
+	 * marker themselves.
+	 *
+	 * @since 1.7.0
+	 * @return string Token.
+	 */
+	public static function get_exclusion_token() {
+		static $token = null;
+
+		if ( null === $token ) {
+			$token = bin2hex( random_bytes( 8 ) );
+		}
+
+		return $token;
 	}
 
 	/**

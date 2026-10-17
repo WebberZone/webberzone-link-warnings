@@ -115,6 +115,7 @@ class Frontend_Handler {
 				'downloadScope'             => $settings['download_scope'] ?? 'all',
 				'warningsDisabled'          => wzlw_is_disabled_for_current_user(),
 				'linkRules'                 => Link_Rules::to_js( Link_Rules::get_rules( $settings ) ),
+				'excludedToken'             => Content_Processor::get_exclusion_token(),
 				'scope'                     => $settings['scope'] ?? 'external',
 				'warningMethod'             => $method,
 				'noIconClass'               => array_values( array_filter( array_map( 'trim', explode( ',', isset( $settings['no_icon_class'] ) ? $settings['no_icon_class'] : 'wzlw-no-icon' ) ) ) ),

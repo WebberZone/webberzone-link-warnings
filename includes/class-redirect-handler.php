@@ -83,14 +83,7 @@ class Redirect_Handler {
 			return;
 		}
 
-		$settings = wzlw_get_settings();
-		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
-
-		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
-		$rules           = Link_Rules::get_rules( $settings );
-		if ( ! $global_redirect && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ), $rules ) ) {
-			return;
-		}
+		$rules = Link_Rules::get_rules();
 
 		// Get and validate destination URL.
 		$destination = isset( $_GET['url'] ) && is_string( $_GET['url'] ) ? esc_url_raw( wp_unslash( $_GET['url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -114,12 +107,9 @@ class Redirect_Handler {
 			$confirm_only = true;
 		}
 
-		// The rule comes from the signed destination, never from the request.
+		// A valid signature is still honoured after the warning method or rules change,
+		// so cached pages keep working. The rule comes from the signed destination only.
 		$rule = $this->get_redirect_rule( $destination, $rules );
-		if ( ! $global_redirect && ! $rule ) {
-			wp_safe_redirect( home_url() );
-			exit;
-		}
 
 		// The screen differs by referrer, so it must never be cached.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
@@ -149,8 +139,9 @@ class Redirect_Handler {
 	 * Check whether the redirect screen may count down and redirect automatically.
 	 *
 	 * A signed URL is a reusable token, so wherever it was signed, it only redirects
-	 * automatically for a visitor who arrives from a page on this site. Opened from an
-	 * email or another site, the screen waits for the visitor to click Continue.
+	 * automatically for a visitor who arrives from a page on this site, as reported by
+	 * Sec-Fetch-Site or, in browsers without it, the Referer. Opened from an email or
+	 * another site, the screen waits for the visitor to click Continue.
 	 * Destinations on this site are always safe to redirect to.
 	 *
 	 * @since 1.7.0
@@ -163,7 +154,18 @@ class Redirect_Handler {
 			return false;
 		}
 
-		return self::is_same_site( $destination ) || self::is_same_site( isset( $_SERVER['HTTP_REFERER'] ) && is_string( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared, never output.
+		if ( self::is_same_site( $destination ) ) {
+			return true;
+		}
+
+		// Browsers send Sec-Fetch-Site even when the referrer is suppressed by
+		// Referrer-Policy or rel="noreferrer", and a page cannot forge it.
+		$fetch_site = isset( $_SERVER['HTTP_SEC_FETCH_SITE'] ) && is_string( $_SERVER['HTTP_SEC_FETCH_SITE'] ) ? sanitize_key( wp_unslash( $_SERVER['HTTP_SEC_FETCH_SITE'] ) ) : '';
+		if ( '' !== $fetch_site ) {
+			return 'same-origin' === $fetch_site;
+		}
+
+		return self::is_same_site( isset( $_SERVER['HTTP_REFERER'] ) && is_string( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Only compared, never output.
 	}
 
 	/**
@@ -217,9 +219,8 @@ class Redirect_Handler {
 	 * Check whether a destination may redirect automatically after the countdown.
 	 *
 	 * Destinations on this site and destinations covered by a redirect rule may.
-	 * Any other destination from a source the site does not control, such as a
-	 * comment or a URL sent to the signing endpoint, gets a confirm-only signature
-	 * so the redirect screen cannot be used as an automatic open redirect.
+	 * Any other destination from content the site does not control, such as a
+	 * comment or a preview, gets a confirm-only signature.
 	 *
 	 * @since 1.7.0
 	 * @param string  $destination Destination URL.
@@ -377,7 +378,8 @@ class Redirect_Handler {
 		}
 
 		// Without a global redirect method, only destinations that a redirect rule covers are signed.
-		// Anyone can call this endpoint, so other external destinations are signed confirm-only.
+		// Anyone can call this endpoint; allows_countdown() keeps its signatures from counting
+		// down for visitors who do not arrive from this site.
 		$method          = wzlw_get_option( 'warning_method', 'inline_modal' );
 		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
 		$rules           = Link_Rules::get_rules();
@@ -392,7 +394,7 @@ class Redirect_Handler {
 			if ( ! $url || ! $this->is_valid_url( $url ) || ( ! $global_redirect && ! $this->get_redirect_rule( $url, $rules ) ) ) {
 				continue;
 			}
-			$result[ $raw_url ] = self::get_redirect_url( $url, ! self::allows_auto_redirect( $url, $rules ) );
+			$result[ $raw_url ] = self::get_redirect_url( $url );
 		}
 
 		wp_send_json_success( $result );

@@ -257,9 +257,9 @@ The message displayed on the redirect page above the destination URL.
 
 The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely — the user must click the “Continue to site” link manually.
 
-The countdown only runs for visitors who reach the redirect screen from a page on your site, as reported by the browser's `Referer` header. Opened from an email, a bookmark or another site, the screen waits for the visitor to click “Continue to site”. Links in comments, links from previews, links with `rel="ugc"` and links the JavaScript scan signs on request always wait for the click, unless they point to your own site or match a redirect rule. Together, this stops anyone from using your redirect screen as an automatic redirect to a site of their choosing.
+The countdown only runs for visitors who reach the redirect screen from a page on your site. Browsers report this in the `Sec-Fetch-Site` header, which is sent even with `rel="noreferrer"` or `Referrer-Policy: no-referrer`; older browsers without it fall back to the `Referer` header. Opened from an email, a bookmark or another site, the screen waits for the visitor to click “Continue to site”. Links in comments, links from previews and links with `rel="ugc"` always wait for the click, unless they point to your own site or match a redirect rule. Together, this stops anyone from using your redirect screen as an automatic redirect to a site of their choosing.
 
-If your site sends `Referrer-Policy: no-referrer`, or a link has `rel="noreferrer"`, the browser sends no `Referer` and the visitor clicks “Continue to site” instead of waiting for the countdown. The redirect screen is never cached. Redirect links signed by versions before 1.7.0, for example in cached pages, still open the redirect screen but always wait for the click.
+The redirect screen is never cached. Redirect links in cached pages keep working after you change the warning method or rules. Redirect links signed by versions before 1.7.0 still open the redirect screen but always wait for the click.
 
 **Default:** `5`
 **Range:** 0–60

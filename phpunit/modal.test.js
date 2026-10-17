@@ -191,6 +191,23 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.title.textContent, 'Download this file');
 		assert.equal(page.message.textContent, 'The file will be downloaded. Continue?');
 	});
+	for (const href of ['/wp-content/uploads/a.pdf', 'https://site.test/b.pdf']) {
+		test(`${filename}: download scope external skips site file: ${href}`, () => {
+			const page = boot(script, { href }, { downloadExtensions: ['pdf'], downloadScope: 'external' });
+			assert.equal(page.link.getAttribute('data-wzlw-download'), null);
+			assert.equal(page.link.classList.contains('wzlw-processed'), false);
+		});
+	}
+	test(`${filename}: download scope external keeps external and forced files`, () => {
+		for (const attributes of [{ href: 'https://outside.test/c.pdf' }, { href: '/e.pdf', class: 'wzlw-force-external' }]) {
+			const page = boot(script, attributes, { downloadExtensions: ['pdf'], downloadScope: 'external' });
+			assert.equal(page.link.getAttribute('data-wzlw-download'), 'true');
+		}
+	});
+	test(`${filename}: download scope all keeps site files`, () => {
+		const page = boot(script, { href: '/wp-content/uploads/a.pdf' }, { downloadExtensions: ['pdf'], downloadScope: 'all' });
+		assert.equal(page.link.getAttribute('data-wzlw-download'), 'true');
+	});
 	test(`${filename}: file extension in a query string is ignored`, () => {
 		const page = boot(script, { href: '/download?file=report.pdf' }, { downloadExtensions: ['pdf'] });
 		assert.equal(page.link.getAttribute('data-wzlw-download'), null);

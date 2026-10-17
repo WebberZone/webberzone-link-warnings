@@ -286,6 +286,7 @@ class Settings {
 
 			// Advanced — Exclusions and Classes.
 			'download_extensions'          => 'pdf, zip, doc, docx, xls, xlsx, exe, dmg',
+			'download_scope'               => 'all',
 			'excluded_domains'             => '',
 			'no_icon_class'                => 'wzlw-no-icon',
 			'no_icon_wrapper_class'        => 'wzlw-no-icon-wrapper',
@@ -678,6 +679,17 @@ class Settings {
 				'type'    => 'text',
 				'default' => $defaults['download_extensions'],
 				'size'    => 'large',
+			),
+			'download_scope'               => array(
+				'id'      => 'download_scope',
+				'name'    => esc_html__( 'Download Warning Scope', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose which download links get a download warning. With the second option, files on your own site, including root-relative links such as /wp-content/uploads/file.pdf, are left alone.', 'webberzone-link-warnings' ),
+				'type'    => 'radio',
+				'default' => $defaults['download_scope'],
+				'options' => array(
+					'all'      => esc_html__( 'All download links', 'webberzone-link-warnings' ),
+					'external' => esc_html__( 'Download links to external sites only', 'webberzone-link-warnings' ),
+				),
 			),
 			'exclusions_header'            => array(
 				'id'   => 'exclusions_header',

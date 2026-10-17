@@ -107,7 +107,7 @@
 				isExcluded = false;
 			}
 			const isExternal = isForced || (!isExcluded && isExternalHref(href));
-			const isDownload = !isExcluded && isDownloadHref(href);
+			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(href);
 			applyLinkAttributes(link, isExternal, isAffiliate);
 			const hasTarget = '_blank' === link.getAttribute('target');
 

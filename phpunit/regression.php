@@ -205,6 +205,25 @@ namespace {
 		$link = link_attributes( $html, 'https://trusted.test/report.pdf' );
 		expect( 'true' === $link['data-wzlw-excluded'] && null === $link['data-wzlw-download'], 'Excluded download link was processed.' );
 	};
+	$tests['download scope external skips files on the site'] = static function () {
+		settings( array( 'download_scope' => 'external' ) );
+		$html = process(
+			'<a href="/wp-content/uploads/a.pdf">root-relative</a>'
+			. '<a href="https://site.test/wp-content/uploads/b.pdf">absolute</a>'
+			. '<a href="https://outside.test/c.pdf">external</a>'
+			. '<a class="wzlw-affiliate" href="/go/d.pdf">affiliate</a>'
+			. '<a class="wzlw-force-external" href="/e.pdf">forced</a>'
+		);
+		expect( false === strpos( (string) link_attributes( $html, '/wp-content/uploads/a.pdf' )['class'], 'wzlw-processed' ), 'Root-relative file link was processed.' );
+		expect( false === strpos( (string) link_attributes( $html, 'https://site.test/wp-content/uploads/b.pdf' )['class'], 'wzlw-processed' ), 'Same-site file link was processed.' );
+		expect( 'true' === link_attributes( $html, 'https://outside.test/c.pdf' )['data-wzlw-download'], 'External file link lost its download warning.' );
+		expect( 'true' === link_attributes( $html, '/go/d.pdf' )['data-wzlw-download'], 'Affiliate file link lost its download warning.' );
+		expect( 'true' === link_attributes( $html, '/e.pdf' )['data-wzlw-download'], 'Force-external file link lost its download warning.' );
+
+		settings( array( 'download_scope' => 'all' ) );
+		$html = process( '<a href="/wp-content/uploads/a.pdf">root-relative</a>' );
+		expect( 'true' === link_attributes( $html, '/wp-content/uploads/a.pdf' )['data-wzlw-download'], 'Download scope "all" skipped a site file.' );
+	};
 	$tests['download indicators use a distinct icon class'] = static function () {
 		settings();
 		$html = process( '<a href="/files/report.pdf">PDF</a><a href="https://outside.test/page">External</a>' );

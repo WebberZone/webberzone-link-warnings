@@ -145,7 +145,7 @@ class Content_Processor {
 			$is_forced    = $is_affiliate || $force_external_depth > 0 || $this->link_has_force_external_class( $processor );
 			$is_excluded  = ! $is_forced && $this->is_excluded_domain( $href );
 			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $href ) );
-			$is_download  = ! $is_excluded && $this->is_download_link( $href );
+			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $href );
 
 			if ( $is_excluded ) {
 				$processor->set_attribute( 'data-wzlw-excluded', 'true' );

@@ -113,6 +113,7 @@ class Frontend_Handler {
 				'siteHost'                  => $site_host,
 				'excludedDomains'           => $excluded_domains_js,
 				'downloadExtensions'        => $download_extensions,
+				'downloadScope'             => $settings['download_scope'] ?? 'all',
 				'scope'                     => $settings['scope'] ?? 'external',
 				'warningMethod'             => $method,
 				'noIconClass'               => array_values( array_filter( array_map( 'trim', explode( ',', isset( $settings['no_icon_class'] ) ? $settings['no_icon_class'] : 'wzlw-no-icon' ) ) ) ),

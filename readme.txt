@@ -279,6 +279,7 @@ Release date: 3 November 2026
 **Fixed**
 
 * Links that open in the same tab were announced to screen readers as opening in a new window.
+* Links written with backslashes, such as `/\evil.example/` or `https:\\evil.example/`, were treated as internal or excluded and showed no warning.
 * The Inline Indicator Scope description said modal and redirect warnings applied to external links only, but the second option also applied them to internal links that open in a new tab.
 
 = Earlier versions =

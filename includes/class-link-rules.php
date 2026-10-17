@@ -37,7 +37,7 @@ class Link_Rules {
 	const ACTIONS = array( 'inline', 'modal', 'inline_modal', 'redirect', 'inline_redirect', 'exclude' );
 
 	/**
-	 * Get the normalised rules from the settings.
+	 * Get the normalized rules from the settings.
 	 *
 	 * A pattern starting with `/` is root-relative and is matched against this site only.
 	 *
@@ -57,7 +57,7 @@ class Link_Rules {
 
 		foreach ( array_values( $rows ) as $index => $row ) {
 			$fields  = isset( $row['fields'] ) && is_array( $row['fields'] ) ? $row['fields'] : array();
-			$pattern = self::normalise_pattern( (string) ( $fields['pattern'] ?? '' ) );
+			$pattern = self::normalize_pattern( (string) ( $fields['pattern'] ?? '' ) );
 			$action  = (string) ( $fields['action'] ?? '' );
 
 			if ( '' === $pattern || ! in_array( $action, self::ACTIONS, true ) ) {
@@ -195,15 +195,15 @@ class Link_Rules {
 	}
 
 	/**
-	 * Normalise a pattern as entered in the settings.
+	 * Normalize a pattern as entered in the settings.
 	 *
 	 * Strips whitespace and any http(s) scheme, and collapses repeated wildcards.
 	 *
 	 * @since 1.7.0
 	 * @param string $pattern Pattern.
-	 * @return string Normalised pattern.
+	 * @return string Normalized pattern.
 	 */
-	public static function normalise_pattern( $pattern ) {
+	public static function normalize_pattern( $pattern ) {
 		$pattern = preg_replace( '/\s+/', '', $pattern );
 		$pattern = preg_replace( '#^(?:https?:)?//#i', '', (string) $pattern );
 		$pattern = preg_replace( '/\*+/', '*', (string) $pattern );
@@ -212,13 +212,13 @@ class Link_Rules {
 	}
 
 	/**
-	 * Compile a normalised pattern into a regular expression body.
+	 * Compile a normalized pattern into a regular expression body.
 	 *
 	 * ASCII punctuation is escaped with a backslash, which both PCRE and JavaScript
 	 * (without the u flag) read as the literal character. `*` becomes `.*`.
 	 *
 	 * @since 1.7.0
-	 * @param string $pattern Normalised pattern.
+	 * @param string $pattern Normalized pattern.
 	 * @return string Regular expression body, anchored at both ends, without delimiters.
 	 */
 	public static function compile( $pattern ) {

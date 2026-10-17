@@ -95,9 +95,14 @@
 
 			const isAffiliate = !!(inAffiliateWrapper || hasAffiliateClass);
 			const isForced = !!(isAffiliate || inForceExtWrapper || hasForceExtClass);
-			const rule = matchRule(href);
+			const checkHref = normalizeRuleHref(href);
+			const rule = matchRule(checkHref);
 			const ruleMethod = rule && 'exclude' !== rule.action ? rule.action : '';
-			let isExcluded = !ruleMethod && (!!rule || isExcludedHref(href));
+			if (!ruleMethod || settings.warningsDisabled) {
+				link.removeAttribute('data-wzlw-rule');
+				link.removeAttribute('data-wzlw-method');
+			}
+			let isExcluded = !ruleMethod && (!!rule || isExcludedHref(checkHref));
 			if (link.hasAttribute('data-wzlw-excluded')) {
 				if (!isForced) {
 					return;
@@ -106,8 +111,8 @@
 				isExcluded = false;
 			}
 			// A rule overrides the excluded domains list, so only the site host makes its link internal.
-			const isExternal = isForced || (!isExcluded && isExternalHref(href, !!ruleMethod));
-			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(href);
+			const isExternal = isForced || (!isExcluded && isExternalHref(checkHref, !!ruleMethod));
+			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(checkHref);
 			applyLinkAttributes(link, isExternal, isAffiliate);
 			if (settings.warningsDisabled) {
 				return;
@@ -342,20 +347,45 @@
 	}
 
 	/**
-	 * Build the string a link is matched against, mirroring PHP's Link_Rules::get_subject().
+	 * Lowercase ASCII letters only, mirroring PHP's Link_Rules::ascii_lower().
+	 *
+	 * @param {string} text
+	 * @return {string}
+	 */
+	function asciiLower(text) {
+		return text.replace(/[A-Z]/g, function (c) { return c.toLowerCase(); });
+	}
+
+	/**
+	 * Normalize an href the way browsers do, mirroring PHP's Link_Rules::normalize_href().
+	 *
+	 * @param {string} href
+	 * @return {string}
+	 */
+	function normalizeRuleHref(href) {
+		const clean = href.replace(/[\t\n\r]/g, '').replace(/^[\x00-\x20]+|[\x00-\x20]+$/g, '');
+		let cut = clean.search(/[?#]/);
+		if (-1 === cut) {
+			cut = clean.length;
+		}
+		return clean.slice(0, cut).replace(/\\/g, '/') + clean.slice(cut);
+	}
+
+	/**
+	 * Build the strings a link is matched against, mirroring PHP's Link_Rules::get_subject().
 	 *
 	 * @param {string} href
 	 * @return {{host: string, path: string}|null}
 	 */
 	function getRuleSubject(href) {
-		const trimmed = href.trim();
+		const normalized = normalizeRuleHref(href);
 		let rest;
-		if (trimmed.startsWith('//')) {
-			rest = trimmed.slice(2);
-		} else if (/^https?:\/\//i.test(trimmed)) {
-			rest = trimmed.replace(/^https?:\/\//i, '');
-		} else if (trimmed.startsWith('/')) {
-			rest = (settings.siteHost || '') + trimmed;
+		if (normalized.startsWith('//')) {
+			rest = normalized.slice(2);
+		} else if (/^https?:\/\//i.test(normalized)) {
+			rest = normalized.replace(/^https?:\/\//i, '');
+		} else if (normalized.startsWith('/')) {
+			rest = (settings.siteHost || '') + normalized;
 		} else {
 			return null;
 		}
@@ -376,7 +406,7 @@
 		if (-1 !== at) {
 			host = host.slice(at + 1);
 		}
-		host = host.replace(/:\d*$/, '').replace(/\.+$/, '').toLowerCase();
+		host = asciiLower(host.replace(/:\d*$/, '').replace(/\.+$/, ''));
 		if (!host) {
 			return null;
 		}
@@ -385,16 +415,45 @@
 			path = '/' + path;
 		}
 
-		return { host: host, path: path };
+		return { host: host, path: asciiLower(path) };
 	}
 
-	const compiledRules = (Array.isArray(settings.linkRules) ? settings.linkRules : []).map(function (rule) {
-		try {
-			return Object.assign({}, rule, { re: new RegExp(rule.regex, 'i') });
-		} catch (e) {
-			return null;
+	/**
+	 * Match a subject against a pattern where * matches any characters,
+	 * mirroring PHP's Link_Rules::wildcard_match().
+	 *
+	 * @param {string} pattern
+	 * @param {string} subject
+	 * @return {boolean}
+	 */
+	function wildcardMatch(pattern, subject) {
+		let p = 0;
+		let s = 0;
+		let star = -1;
+		let mark = 0;
+		while (s < subject.length) {
+			if (p < pattern.length && '*' !== pattern[p] && pattern[p] === subject[s]) {
+				p++;
+				s++;
+			} else if (p < pattern.length && '*' === pattern[p]) {
+				star = p++;
+				mark = s;
+			} else if (-1 !== star) {
+				p = star + 1;
+				s = ++mark;
+			} else {
+				return false;
+			}
 		}
-	}).filter(Boolean);
+		while (p < pattern.length && '*' === pattern[p]) {
+			p++;
+		}
+		return p === pattern.length;
+	}
+
+	const linkRules = (Array.isArray(settings.linkRules) ? settings.linkRules : []).filter(function (rule) {
+		return rule && 'string' === typeof rule.pattern && 'string' === typeof rule.action;
+	});
 
 	/**
 	 * Find the first link rule that matches an href, mirroring PHP's Link_Rules::match().
@@ -403,15 +462,15 @@
 	 * @return {Object|null}
 	 */
 	function matchRule(href) {
-		if (!compiledRules.length) {
+		if (!linkRules.length) {
 			return null;
 		}
 		const subject = getRuleSubject(href);
 		if (!subject) {
 			return null;
 		}
-		for (const rule of compiledRules) {
-			if (rule.re.test(rule.hostOnly ? subject.host : subject.host + subject.path)) {
+		for (const rule of linkRules) {
+			if (wildcardMatch(rule.pattern, rule.hostOnly ? subject.host : subject.host + subject.path)) {
 				return rule;
 			}
 		}
@@ -419,23 +478,25 @@
 	}
 
 	/**
-	 * Find a link rule by ID.
+	 * Get the rule that sets a link's warning method, from its href, never from its attributes.
 	 *
-	 * @param {string|null} id
+	 * @param {HTMLElement} link
 	 * @return {Object|null}
 	 */
-	function getRule(id) {
-		return id ? compiledRules.find(function (rule) { return rule.id === id; }) || null : null;
+	function getLinkRule(link) {
+		const rule = matchRule(link.getAttribute('href') || '');
+		return rule && 'exclude' !== rule.action ? rule : null;
 	}
 
 	/**
-	 * Get a link's warning method: its rule's method, or the global one.
+	 * Get a link's warning method: its rule's action, or the global method.
 	 *
 	 * @param {HTMLElement} link
 	 * @return {string}
 	 */
 	function getLinkMethod(link) {
-		return link.getAttribute('data-wzlw-method') || method;
+		const rule = getLinkRule(link);
+		return rule ? rule.action : method;
 	}
 
 	/**
@@ -573,18 +634,10 @@
 					return;
 				}
 				links.forEach(function (link) {
-					let signed = data.data[link.getAttribute('data-wzlw-url')];
-					if (!signed) {
-						return;
+					const signed = data.data[link.getAttribute('data-wzlw-url')];
+					if (signed) {
+						link.setAttribute('data-wzlw-redirect-url', signed);
 					}
-					// The rule only picks the redirect screen's message, so it is added after signing.
-					const rule = getRule(link.getAttribute('data-wzlw-rule'));
-					if (rule && rule.message) {
-						const url = new URL(signed, document.baseURI);
-						url.searchParams.set('wzlw_rule', rule.id);
-						signed = url.href;
-					}
-					link.setAttribute('data-wzlw-redirect-url', signed);
 				});
 			})
 			.catch(function () { });
@@ -741,6 +794,9 @@
 	 * @param {Event} e Click event.
 	 */
 	function handleLinkClick(e) {
+		if (settings.warningsDisabled) {
+			return;
+		}
 		const link = e.target.closest('a[data-wzlw-external], a[data-wzlw-blank], a[data-wzlw-download], a[data-wzlw-rule]');
 		if (!link || link.hasAttribute('data-wzlw-excluded')) {
 			return;
@@ -789,7 +845,7 @@
 		}
 		const isDownload = link.hasAttribute('data-wzlw-download');
 		modalTitle.textContent = isDownload ? (settings.downloadModalTitle || settings.modalTitle || '') : (settings.modalTitle || '');
-		const rule = getRule(link.getAttribute('data-wzlw-rule'));
+		const rule = getLinkRule(link);
 		modalMessage.textContent = rule && rule.message ? rule.message : (isDownload ? (settings.downloadModalMessage || settings.modalMessage || '') : (settings.modalMessage || ''));
 		modalUrl.textContent = url.href;
 		if (modalDismiss) {

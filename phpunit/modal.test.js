@@ -219,15 +219,17 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	});
 	test(`${filename}: link rules match exactly as the shared fixture expects`, () => {
 		for (const ruleCase of ruleCases) {
-			const rules = [{ id: 'r1', regex: ruleCase.regex, hostOnly: ruleCase.hostOnly, action: 'inline', message: '' }];
+			const rules = [{ id: 'r1', pattern: ruleCase.normalized, hostOnly: ruleCase.hostOnly, action: 'inline', message: '' }];
+			const start = Date.now();
 			const page = boot(script, { href: ruleCase.href }, { linkRules: rules, warningMethod: 'none' });
-			assert.equal(page.link.getAttribute('data-wzlw-rule') === 'r1', ruleCase.matches, `${ruleCase.pattern} vs ${ruleCase.href}`);
+			assert.equal(page.link.getAttribute('data-wzlw-rule') === 'r1', ruleCase.matches, `${ruleCase.pattern} vs ${ruleCase.href.slice(0, 60)}`);
+			assert.ok(Date.now() - start < 500, `matching was slow for ${ruleCase.pattern}`);
 		}
 	});
 	test(`${filename}: first matching rule wins and sets the link method`, () => {
 		const rules = [
-			{ id: 'a', regex: '^outside\\.test/first/.*$', hostOnly: false, action: 'modal', message: '' },
-			{ id: 'b', regex: '^outside\\.test$', hostOnly: true, action: 'redirect', message: '' },
+			{ id: 'a', pattern: 'outside.test/first/*', hostOnly: false, action: 'modal', message: '' },
+			{ id: 'b', pattern: 'outside.test', hostOnly: true, action: 'redirect', message: '' },
 		];
 		const page = boot(script, { href: 'https://outside.test/first/x' }, { linkRules: rules, warningMethod: 'inline' });
 		assert.equal(page.link.getAttribute('data-wzlw-rule'), 'a');
@@ -236,7 +238,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.click(), true);
 	});
 	test(`${filename}: a rule processes an internal link and shows its own message`, () => {
-		const rules = [{ id: 'go', regex: '^site\\.test/go/.*$', hostOnly: false, action: 'inline_modal', message: 'Affiliate link ahead' }];
+		const rules = [{ id: 'go', pattern: 'site.test/go/*', hostOnly: false, action: 'inline_modal', message: 'Affiliate link ahead' }];
 		const page = boot(script, { href: '/go/product/' }, { linkRules: rules, warningMethod: 'none', modalMessage: 'Global message' });
 		assert.equal(page.link.getAttribute('data-wzlw-url'), '/go/product/');
 		assert.equal(page.link.getAttribute('data-wzlw-external'), null);
@@ -245,13 +247,13 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.message.textContent, 'Affiliate link ahead');
 	});
 	test(`${filename}: a rule overrides an excluded domain`, () => {
-		const rules = [{ id: 't', regex: '^trusted\\.test$', hostOnly: true, action: 'modal', message: '' }];
+		const rules = [{ id: 't', pattern: 'trusted.test', hostOnly: true, action: 'modal', message: '' }];
 		const page = boot(script, { href: 'https://trusted.test/' }, { linkRules: rules, excludedDomains: ['trusted.test'] });
 		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
 		assert.equal(page.click(), true);
 	});
 	test(`${filename}: exclude rule skips the link unless a force class is present`, () => {
-		const rules = [{ id: 'x', regex: '^outside\\.test$', hostOnly: true, action: 'exclude', message: '' }];
+		const rules = [{ id: 'x', pattern: 'outside.test', hostOnly: true, action: 'exclude', message: '' }];
 		let page = boot(script, { href: 'https://outside.test/' }, { linkRules: rules });
 		assert.equal(page.link.classList.contains('wzlw-processed'), false);
 		assert.equal(page.click(), false);
@@ -259,15 +261,36 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
 	});
 	test(`${filename}: a PHP-processed rule link is left alone and uses its own method`, () => {
-		const rules = [{ id: 'm', regex: '^outside\\.test$', hostOnly: true, action: 'modal', message: 'Rule message' }];
+		const rules = [{ id: 'm', pattern: 'outside.test', hostOnly: true, action: 'modal', message: 'Rule message' }];
 		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-processed wzlw-external', 'data-wzlw-rule': 'm', 'data-wzlw-method': 'modal', 'data-wzlw-url': 'https://outside.test/', 'data-wzlw-external': 'true' }, { linkRules: rules, warningMethod: 'inline' });
 		assert.equal(page.link.markup, '');
 		assert.equal(page.click(), true);
 		assert.equal(page.message.textContent, 'Rule message');
 	});
-	test(`${filename}: an invalid rule regex is ignored`, () => {
-		const page = boot(script, { href: 'https://outside.test/' }, { linkRules: [{ id: 'bad', regex: '(', hostOnly: true, action: 'exclude', message: '' }] });
+	test(`${filename}: a malformed rule is ignored`, () => {
+		const page = boot(script, { href: 'https://outside.test/' }, { linkRules: [{ id: 'bad', hostOnly: true, action: 'exclude' }, null] });
 		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+	});
+	test(`${filename}: author-written rule attributes cannot change the method`, () => {
+		const page = boot(script, { href: 'https://out.test/', 'data-wzlw-method': 'inline', 'data-wzlw-rule': 'x' }, { warningMethod: 'modal' });
+		assert.equal(page.link.getAttribute('data-wzlw-method'), null);
+		assert.equal(page.link.getAttribute('data-wzlw-rule'), null);
+		assert.equal(page.click(), true);
+	});
+	test(`${filename}: a forged rule ID on a server-processed link is ignored on click`, () => {
+		const rules = [{ id: 'soft', pattern: 'other.test', hostOnly: true, action: 'inline', message: '' }];
+		const page = boot(script, { href: 'https://out.test/', class: 'wzlw-processed wzlw-external', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://out.test/', 'data-wzlw-rule': 'soft', 'data-wzlw-method': 'inline' }, { warningMethod: 'modal', linkRules: rules });
+		assert.equal(page.click(), true);
+	});
+	test(`${filename}: backslash URLs are treated as external`, () => {
+		for (const href of ['/\\evil.test/x', 'https:\\\\evil.test/y']) {
+			const page = boot(script, { href }, { excludedDomains: ['trusted.test'] });
+			assert.equal(page.link.getAttribute('data-wzlw-external'), 'true', href);
+		}
+	});
+	test(`${filename}: clicks do nothing when warnings are disabled`, () => {
+		const page = boot(script, { href: 'https://out.test/', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://out.test/' }, { warningsDisabled: true });
+		assert.equal(page.click(), false);
 	});
 	test(`${filename}: file extension in a query string is ignored`, () => {
 		const page = boot(script, { href: '/download?file=report.pdf' }, { downloadExtensions: ['pdf'] });

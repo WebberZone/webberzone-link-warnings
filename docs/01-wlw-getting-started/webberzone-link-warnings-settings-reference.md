@@ -275,7 +275,7 @@ Each rule has three fields:
 | Action | `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect`, or `exclude`. The first five are the same as the Warning Method options. `exclude` gives the link no warning. |
 | Message | Optional. Replaces the modal message, or the redirect screen message, for links that match this rule. |
 
-**Pattern syntax.** `*` matches any characters and is the only wildcard. Matching ignores case and ignores the `http://` or `https://` scheme.
+**Pattern syntax.** `*` matches any characters and is the only wildcard. Matching ignores the case of ASCII letters, the `http://` or `https://` scheme, ports and fragments.
 
 | Pattern | Matches |
 | --- | --- |

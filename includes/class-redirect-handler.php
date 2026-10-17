@@ -61,7 +61,6 @@ class Redirect_Handler {
 	public function add_query_vars( $vars ) {
 		$vars[] = 'wzlw_redirect';
 		$vars[] = 'wzlw_sig';
-		$vars[] = 'wzlw_rule';
 		return $vars;
 	}
 
@@ -78,7 +77,8 @@ class Redirect_Handler {
 		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
-		if ( ! in_array( $method, array( 'redirect', 'inline_redirect' ), true ) && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ) ) ) {
+		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
+		if ( ! $global_redirect && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ) ) ) {
 			return;
 		}
 
@@ -98,12 +98,30 @@ class Redirect_Handler {
 			exit;
 		}
 
-		// The rule only picks which configured message to show, so it is not signed.
-		$rule = Link_Rules::get_rule( sanitize_key( (string) get_query_var( 'wzlw_rule' ) ) );
+		// The rule comes from the signed destination, never from the request.
+		$rule = $this->get_redirect_rule( $destination );
+		if ( ! $global_redirect && ! $rule ) {
+			wp_safe_redirect( home_url() );
+			exit;
+		}
 
 		// Render redirect template.
 		$this->render_redirect_template( $destination, $rule ? $rule['message'] : '' );
 		exit;
+	}
+
+	/**
+	 * Get the redirect rule that matches a destination.
+	 *
+	 * @since 1.7.0
+	 * @param string $destination Destination URL.
+	 * @return array|null The first matching rule if its action is a redirect, or null.
+	 */
+	protected function get_redirect_rule( $destination ) {
+		$site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
+		$rule      = Link_Rules::match( $destination, $site_host, Link_Rules::get_rules() );
+
+		return ( $rule && in_array( $rule['action'], array( 'redirect', 'inline_redirect' ), true ) ) ? $rule : null;
 	}
 
 	/**
@@ -248,10 +266,14 @@ class Redirect_Handler {
 			wp_send_json_error( 'invalid_input' );
 		}
 
+		// Without a global redirect method, only destinations that a redirect rule covers are signed.
+		$method          = wzlw_get_option( 'warning_method', 'inline_modal' );
+		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
+
 		$result = array();
 		foreach ( $raw_urls as $raw_url ) {
 			$url = esc_url_raw( (string) $raw_url );
-			if ( $url && $this->is_valid_url( $url ) ) {
+			if ( $url && $this->is_valid_url( $url ) && ( $global_redirect || $this->get_redirect_rule( $url ) ) ) {
 				$result[ $url ] = self::get_redirect_url( $url );
 			}
 		}
@@ -264,20 +286,17 @@ class Redirect_Handler {
 	 *
 	 * @since 1.0.0
 	 * @param string $destination Destination URL.
-	 * @param string $rule_id     Optional ID of the link rule whose message the redirect screen shows.
 	 * @return string Redirect URL.
 	 */
-	public static function get_redirect_url( $destination, $rule_id = '' ) {
+	public static function get_redirect_url( $destination ) {
 		$destination = esc_url_raw( $destination );
-		$args        = array(
-			'url'      => rawurlencode( $destination ),
-			'wzlw_sig' => hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ),
+
+		return add_query_arg(
+			array(
+				'url'      => rawurlencode( $destination ),
+				'wzlw_sig' => hash_hmac( 'sha256', $destination, wp_salt( 'auth' ) ),
+			),
+			home_url( 'external-redirect/' )
 		);
-
-		if ( '' !== $rule_id ) {
-			$args['wzlw_rule'] = sanitize_key( $rule_id );
-		}
-
-		return add_query_arg( $args, home_url( 'external-redirect/' ) );
 	}
 }

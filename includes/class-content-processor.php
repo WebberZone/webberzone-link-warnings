@@ -145,11 +145,12 @@ class Content_Processor {
 			// Determine if link should be processed.
 			$is_affiliate = $affiliate_depth > 0 || $this->link_has_affiliate_class( $processor );
 			$is_forced    = $is_affiliate || $force_external_depth > 0 || $this->link_has_force_external_class( $processor );
-			$rule         = Link_Rules::match( $href, $this->site_host, $rules );
+			$check_href   = Link_Rules::normalize_href( $href );
+			$rule         = Link_Rules::match( $check_href, $this->site_host, $rules );
 			$rule_method  = ( $rule && 'exclude' !== $rule['action'] ) ? $rule['action'] : '';
-			$is_excluded  = ! $is_forced && '' === $rule_method && ( null !== $rule || $this->is_excluded_domain( $href ) );
-			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $href ) );
-			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $href );
+			$is_excluded  = ! $is_forced && '' === $rule_method && ( null !== $rule || $this->is_excluded_domain( $check_href ) );
+			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $check_href ) );
+			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $check_href );
 
 			if ( $is_excluded ) {
 				$processor->set_attribute( 'data-wzlw-excluded', 'true' );
@@ -159,7 +160,7 @@ class Content_Processor {
 			} else {
 				$processor->remove_attribute( 'data-wzlw-excluded' );
 			}
-			if ( '' === $rule_method ) {
+			if ( '' === $rule_method || $warnings_disabled ) {
 				$processor->remove_attribute( 'data-wzlw-rule' );
 				$processor->remove_attribute( 'data-wzlw-method' );
 			}
@@ -211,7 +212,7 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href, ( $rule && '' !== $rule['message'] ) ? $rule['id'] : '' ) );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href ) );
 				}
 			}
 
@@ -564,11 +565,14 @@ class Content_Processor {
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
 
+		// Read the opening tag's own attributes; the link text can contain anything.
+		$tag = new \WP_HTML_Tag_Processor( $link_html );
+		$tag->next_tag( 'A' );
+		$has_target = '_blank' === $tag->get_attribute( 'target' );
+
 		// A rule can give a link its own method; only inline methods get an indicator.
-		$warning_method = $this->settings['warning_method'] ?? 'none';
-		if ( preg_match( '/^<a\s[^>]*\bdata-wzlw-method=["\']([a-z_]+)["\']/i', $link_html, $method_match ) ) {
-			$warning_method = $method_match[1];
-		}
+		$link_method    = $tag->get_attribute( 'data-wzlw-method' );
+		$warning_method = is_string( $link_method ) && '' !== $link_method ? $link_method : ( $this->settings['warning_method'] ?? 'none' );
 		if ( ! in_array( $warning_method, array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
 			return $link_html;
 		}
@@ -582,8 +586,6 @@ class Content_Processor {
 		if ( $has_indicator ) {
 			return $link_html;
 		}
-
-		$has_target = (bool) preg_match( '/\btarget\s*=\s*(?:"_blank"|\'_blank\'|_blank)/i', $link_html );
 
 		// Check if link has the no-icon class — suppress visual indicator but
 		// still add screen reader text for target="_blank" links.

@@ -272,21 +272,32 @@ namespace {
 		}
 		return $rules;
 	}
-	$tests['link rule patterns compile and match as in the shared fixture'] = static function () {
+	$tests['link rule patterns normalize and match as in the shared fixture'] = static function () {
 		$cases = json_decode( (string) file_get_contents( __DIR__ . '/fixtures/link-rules.json' ), true );
-		expect( is_array( $cases ) && count( $cases ) > 20, 'Link rule fixture is missing.' );
+		expect( is_array( $cases ) && count( $cases ) > 40, 'Link rule fixture is missing.' );
 		foreach ( $cases as $case ) {
 			$rules = Link_Rules::get_rules( array( 'link_rules' => rules( array( array( $case['pattern'], 'modal' ) ) ) ) );
 			expect( 1 === count( $rules ), 'Rule was dropped: ' . $case['pattern'] );
-			expect( $case['regex'] === $rules[0]['regex'] && $case['hostOnly'] === $rules[0]['host_only'], 'Compiled form changed for ' . $case['pattern'] . ': ' . $rules[0]['regex'] );
+			expect( $case['normalized'] === $rules[0]['pattern'] && $case['hostOnly'] === $rules[0]['host_only'], 'Normalized form changed for ' . $case['pattern'] . ': ' . $rules[0]['pattern'] );
+			$start   = microtime( true );
 			$matched = null !== Link_Rules::match( $case['href'], 'site.test', $rules );
-			expect( $case['matches'] === $matched, 'Pattern ' . $case['pattern'] . ' gave the wrong result for ' . $case['href'] . '.' );
+			expect( $case['matches'] === $matched, 'Pattern ' . $case['pattern'] . ' gave the wrong result for ' . substr( $case['href'], 0, 60 ) . '.' );
+			expect( microtime( true ) - $start < 0.5, 'Matching was slow for ' . $case['pattern'] . '.' );
 		}
 	};
 	$tests['invalid link rules are dropped'] = static function () {
 		$rules = Link_Rules::get_rules( array( 'link_rules' => rules( array( array( '', 'modal' ), array( 'example.com', 'bogus' ), array( '  ', 'exclude' ), array( 'ok.test', 'exclude' ) ) ) ) );
 		expect( 1 === count( $rules ) && 'ok.test' === $rules[0]['pattern'], 'Invalid rules were kept.' );
 		expect( array() === Link_Rules::get_rules( array( 'link_rules' => 'not an array' ) ), 'A malformed rules setting broke get_rules().' );
+
+		$filter = static function () {
+			return array( 'junk', array( 'id' => 'x', 'action' => 'modal' ), array( 'id' => array(), 'pattern' => 'a.test', 'action' => 'modal' ), array( 'id' => 'ok', 'pattern' => '/go/*', 'action' => 'modal' ) );
+		};
+		add_filter( 'wzlw_link_rules', $filter );
+		$rules = Link_Rules::get_rules( array() );
+		remove_filter( 'wzlw_link_rules', $filter );
+		expect( 1 === count( $rules ) && 'site.test/go/*' === $rules[0]['pattern'] && '' === $rules[0]['message'], 'The wzlw_link_rules filter output was not validated.' );
+		expect( null === Link_Rules::match( '/internal/', 'site.test', $rules ), 'A filtered rule matched an unrelated link.' );
 	};
 	$tests['link rules set the method per link and the first match wins'] = static function () {
 		settings(
@@ -352,24 +363,45 @@ namespace {
 		$second = process( $html );
 		expect( 1 === substr_count( $second, 'class="wzlw-icon"' ), 'A second pass duplicated the rule indicator.' );
 	};
-	$tests['rule messages are passed to the redirect screen'] = static function () {
+	$tests['the redirect screen takes its rule from the signed destination only'] = static function () {
 		settings(
 			array(
 				'warning_method' => 'inline',
-				'link_rules'     => rules( array( array( 'msg.test', 'redirect', 'Custom message' ), array( 'plain.test', 'redirect' ) ) ),
+				'link_rules'     => rules( array( array( 'msg.test', 'redirect', 'Custom message' ), array( 'modal.test', 'modal', 'Modal message' ) ) ),
 			)
 		);
-		$html = process( '<a href="https://msg.test/">msg</a><a href="https://plain.test/">plain</a>' );
-		$processor = new \WP_HTML_Tag_Processor( $html );
-		$urls      = array();
-		while ( $processor->next_tag( 'A' ) ) {
-			$urls[ $processor->get_attribute( 'href' ) ] = (string) $processor->get_attribute( 'data-wzlw-redirect-url' );
-		}
-		parse_str( (string) wp_parse_url( $urls['https://msg.test/'], PHP_URL_QUERY ), $with_message );
-		parse_str( (string) wp_parse_url( $urls['https://plain.test/'], PHP_URL_QUERY ), $without_message );
-		expect( 'rule0' === ( $with_message['wzlw_rule'] ?? '' ), 'Rule with a message did not pass its ID to the redirect screen.' );
-		expect( ! isset( $without_message['wzlw_rule'] ), 'Rule without a message passed its ID to the redirect screen.' );
-		expect( 'Custom message' === Link_Rules::get_rule( 'rule0', Link_Rules::get_rules() )['message'], 'Rule message lookup failed.' );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'get_redirect_rule' );
+		$method->setAccessible( true );
+		expect( 'Custom message' === ( $method->invoke( $handler, 'https://msg.test/page' )['message'] ?? null ), 'Redirect rule was not found for its destination.' );
+		expect( null === $method->invoke( $handler, 'https://modal.test/' ), 'A non-redirect rule enabled the redirect screen.' );
+		expect( null === $method->invoke( $handler, 'https://evil.example/phish' ), 'An unmatched destination enabled the redirect screen.' );
+
+		$html = process( '<a href="https://msg.test/">msg</a>' );
+		expect( false === strpos( $html, 'wzlw_rule' ), 'The redirect URL still carries a rule parameter.' );
+	};
+	$tests['backslash and control characters cannot hide an external link'] = static function () {
+		settings( array( 'excluded_domains' => 'trusted.test' ) );
+		$html = process( '<a href="/\\evil.test/x">a</a><a href="https:\\\\evil.test/y">b</a><a href="https://evil.test\\@trusted.test/z">c</a>' );
+		expect( 3 === substr_count( $html, 'data-wzlw-external="true"' ), 'A backslash URL was not treated as external: ' . $html );
+		expect( false === strpos( $html, 'data-wzlw-excluded' ), 'A backslash URL matched an excluded domain.' );
+	};
+	$tests['indicators read target and method from the opening tag only'] = static function () {
+		settings( array( 'warning_method' => 'inline' ) );
+		$html = process( '<a href="https://outside.test/?target=_blank">same tab</a><a href="https://outside.test/b">set target=_blank here</a>' );
+		expect( false === strpos( $html, 'screen-reader-text' ), 'Text resembling target=_blank added new-window screen reader text.' );
+		$html = process( '<a data-x-data-wzlw-method="modal" href="https://outside.test/c">c</a>' );
+		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'A look-alike attribute changed the link method.' );
+	};
+	$tests['author-written rule attributes are removed'] = static function () {
+		settings( array( 'warning_method' => 'modal' ) );
+		$attrs = link_attributes( process( '<a data-wzlw-method="inline" data-wzlw-rule="x" href="https://outside.test/">go</a>' ), 'https://outside.test/' );
+		expect( null === $attrs['data-wzlw-method'] && null === $attrs['data-wzlw-rule'] && 'true' === $attrs['data-wzlw-external'], 'Author-written rule attributes survived.' );
+
+		settings( array( 'disable_for' => 'logged_in', 'link_rules' => rules( array( array( 'outside.test', 'modal' ) ) ) ) );
+		$GLOBALS['wzlw_test_roles'] = array( 'subscriber' );
+		$attrs = link_attributes( process( '<a data-wzlw-method="modal" data-wzlw-rule="rule0" href="https://outside.test/">go</a>' ), 'https://outside.test/' );
+		expect( null === $attrs['data-wzlw-method'] && null === $attrs['data-wzlw-rule'], 'Rule attributes survived for a user with warnings disabled.' );
 	};
 	$tests['download indicators use a distinct icon class'] = static function () {
 		settings();

@@ -161,22 +161,18 @@ add_filter( 'wzlw_is_disabled_for_current_user', function ( bool $disabled ): bo
 
 ### `wzlw_link_rules`
 
-Filters the Link Rules after they are read from the settings. Rules are checked in order and the first match wins. Build new rules with `Link_Rules::compile()` so the regular expression stays valid in both PHP and JavaScript.
+Filters the Link Rules before they are validated. Rules are checked in order and the first match wins. Patterns use the same syntax as the Rules tab. Rules with a missing or invalid pattern, action or ID are dropped.
 
 ```php
-use WebberZone\Link_Warnings\Link_Rules;
-
 add_filter( 'wzlw_link_rules', function ( array $rules ): array {
     // Always show the modal for links to partner.example, ahead of the saved rules.
     array_unshift(
         $rules,
         array(
-            'id'        => 'partner',
-            'pattern'   => 'partner.example',
-            'action'    => 'modal',
-            'message'   => 'You are leaving for our partner site.',
-            'regex'     => Link_Rules::compile( 'partner.example' ),
-            'host_only' => true,
+            'id'      => 'partner',
+            'pattern' => 'partner.example',
+            'action'  => 'modal',
+            'message' => 'You are leaving for our partner site.',
         )
     );
     return $rules;
@@ -185,6 +181,5 @@ add_filter( 'wzlw_link_rules', function ( array $rules ): array {
 
 **Parameters:**
 
-- `$rules` *(array[])* — Rules, each with `id`, `pattern`, `action`, `message`, `regex` and `host_only` keys.
+- `$rules` *(array[])* — Rules, each with `id`, `pattern`, `action` and optional `message` keys. `action` is one of `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect` or `exclude`.
 - `$settings` *(array)* — The plugin settings.
-

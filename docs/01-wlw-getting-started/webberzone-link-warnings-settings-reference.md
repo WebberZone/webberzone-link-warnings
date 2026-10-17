@@ -11,7 +11,7 @@ toc: true
 
 [toc]
 
-This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings > Link Warnings**. The settings page is organized into three tabs: General, Display, and Advanced.
+This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings > Link Warnings**. The settings page is organized into four tabs: General, Display, Rules, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
@@ -82,6 +82,17 @@ Processes the rendered output of block-theme template parts. This covers links i
 
 **Default:** enabled
 **Setting key:** `process_template_parts`
+
+### Disable Warnings For
+
+Hides warnings from logged-in users, for example while you edit your own site. Tick **All logged-in users**, or tick individual roles. Visitors who are not logged in always see warnings.
+
+For the users you select, the plugin adds no indicators, data attributes or modal markup. The configured Link Attributes are still added, so the link markup matches what visitors get.
+
+Most page caches skip logged-in users. If yours caches pages for logged-in users, it may serve a cached page with or without warnings to the wrong users.
+
+**Default:** none selected
+**Setting key:** `disable_for` (values: `logged_in`, or `role:` followed by the role slug, such as `role:administrator`)
 
 ## Display tab
 
@@ -250,6 +261,42 @@ The number of seconds before the page automatically redirects to the external UR
 **Range:** 0–60
 **Setting key:** `redirect_countdown`
 
+## Rules tab
+
+### Link Rules
+
+An ordered list of rules that give links matching a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs.
+
+Each rule has three fields:
+
+| Field | Description |
+| --- | --- |
+| URL Pattern | The pattern to match. See below. |
+| Action | `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect`, or `exclude`. The first five are the same as the Warning Method options. `exclude` gives the link no warning. |
+| Message | Optional. Replaces the modal message, or the redirect screen message, for links that match this rule. |
+
+**Pattern syntax.** `*` matches any characters and is the only wildcard. Matching ignores case and ignores the `http://` or `https://` scheme.
+
+| Pattern | Matches |
+| --- | --- |
+| `example.com` | Every link to `example.com`, whatever the path. Not its subdomains. |
+| `*.example.com` | Every link to a subdomain of `example.com`. Not `example.com` itself. |
+| `example.com/go/*` | Links to `example.com` whose path starts with `/go/`. |
+| `amazon.*/dp/*` | Product links on any `amazon.` domain, such as `amazon.com` or `amazon.co.uk`. |
+| `/go/*` | Links on your own site whose path starts with `/go/`, such as cloaked affiliate links. |
+
+A pattern without a slash matches the domain only. A pattern with a slash matches the domain and the path, including any query string, so it must match to the end: use a trailing `*` to match everything below a path. Relative links that do not start with a slash, such as `page/`, are not matched.
+
+**How rules combine with other settings:**
+
+* A rule with a warning action applies to the link even if it is internal, outside the Inline Indicator Scope, or on the Excluded Domains list.
+* An `exclude` rule behaves like an Excluded Domains entry. The Affiliate Link and Force External classes still override it.
+* The Suppress Icon class and wrapper class still hide the icon on a matching link.
+* The modal markup and the redirect screen are enabled when any rule uses them, even if the Warning Method does not.
+
+**Default:** no rules
+**Setting key:** `link_rules`
+
 ## Advanced tab
 
 ### Download Links
@@ -260,6 +307,18 @@ A comma-separated list of file extensions whose links should receive a download 
 
 **Default:** `pdf, zip, doc, docx, xls, xlsx, exe, dmg`
 **Setting key:** `download_extensions`
+
+#### Download Warning Scope
+
+Chooses which download links get a download warning.
+
+| Value | Label | Behavior |
+| --- | --- | --- |
+| `all` | All download links | Every link to a configured file extension, whatever the host. |
+| `external` | Download links to external sites only | Skips files on your own site, including root-relative links such as `/wp-content/uploads/file.pdf`. Links with the Force External or Affiliate Link class still count as external. |
+
+**Default:** `all`
+**Setting key:** `download_scope`
 
 ### Link Attributes
 

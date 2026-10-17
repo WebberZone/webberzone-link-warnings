@@ -114,6 +114,18 @@ wzlw_settings_reset();
 
 **Returns:** `bool`
 
+### `wzlw_is_disabled_for_current_user()`
+
+Returns whether warnings are hidden from the current user under the **Disable Warnings For** setting. Link attributes are still applied for these users.
+
+```php
+if ( ! wzlw_is_disabled_for_current_user() ) {
+    // Output something that only makes sense alongside the warnings.
+}
+```
+
+**Returns:** `bool`
+
 ## Filter hooks
 
 ### `wzlw_get_settings`
@@ -131,3 +143,48 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 **Parameters:**
 
 - `$settings` *(array)* — The merged settings array.
+
+### `wzlw_is_disabled_for_current_user`
+
+Filters whether warnings are hidden from the current user.
+
+```php
+add_filter( 'wzlw_is_disabled_for_current_user', function ( bool $disabled ): bool {
+    // Hide warnings from users who can edit posts.
+    return $disabled || current_user_can( 'edit_posts' );
+} );
+```
+
+**Parameters:**
+
+- `$disabled` *(bool)* — True if warnings are disabled for the current user.
+
+### `wzlw_link_rules`
+
+Filters the Link Rules after they are read from the settings. Rules are checked in order and the first match wins. Build new rules with `Link_Rules::compile()` so the regular expression stays valid in both PHP and JavaScript.
+
+```php
+use WebberZone\Link_Warnings\Link_Rules;
+
+add_filter( 'wzlw_link_rules', function ( array $rules ): array {
+    // Always show the modal for links to partner.example, ahead of the saved rules.
+    array_unshift(
+        $rules,
+        array(
+            'id'        => 'partner',
+            'pattern'   => 'partner.example',
+            'action'    => 'modal',
+            'message'   => 'You are leaving for our partner site.',
+            'regex'     => Link_Rules::compile( 'partner.example' ),
+            'host_only' => true,
+        )
+    );
+    return $rules;
+} );
+```
+
+**Parameters:**
+
+- `$rules` *(array[])* — Rules, each with `id`, `pattern`, `action`, `message`, `regex` and `host_only` keys.
+- `$settings` *(array)* — The plugin settings.
+

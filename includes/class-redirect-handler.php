@@ -78,7 +78,8 @@ class Redirect_Handler {
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline';
 
 		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
-		if ( ! $global_redirect && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ) ) ) {
+		$rules           = Link_Rules::get_rules( $settings );
+		if ( ! $global_redirect && ! Link_Rules::uses_action( array( 'redirect', 'inline_redirect' ), $rules ) ) {
 			return;
 		}
 
@@ -99,7 +100,7 @@ class Redirect_Handler {
 		}
 
 		// The rule comes from the signed destination, never from the request.
-		$rule = $this->get_redirect_rule( $destination );
+		$rule = $this->get_redirect_rule( $destination, $rules );
 		if ( ! $global_redirect && ! $rule ) {
 			wp_safe_redirect( home_url() );
 			exit;
@@ -114,12 +115,12 @@ class Redirect_Handler {
 	 * Get the redirect rule that matches a destination.
 	 *
 	 * @since 1.7.0
-	 * @param string $destination Destination URL.
+	 * @param string       $destination Destination URL.
+	 * @param array[]|null $rules       Rules from Link_Rules::get_rules(). Defaults to the saved rules.
 	 * @return array|null The first matching rule if its action is a redirect, or null.
 	 */
-	protected function get_redirect_rule( $destination ) {
-		$site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
-		$rule      = Link_Rules::match( $destination, $site_host, Link_Rules::get_rules() );
+	protected function get_redirect_rule( $destination, $rules = null ) {
+		$rule = Link_Rules::match( $destination, Link_Rules::site_host(), null === $rules ? Link_Rules::get_rules() : $rules );
 
 		return ( $rule && in_array( $rule['action'], array( 'redirect', 'inline_redirect' ), true ) ) ? $rule : null;
 	}
@@ -269,11 +270,12 @@ class Redirect_Handler {
 		// Without a global redirect method, only destinations that a redirect rule covers are signed.
 		$method          = wzlw_get_option( 'warning_method', 'inline_modal' );
 		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
+		$rules           = $global_redirect ? array() : Link_Rules::get_rules();
 
 		$result = array();
 		foreach ( $raw_urls as $raw_url ) {
 			$url = esc_url_raw( (string) $raw_url );
-			if ( $url && $this->is_valid_url( $url ) && ( $global_redirect || $this->get_redirect_rule( $url ) ) ) {
+			if ( $url && $this->is_valid_url( $url ) && ( $global_redirect || $this->get_redirect_rule( $url, $rules ) ) ) {
 				$result[ $url ] = self::get_redirect_url( $url );
 			}
 		}

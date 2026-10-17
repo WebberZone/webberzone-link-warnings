@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-17T14:59:07+00:00\n"
+"POT-Creation-Date: 2026-10-17T15:54:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webberzone-link-warnings\n"
@@ -364,7 +364,7 @@ msgid "Disable Warnings For"
 msgstr ""
 
 #: includes/admin/class-settings.php:424
-msgid "Hide warnings from these logged-in users, for example while you edit your own site. Link attributes are still added. Visitors who are not logged in always see warnings."
+msgid "Hide warnings from these logged-in users, for example while you edit your own site. Link attributes and the hidden screen reader text on links that open in a new tab are still added. Visitors who are not logged in always see warnings."
 msgstr ""
 
 #: includes/admin/class-settings.php:443
@@ -440,7 +440,7 @@ msgid "Text displayed next to links (when text indicator is enabled)."
 msgstr ""
 
 #: includes/admin/class-settings.php:518
-#: includes/class-content-processor.php:741
+#: includes/class-content-processor.php:772
 #: includes/class-frontend-handler.php:130
 msgid "(opens in new window)"
 msgstr ""
@@ -454,8 +454,8 @@ msgid "Hidden text for screen readers."
 msgstr ""
 
 #: includes/admin/class-settings.php:525
-#: includes/class-content-processor.php:755
-#: includes/class-content-processor.php:767
+#: includes/class-content-processor.php:786
+#: includes/class-content-processor.php:798
 #: includes/class-frontend-handler.php:131
 msgid "Opens in a new window"
 msgstr ""
@@ -606,7 +606,7 @@ msgid "Message shown on the redirect page."
 msgstr ""
 
 #: includes/admin/class-settings.php:630
-#: includes/class-redirect-handler.php:177
+#: includes/class-redirect-handler.php:196
 msgid "You are being redirected to an external site."
 msgstr ""
 

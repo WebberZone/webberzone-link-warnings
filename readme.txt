@@ -244,7 +244,7 @@ Go to Settings > WebberZone Link Warnings > Advanced > Download Links and set __
 
 = Can I hide the warnings while I am logged in? =
 
-Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings, and link attributes such as `nofollow` are still added for everyone.
+Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings. Link attributes such as `nofollow`, and the hidden screen reader text on links that open in a new tab, are still added for everyone.
 
 = Does this modify my database content? =
 
@@ -273,7 +273,7 @@ Release date: 3 November 2026
 
 * Rules tab for giving links that match a URL pattern their own warning method and message, or excluding them. `*` is the wildcard, and `/go/*` matches links on your own site.
 * Download Warning Scope setting under Advanced > Download Links to skip download warnings for files hosted on your own site.
-* Disable Warnings For setting under General to hide warnings from logged-in users or selected roles. Link attributes are still added.
+* Disable Warnings For setting under General to hide warnings from logged-in users or selected roles. Link attributes and screen reader text are still added.
 * `wzlw_link_rules` and `wzlw_is_disabled_for_current_user` filters, and the `wzlw_is_disabled_for_current_user()` function.
 
 **Fixed**

@@ -87,7 +87,7 @@ Processes the rendered output of block-theme template parts. This covers links i
 
 Hides warnings from logged-in users, for example while you edit your own site. Tick **All logged-in users**, or tick individual roles. Visitors who are not logged in always see warnings.
 
-For the users you select, the plugin adds no indicators, data attributes or modal markup. The configured Link Attributes are still added, so the link markup matches what visitors get.
+For the users you select, the plugin adds no visible indicators, data attributes or modal markup, and link rules do not apply. The configured Link Attributes are still added, and links that open in a new tab keep their hidden screen reader text, so screen reader users with an account are still told when a new tab opens.
 
 Most page caches skip logged-in users. If yours caches pages for logged-in users, it may serve a cached page with or without warnings to the wrong users.
 

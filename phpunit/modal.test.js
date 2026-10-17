@@ -42,7 +42,7 @@ function element(attributes = {}, innerMarkup = '') {
 	};
 }
 
-function boot(script, attributes, overrides = {}, innerMarkup = '') {
+function boot(script, attributes, overrides = {}, innerMarkup = '', windowExtras = {}) {
 	const link = element(attributes, innerMarkup);
 	const modal = element({ hidden: '' });
 	const title = element();
@@ -74,7 +74,7 @@ function boot(script, attributes, overrides = {}, innerMarkup = '') {
 	};
 	const context = {
 		document,
-		window: { location, open: (...args) => opened.push(args) },
+		window: { location, open: (...args) => opened.push(args), ...windowExtras },
 		wzlwSettings: {
 			siteHost: 'site.test',
 			warningMethod: 'inline_modal',
@@ -97,6 +97,7 @@ function boot(script, attributes, overrides = {}, innerMarkup = '') {
 		title,
 		message,
 		displayUrl,
+		dismiss,
 		location,
 		opened,
 		click() {
@@ -287,6 +288,47 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 			const page = boot(script, { href }, { excludedDomains: ['trusted.test'] });
 			assert.equal(page.link.getAttribute('data-wzlw-external'), 'true', href);
 		}
+	});
+	test(`${filename}: force class beats an exclude rule for downloads too`, () => {
+		const rules = [{ id: 'x', pattern: 'partner.test', hostOnly: true, action: 'exclude', message: '' }];
+		const page = boot(script, { href: 'https://partner.test/file.pdf', class: 'wzlw-affiliate' }, { linkRules: rules, downloadExtensions: ['pdf'] });
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+		assert.equal(page.link.getAttribute('data-wzlw-download'), 'true');
+	});
+	test(`${filename}: users with warnings disabled keep new-tab screen reader text`, () => {
+		const page = boot(script, { href: 'https://out.test/', target: '_blank' }, { warningsDisabled: true, screenReaderText: 'Opens in a new window', noIconClass: ['wzlw-no-icon'] });
+		assert.equal(page.link.markup, '<span class="screen-reader-text">Opens in a new window</span>');
+		assert.equal(page.link.getAttribute('data-wzlw-url'), null);
+		assert.equal(page.click(), false);
+	});
+	test(`${filename}: target=_BLANK is matched case-insensitively`, () => {
+		const page = boot(script, { href: 'https://out.test/', target: '_BLANK', 'aria-label': 'Docs' }, { screenReaderText: 'Opens in a new window' });
+		assert.equal(page.link.getAttribute('aria-label'), 'Docs, Opens in a new window');
+		assert.match(page.link.markup, /screen-reader-text/);
+	});
+	test(`${filename}: backslash links send the normalized URL for signing`, () => {
+		const page = boot(script, { href: 'https://example.com\\go\\deal' }, { warningMethod: 'redirect' });
+		assert.equal(page.link.getAttribute('data-wzlw-url'), 'https://example.com/go/deal');
+	});
+	test(`${filename}: a data-wzlw-rule attribute alone does not trigger a warning`, () => {
+		const page = boot(script, { href: '/about/' }, { warningMethod: 'modal' });
+		page.link.setAttribute('data-wzlw-rule', 'x');
+		assert.equal(page.click(), false);
+	});
+	test(`${filename}: dismissing one modal does not hide a rule's own modal`, () => {
+		const store = new Map();
+		const sessionStorage = { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)) };
+		const rules = [{ id: 'aff', pattern: 'site.test/go/*', hostOnly: false, action: 'modal', message: 'Disclosure' }];
+		const options = { modalFrequency: 'session', linkRules: rules, scope: 'both' };
+		let page = boot(script, { href: '/blank/', target: '_blank' }, options, '', { sessionStorage });
+		assert.equal(page.click(), true);
+		page.dismiss.checked = true;
+		page.continue();
+		page = boot(script, { href: '/blank/', target: '_blank' }, options, '', { sessionStorage });
+		assert.equal(page.click(), false, 'the dismissed modal came back');
+		page = boot(script, { href: '/go/deal/' }, options, '', { sessionStorage });
+		assert.equal(page.click(), true, 'the rule modal was hidden by an unrelated dismissal');
+		assert.equal(page.message.textContent, 'Disclosure');
 	});
 	test(`${filename}: clicks do nothing when warnings are disabled`, () => {
 		const page = boot(script, { href: 'https://out.test/', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://out.test/' }, { warningsDisabled: true });

@@ -89,7 +89,7 @@ class Link_Rules {
 	 * @return array[] Valid rules.
 	 */
 	private static function validate( array $rules ) {
-		$site_host = self::ascii_lower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
+		$site_host = self::site_host();
 		$valid     = array();
 
 		foreach ( $rules as $rule ) {
@@ -115,6 +115,16 @@ class Link_Rules {
 		}
 
 		return $valid;
+	}
+
+	/**
+	 * Get the site hostname, lowercased in ASCII only.
+	 *
+	 * @since 1.7.0
+	 * @return string Site hostname.
+	 */
+	public static function site_host() {
+		return self::ascii_lower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
 	}
 
 	/**

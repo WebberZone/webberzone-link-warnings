@@ -298,7 +298,7 @@ Go to Settings > WebberZone Link Warnings > Advanced > Download Links and set __
 
 ### Can I hide the warnings while I am logged in?
 
-Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings, and link attributes such as `nofollow` are still added for everyone.
+Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings. Link attributes such as `nofollow`, and the hidden screen reader text on links that open in a new tab, are still added for everyone.
 
 ### Does this modify my database content?
 

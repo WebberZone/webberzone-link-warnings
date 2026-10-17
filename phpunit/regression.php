@@ -393,6 +393,32 @@ namespace {
 		$html = process( '<a data-x-data-wzlw-method="modal" href="https://outside.test/c">c</a>' );
 		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'A look-alike attribute changed the link method.' );
 	};
+	$tests['users with warnings disabled keep new-tab screen reader text'] = static function () {
+		settings( array( 'disable_for' => 'logged_in', 'link_rules' => rules( array( array( 'rule.test', 'modal' ) ) ) ) );
+		$GLOBALS['wzlw_test_roles'] = array( 'subscriber' );
+		$html = process( '<a href="https://outside.test/new" target="_blank">new</a><a href="https://outside.test/same">same</a><a href="https://rule.test/" target="_blank">rule</a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'New-tab links lost their screen reader text for a user with warnings disabled: ' . $html );
+		expect( false === strpos( $html, 'wzlw-icon' ) && false === strpos( $html, 'data-wzlw-url' ) && false === strpos( $html, 'data-wzlw-method' ), 'A user with warnings disabled still got warnings.' );
+	};
+	$tests['target=_blank is matched case-insensitively'] = static function () {
+		settings();
+		$html = process( '<a class="wzlw-no-icon" target="_BLANK" href="https://outside.test/a">a</a><a target="_Blank" aria-label="Docs" href="https://outside.test/b">b</a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'An uppercase _BLANK target lost its screen reader text.' );
+		expect( 'Docs, Opens in a new window' === link_attributes( $html, 'https://outside.test/b' )['aria-label'], 'An uppercase _BLANK target lost its ARIA suffix.' );
+	};
+	$tests['backslash links are signed in the form the redirect endpoint matches'] = static function () {
+		settings( array( 'warning_method' => 'modal', 'link_rules' => rules( array( array( 'example.com/go/*', 'redirect' ) ) ) ) );
+		$html      = process( '<a href="https://example.com\\go\\deal">deal</a>' );
+		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'A' );
+		parse_str( (string) wp_parse_url( (string) $processor->get_attribute( 'data-wzlw-redirect-url' ), PHP_URL_QUERY ), $query );
+		$destination = rawurldecode( $query['url'] ?? '' );
+		expect( 'https://example.com/go/deal' === $destination, 'The signed destination was not normalized: ' . $destination );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'get_redirect_rule' );
+		$method->setAccessible( true );
+		expect( null !== $method->invoke( $handler, $destination ), 'The redirect endpoint did not match the signed destination.' );
+	};
 	$tests['author-written rule attributes are removed'] = static function () {
 		settings( array( 'warning_method' => 'modal' ) );
 		$attrs = link_attributes( process( '<a data-wzlw-method="inline" data-wzlw-rule="x" href="https://outside.test/">go</a>' ), 'https://outside.test/' );

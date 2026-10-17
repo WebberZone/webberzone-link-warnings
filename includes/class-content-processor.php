@@ -42,6 +42,14 @@ class Content_Processor {
 	private $site_host;
 
 	/**
+	 * Warning method that overrides every link's own while indicators are added.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	private $method_override = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -152,6 +160,11 @@ class Content_Processor {
 			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $check_href ) );
 			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $check_href );
 
+			// Users with warnings disabled keep the link classification but get no rule method.
+			if ( $warnings_disabled ) {
+				$rule_method = '';
+			}
+
 			if ( $is_excluded ) {
 				$processor->set_attribute( 'data-wzlw-excluded', 'true' );
 				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-rule', 'data-wzlw-method' ) as $attribute ) {
@@ -160,15 +173,12 @@ class Content_Processor {
 			} else {
 				$processor->remove_attribute( 'data-wzlw-excluded' );
 			}
-			if ( '' === $rule_method || $warnings_disabled ) {
+			if ( '' === $rule_method ) {
 				$processor->remove_attribute( 'data-wzlw-rule' );
 				$processor->remove_attribute( 'data-wzlw-method' );
 			}
 			$this->apply_link_attributes( $processor, $is_external, $is_affiliate );
-			if ( $warnings_disabled ) {
-				continue;
-			}
-			$has_target     = '_blank' === $processor->get_attribute( 'target' );
+			$has_target     = $this->is_new_tab_target( $processor->get_attribute( 'target' ) );
 			$should_process = '' !== $rule_method || $this->should_process_link( $is_external, $has_target, $is_download );
 
 			// Inside a skip wrapper, target="_blank" links still need ARIA for accessibility
@@ -192,8 +202,9 @@ class Content_Processor {
 				continue;
 			}
 
-			// A matching rule sets this link's own warning method.
-			$warning_method = $this->settings['warning_method'] ?? 'none';
+			// A matching rule sets this link's own warning method. Users with warnings
+			// disabled get none: only the screen reader text for new-tab links remains.
+			$warning_method = $warnings_disabled ? 'none' : ( $this->settings['warning_method'] ?? 'none' );
 			if ( '' !== $rule_method ) {
 				$warning_method = $rule_method;
 				$processor->set_attribute( 'data-wzlw-rule', $rule['id'] );
@@ -202,7 +213,7 @@ class Content_Processor {
 
 			// Add data attributes for JavaScript handling.
 			if ( in_array( $warning_method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
-				$processor->set_attribute( 'data-wzlw-url', $href );
+				$processor->set_attribute( 'data-wzlw-url', $check_href );
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wzlw-external', 'true' );
 				} elseif ( $has_target ) {
@@ -212,7 +223,7 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href ) );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $check_href ) );
 				}
 			}
 
@@ -232,7 +243,7 @@ class Content_Processor {
 			if ( $is_download ) {
 				$new_classes[] = 'wzlw-download';
 			}
-			if ( $skip_depth > 0 ) {
+			if ( $skip_depth > 0 || $warnings_disabled ) {
 				$new_classes = array_merge( $new_classes, $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' ) );
 			}
 			$processor->set_attribute( 'class', $this->merge_classes( $processor->get_attribute( 'class' ), $new_classes ) );
@@ -241,9 +252,13 @@ class Content_Processor {
 		$processed_content = $processor->get_updated_html();
 
 		// Add visual indicators if the global method or any rule uses an inline method.
+		// For users with warnings disabled, every processed link carries the no-icon class,
+		// so an inline pass adds only the screen reader text for new-tab links.
 		$inline_methods = array( 'inline', 'inline_modal', 'inline_redirect' );
-		if ( ! $warnings_disabled && ( in_array( $this->settings['warning_method'] ?? 'none', $inline_methods, true ) || Link_Rules::uses_action( $inline_methods, $rules ) ) ) {
-			$processed_content = $this->add_visual_indicators( $processed_content );
+		if ( $warnings_disabled || in_array( $this->settings['warning_method'] ?? 'none', $inline_methods, true ) || Link_Rules::uses_action( $inline_methods, $rules ) ) {
+			$this->method_override = $warnings_disabled ? 'inline' : '';
+			$processed_content     = $this->add_visual_indicators( $processed_content );
+			$this->method_override = '';
 		}
 
 		return $processed_content;
@@ -568,11 +583,14 @@ class Content_Processor {
 		// Read the opening tag's own attributes; the link text can contain anything.
 		$tag = new \WP_HTML_Tag_Processor( $link_html );
 		$tag->next_tag( 'A' );
-		$has_target = '_blank' === $tag->get_attribute( 'target' );
+		$has_target = $this->is_new_tab_target( $tag->get_attribute( 'target' ) );
 
 		// A rule can give a link its own method; only inline methods get an indicator.
 		$link_method    = $tag->get_attribute( 'data-wzlw-method' );
 		$warning_method = is_string( $link_method ) && '' !== $link_method ? $link_method : ( $this->settings['warning_method'] ?? 'none' );
+		if ( '' !== $this->method_override ) {
+			$warning_method = $this->method_override;
+		}
 		if ( ! in_array( $warning_method, array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
 			return $link_html;
 		}
@@ -618,6 +636,17 @@ class Content_Processor {
 		$link_html = str_ireplace( '</a>', $indicator . '</a>', $link_html );
 
 		return $link_html;
+	}
+
+	/**
+	 * Check whether a target attribute opens a new tab. HTML matches `_blank` case-insensitively.
+	 *
+	 * @since 1.7.0
+	 * @param mixed $target Target attribute value.
+	 * @return bool True if the link opens in a new tab.
+	 */
+	private function is_new_tab_target( $target ) {
+		return is_string( $target ) && '_blank' === strtolower( $target );
 	}
 
 	/**
@@ -668,7 +697,7 @@ class Content_Processor {
 			}
 		}
 
-		if ( '_blank' === $processor->get_attribute( 'target' ) ) {
+		if ( $this->is_new_tab_target( $processor->get_attribute( 'target' ) ) ) {
 			foreach ( array( 'noopener', 'noreferrer' ) as $rel ) {
 				if ( in_array( $rel, $attributes, true ) ) {
 					$rel_values[] = $rel;

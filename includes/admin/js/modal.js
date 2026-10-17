@@ -20,6 +20,7 @@
 	let modalCancel = null;
 	let modalDismiss = null;
 	let currentLink = null;
+	let currentRule = null;
 	let focusableElements = [];
 	let firstFocusable = null;
 	let lastFocusable = null;
@@ -97,12 +98,9 @@
 			const isForced = !!(isAffiliate || inForceExtWrapper || hasForceExtClass);
 			const checkHref = normalizeRuleHref(href);
 			const rule = matchRule(checkHref);
+			const warningsDisabled = !!settings.warningsDisabled;
 			const ruleMethod = rule && 'exclude' !== rule.action ? rule.action : '';
-			if (!ruleMethod || settings.warningsDisabled) {
-				link.removeAttribute('data-wzlw-rule');
-				link.removeAttribute('data-wzlw-method');
-			}
-			let isExcluded = !ruleMethod && (!!rule || isExcludedHref(checkHref));
+			let isExcluded = !isForced && !ruleMethod && (!!rule || isExcludedHref(checkHref));
 			if (link.hasAttribute('data-wzlw-excluded')) {
 				if (!isForced) {
 					return;
@@ -114,12 +112,15 @@
 			const isExternal = isForced || (!isExcluded && isExternalHref(checkHref, !!ruleMethod));
 			const isDownload = !isExcluded && (isExternal || 'external' !== settings.downloadScope) && isDownloadHref(checkHref);
 			applyLinkAttributes(link, isExternal, isAffiliate);
-			if (settings.warningsDisabled) {
-				return;
+			// Users with warnings disabled keep the link classification but get no rule method.
+			const linkRuleMethod = warningsDisabled ? '' : ruleMethod;
+			if (!linkRuleMethod) {
+				link.removeAttribute('data-wzlw-rule');
+				link.removeAttribute('data-wzlw-method');
 			}
-			const hasTarget = '_blank' === link.getAttribute('target');
+			const hasTarget = opensNewTab(link);
 
-			if (!ruleMethod && !shouldProcess(isExternal, hasTarget, isDownload)) {
+			if (!linkRuleMethod && !shouldProcess(isExternal, hasTarget, isDownload)) {
 				if (inNoIconWrapper && hasTarget) {
 					appendAriaLabel(link);
 				}
@@ -133,13 +134,15 @@
 				return;
 			}
 
-			const linkMethod = ruleMethod || method;
+			// Users with warnings disabled get the inline pass with the icon suppressed,
+			// which leaves only the screen reader text for new-tab links.
+			const linkMethod = warningsDisabled ? 'inline' : (linkRuleMethod || method);
 			const isInlineMethod = ['inline', 'inline_modal', 'inline_redirect'].includes(linkMethod);
-			const needsDataAttrs = ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(linkMethod);
+			const needsDataAttrs = !warningsDisabled && ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(linkMethod);
 			const needsRedirectUrl = ['redirect', 'inline_redirect'].includes(linkMethod);
-			if (ruleMethod) {
+			if (linkRuleMethod) {
 				link.setAttribute('data-wzlw-rule', rule.id);
-				link.setAttribute('data-wzlw-method', ruleMethod);
+				link.setAttribute('data-wzlw-method', linkRuleMethod);
 			}
 
 			link.classList.add('wzlw-processed');
@@ -149,7 +152,7 @@
 			if (isDownload) {
 				link.classList.add('wzlw-download');
 			}
-			if (inNoIconWrapper && noIconClasses.length) {
+			if ((inNoIconWrapper || warningsDisabled) && noIconClasses.length) {
 				noIconClasses.forEach(function (c) { link.classList.add(c); });
 			}
 
@@ -159,7 +162,7 @@
 			}
 
 			if (needsDataAttrs) {
-				link.setAttribute('data-wzlw-url', href);
+				link.setAttribute('data-wzlw-url', checkHref);
 				if (isExternal) {
 					link.setAttribute('data-wzlw-external', 'true');
 				} else if (hasTarget) {
@@ -174,7 +177,7 @@
 			}
 
 			if (isInlineMethod) {
-				const indicator = buildIndicatorHtml(!!(inNoIconWrapper || hasNoIconClass), hasTarget, isDownload, !hasVisibleText(link));
+				const indicator = buildIndicatorHtml(!!(warningsDisabled || inNoIconWrapper || hasNoIconClass), hasTarget, isDownload, !hasVisibleText(link));
 				if (indicator) {
 					link.insertAdjacentHTML('beforeend', indicator);
 				}
@@ -232,7 +235,7 @@
 		const relValues = attributes.filter(function (attribute) {
 			return ['nofollow', 'sponsored', 'ugc'].includes(attribute);
 		});
-		if ('_blank' === link.getAttribute('target')) {
+		if (opensNewTab(link)) {
 			['noopener', 'noreferrer'].forEach(function (attribute) {
 				if (attributes.includes(attribute)) {
 					relValues.push(attribute);
@@ -248,6 +251,16 @@
 			});
 			link.setAttribute('rel', existing.join(' '));
 		}
+	}
+
+	/**
+	 * Return true if a link opens in a new tab. HTML matches _blank case-insensitively.
+	 *
+	 * @param {HTMLElement} link
+	 * @return {boolean}
+	 */
+	function opensNewTab(link) {
+		return '_blank' === (link.getAttribute('target') || '').toLowerCase();
 	}
 
 	/**
@@ -489,17 +502,6 @@
 	}
 
 	/**
-	 * Get a link's warning method: its rule's action, or the global method.
-	 *
-	 * @param {HTMLElement} link
-	 * @return {string}
-	 */
-	function getLinkMethod(link) {
-		const rule = getLinkRule(link);
-		return rule ? rule.action : method;
-	}
-
-	/**
 	 * Mirror PHP's should_process_link() logic.
 	 *
 	 * @param {boolean} isExternal
@@ -702,31 +704,37 @@
 	/**
 	 * Build the dismissal key for a URL, honouring the configured scope.
 	 *
+	 * Links that match a link rule are dismissed per rule, so dismissing one modal
+	 * never hides a rule's own message, such as an affiliate disclosure.
+	 *
 	 * @param {string} url
+	 * @param {Object|null} rule Matching link rule, if any.
 	 * @return {string} Empty string when no key can be derived.
 	 */
-	function dismissKeyFor(url) {
-		if ('global' === dismissScope) {
-			return '*';
+	function dismissKeyFor(url, rule) {
+		let key = '*';
+		if ('global' !== dismissScope) {
+			try {
+				key = new URL(url, window.location.href).hostname.toLowerCase().replace(/\.$/, '');
+			} catch (e) {
+				return '';
+			}
 		}
-		try {
-			return new URL(url, window.location.href).hostname.toLowerCase().replace(/\.$/, '');
-		} catch (e) {
-			return '';
-		}
+		return rule ? 'rule:' + rule.id + '|' + key : key;
 	}
 
 	/**
 	 * Determine whether the modal has been dismissed for a URL.
 	 *
 	 * @param {string} url
+	 * @param {Object|null} rule Matching link rule, if any.
 	 * @return {boolean}
 	 */
-	function isDismissed(url) {
+	function isDismissed(url, rule) {
 		if (!getDismissStore() || !url) {
 			return false;
 		}
-		const key = dismissKeyFor(url);
+		const key = dismissKeyFor(url, rule);
 		if (!key) {
 			return false;
 		}
@@ -747,12 +755,13 @@
 	 * Record a dismissal for a URL.
 	 *
 	 * @param {string} url
+	 * @param {Object|null} rule Matching link rule, if any.
 	 */
-	function storeDismissal(url) {
+	function storeDismissal(url, rule) {
 		if (!getDismissStore() || !url) {
 			return;
 		}
-		const key = dismissKeyFor(url);
+		const key = dismissKeyFor(url, rule);
 		if (!key) {
 			return;
 		}
@@ -805,13 +814,18 @@
 		if (!destination) {
 			return;
 		}
-		const linkMethod = getLinkMethod(link);
+		const rule = getLinkRule(link);
+		// A data-wzlw-rule attribute alone is not enough: the href must match a rule.
+		if (!rule && !['data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download'].some(function (name) { return link.hasAttribute(name); })) {
+			return;
+		}
+		const linkMethod = rule ? rule.action : method;
 
 		if ('redirect' === linkMethod || 'inline_redirect' === linkMethod) {
 			const redirectUrl = getRedirectUrl(link, destination);
 			if (redirectUrl) {
 				e.preventDefault();
-				if ('_blank' === link.getAttribute('target')) {
+				if (opensNewTab(link)) {
 					window.open(redirectUrl, '_blank', windowOpenFeatures(link));
 				} else {
 					window.location.href = redirectUrl;
@@ -822,12 +836,13 @@
 
 		if ('modal' === linkMethod || 'inline_modal' === linkMethod) {
 			// Previously dismissed: let the browser follow the link untouched.
-			if (!modal || isDismissed(destination.href)) {
+			if (!modal || isDismissed(destination.href, rule)) {
 				return;
 			}
 			e.preventDefault();
 			currentLink = link;
-			showModal(link);
+			currentRule = rule;
+			showModal(link, rule);
 		}
 	}
 
@@ -837,21 +852,21 @@
 	 * Show modal.
 	 *
 	 * @param {HTMLElement} link Link element.
+	 * @param {Object|null} rule Matching link rule, if any.
 	 */
-	function showModal(link) {
+	function showModal(link, rule) {
 		const url = parseHttpUrl(link.getAttribute('href'));
 		if (!url) {
 			return;
 		}
 		const isDownload = link.hasAttribute('data-wzlw-download');
 		modalTitle.textContent = isDownload ? (settings.downloadModalTitle || settings.modalTitle || '') : (settings.modalTitle || '');
-		const rule = getLinkRule(link);
 		modalMessage.textContent = rule && rule.message ? rule.message : (isDownload ? (settings.downloadModalMessage || settings.modalMessage || '') : (settings.modalMessage || ''));
 		modalUrl.textContent = url.href;
 		if (modalDismiss) {
 			modalDismiss.checked = false;
 		}
-		if ('_blank' === link.getAttribute('target') && settings.screenReaderText) {
+		if (opensNewTab(link) && settings.screenReaderText) {
 			modalContinue.setAttribute('aria-label', settings.continueText + ', ' + settings.screenReaderText);
 		} else {
 			modalContinue.removeAttribute('aria-label');
@@ -885,6 +900,7 @@
 			currentLink.focus();
 		}
 		currentLink = null;
+		currentRule = null;
 	}
 
 	/**
@@ -900,9 +916,9 @@
 			return;
 		}
 		if (modalDismiss && modalDismiss.checked) {
-			storeDismissal(url.href);
+			storeDismissal(url.href, currentRule);
 		}
-		if ('_blank' === currentLink.getAttribute('target')) {
+		if (opensNewTab(currentLink)) {
 			window.open(url.href, '_blank', windowOpenFeatures(currentLink));
 		} else {
 			window.location.href = url.href;

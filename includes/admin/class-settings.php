@@ -421,7 +421,7 @@ class Settings {
 			'disable_for'             => array(
 				'id'      => 'disable_for',
 				'name'    => esc_html__( 'Disable Warnings For', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Hide warnings from these logged-in users, for example while you edit your own site. Link attributes are still added. Visitors who are not logged in always see warnings.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Hide warnings from these logged-in users, for example while you edit your own site. Link attributes and the hidden screen reader text on links that open in a new tab are still added. Visitors who are not logged in always see warnings.', 'webberzone-link-warnings' ),
 				'type'    => 'multicheck',
 				'default' => $defaults['disable_for'],
 				'options' => self::get_disable_for_options(),

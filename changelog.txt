@@ -1,5 +1,61 @@
 == Changelog ==
 
+= 1.6.3 =
+
+Release date: 14 October 2026
+
+**Fixed**
+
+* Links with no visible text, such as social icons or linked images, received a visual indicator that broke fixed-size icon layouts. Screen reader text is still added.
+* The visual indicator could wrap onto a line of its own, for example inside a narrow header button.
+* Links with the no-icon class and `target="_blank"` received duplicate screen reader text when the same content passed through more than one filter.
+
+= 1.6.2 =
+
+Release date: 8 October 2026
+
+**Fixed**
+
+* Settings page and setup wizard field labels were not linked to their fields, so clicking a label did not focus the field and screen readers did not announce the label.
+* `wzlw_update_option()` and `wzlw_delete_option()` failed with a PHP error when the stored settings option was not an array.
+
+= 1.6.1 =
+
+Release date: 13 September 2026
+
+**Fixed**
+
+* Redirect screens triggered deprecated header and footer template notices on block themes and other themes without `header.php` or `footer.php`.
+
+= 1.6.0 =
+
+Release date: 6 September 2026
+Release post: https://webberzone.com/announcements/link-warnings-v1-6/
+
+**Added**
+
+* Warnings for configured downloadable file extensions, including files hosted on the current site.
+* Downloadable File Extensions, Download Modal Title, and Download Modal Message settings.
+* Distinct download indicator icon, with query strings and fragments ignored when matching file extensions.
+* Server-side processing for widgets, navigation menus, comments, and block-theme template parts, with all four sources enabled by default under General > External Content.
+
+**Changed**
+
+* Marked excluded domains in the markup so the JavaScript scan honored the same exclusions as PHP.
+* Stopped activation from writing a duplicate copy of the default settings.
+
+**Security**
+
+* Hardened modal and redirect scripts against malformed link markup and mismatched destination URLs.
+
+**Fixed**
+
+* External links without a scheme, such as `//example.com/page`, were treated as internal and received no warning.
+* Redirect destinations containing `&`, `#`, or `+` failed signature checks and sent visitors to the home page.
+* Force-external links and internal `target="_blank"` links sent visitors to the home page instead of the redirect warning screen.
+* No-icon, force-external, or affiliate wrappers containing an `<iframe>`, `<script>`, `<textarea>`, or similar element suppressed warnings on subsequent links.
+* Links with an uppercase `</A>` closing tag received no icon or screen reader text.
+
 = 1.5.1 =
 
 * Improvement: Setting defaults are now resolved from a single lightweight list instead of building every settings field, so reading an option early in the page load no longer risks a "translation loading triggered too early" notice.

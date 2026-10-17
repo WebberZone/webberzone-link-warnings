@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.6.3
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,8 @@ WebberZone Link Warnings uses a two-layer approach to process links across your 
 * __Automatic Link Attributes__: Add `nofollow`, `sponsored`, `ugc`, `noopener`, `noreferrer` and `target="_blank"` to external links, affiliate links, or both — no post edits needed
 * __Affiliate Link Marking__: Flag a link or container with a class and give affiliate links their own attributes
 * __Domain Exclusions__: Allow trusted domains to treat them as internal links
+* __Link Rules__: Give links that match a URL pattern, such as `amazon.com/dp/*` or `/go/*`, their own warning method and message, or exclude them
+* __Hide Warnings While You Edit__: Turn warnings off for logged-in users or selected roles
 * __Sitewide Coverage__: Server-side filters process widget output, navigation menus, comment text, and block-theme template parts, while the JavaScript scan covers remaining theme output
 * __Post Type Control__: PHP-side processing is scoped to configured post types; JS scanning covers the full page regardless
 * __Built to support accessibility best practices for external link behaviour in WordPress__: Adds screen reader text, ARIA attributes, and keyboard-friendly modal confirmations
@@ -81,6 +83,9 @@ __Advanced Settings:__
 * Link attributes for external and affiliate links (`nofollow`, `sponsored`, `ugc`, open in a new tab, `noopener`, `noreferrer`)
 * Affiliate link class and wrapper class (defaults: `wzlw-affiliate`, `wzlw-affiliate-wrapper`)
 * Domain exclusion list
+* Link rules by URL pattern, each with its own warning method and message
+* Download warnings for all files, or for files on external sites only
+* Warnings hidden from logged-in users or selected roles
 * Post type selection
 * Force-external class name (default: `wzlw-force-external`)
 
@@ -194,7 +199,7 @@ Add the class `wzlw-no-icon` to any link where you don't want an icon to appear.
 
 `<a href="https://example.com" class="wzlw-no-icon">Link without icon</a>`
 
-This suppresses the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added.
+This suppresses the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added to links that open in a new tab.
 
 To exclude all links inside a wrapper element (e.g. a navigation block or card), add the class `wzlw-no-icon-wrapper` to the containing element:
 
@@ -227,6 +232,20 @@ Dismissals live in the visitor's browser, in `sessionStorage` for the session op
 
 The default is "Always show the modal", which is the behaviour from earlier versions.
 
+= How do I give some links a different warning? =
+
+Go to Settings > WebberZone Link Warnings > Rules and add a rule. Each rule has a URL pattern, an action and an optional message. Rules are checked from top to bottom and the first match wins. Links that match no rule use your normal settings.
+
+`*` matches any characters. `example.com` matches every link to that domain, `*.example.com` matches its subdomains, `amazon.com/dp/*` matches product pages, and `/go/*` matches cloaked links on your own site. The action can be any warning method, or Exclude to give the link no warning.
+
+= How do I stop download warnings on files hosted on my own site? =
+
+Go to Settings > WebberZone Link Warnings > Advanced > Download Links and set __Download Warning Scope__ to "Download links to external sites only". Links to files on other sites keep their download warning.
+
+= Can I hide the warnings while I am logged in? =
+
+Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings, and link attributes such as `nofollow` are still added for everyone.
+
 = Does this modify my database content? =
 
 No. The plugin only alters rendered output. Your stored content remains unchanged.
@@ -246,61 +265,21 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
-= 1.6.3 =
+= 1.7.0 =
 
-Release date: 14 October 2026
-
-**Fixed**
-
-* Links with no visible text, such as social icons or linked images, received a visual indicator that broke fixed-size icon layouts. Screen reader text is still added.
-* The visual indicator could wrap onto a line of its own, for example inside a narrow header button.
-* Links with the no-icon class and `target="_blank"` received duplicate screen reader text when the same content passed through more than one filter.
-
-= 1.6.2 =
-
-Release date: 8 October 2026
-
-**Fixed**
-
-* Settings page and setup wizard field labels were not linked to their fields, so clicking a label did not focus the field and screen readers did not announce the label.
-* `wzlw_update_option()` and `wzlw_delete_option()` failed with a PHP error when the stored settings option was not an array.
-
-= 1.6.1 =
-
-Release date: 13 September 2026
-
-**Fixed**
-
-* Redirect screens triggered deprecated header and footer template notices on block themes and other themes without `header.php` or `footer.php`.
-
-= 1.6.0 =
-
-Release date: 6 September 2026
-Release post: https://webberzone.com/announcements/link-warnings-v1-6/
+Release date: 3 November 2026
 
 **Added**
 
-* Warnings for configured downloadable file extensions, including files hosted on the current site.
-* Downloadable File Extensions, Download Modal Title, and Download Modal Message settings.
-* Distinct download indicator icon, with query strings and fragments ignored when matching file extensions.
-* Server-side processing for widgets, navigation menus, comments, and block-theme template parts, with all four sources enabled by default under General > External Content.
-
-**Changed**
-
-* Marked excluded domains in the markup so the JavaScript scan honored the same exclusions as PHP.
-* Stopped activation from writing a duplicate copy of the default settings.
-
-**Security**
-
-* Hardened modal and redirect scripts against malformed link markup and mismatched destination URLs.
+* Rules tab for giving links that match a URL pattern their own warning method and message, or excluding them. `*` is the wildcard, and `/go/*` matches links on your own site.
+* Download Warning Scope setting under Advanced > Download Links to skip download warnings for files hosted on your own site.
+* Disable Warnings For setting under General to hide warnings from logged-in users or selected roles. Link attributes are still added.
+* `wzlw_link_rules` and `wzlw_is_disabled_for_current_user` filters, and the `wzlw_is_disabled_for_current_user()` function.
 
 **Fixed**
 
-* External links without a scheme, such as `//example.com/page`, were treated as internal and received no warning.
-* Redirect destinations containing `&`, `#`, or `+` failed signature checks and sent visitors to the home page.
-* Force-external links and internal `target="_blank"` links sent visitors to the home page instead of the redirect warning screen.
-* No-icon, force-external, or affiliate wrappers containing an `<iframe>`, `<script>`, `<textarea>`, or similar element suppressed warnings on subsequent links.
-* Links with an uppercase `</A>` closing tag received no icon or screen reader text.
+* Links that open in the same tab were announced to screen readers as opening in a new window.
+* The Inline Indicator Scope description said modal and redirect warnings applied to external links only, but the second option also applied them to internal links that open in a new tab.
 
 = Earlier versions =
 
@@ -308,5 +287,5 @@ For the changelog of earlier versions, please refer to the [releases page on Git
 
 == Upgrade Notice ==
 
-= 1.6.3 =
-Fixes visual indicators breaking icon and image links such as social buttons, and wrapping onto their own line inside narrow buttons. No action needed.
+= 1.7.0 =
+Adds URL pattern rules, an option to skip download warnings for files on your own site, and an option to hide warnings from logged-in users. Same-tab links are no longer announced as opening a new window. No action needed.

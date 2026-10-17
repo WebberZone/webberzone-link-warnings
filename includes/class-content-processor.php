@@ -50,6 +50,14 @@ class Content_Processor {
 	private $method_override = '';
 
 	/**
+	 * Whether the content being processed comes from a source the site does not control.
+	 *
+	 * @since 1.7.0
+	 * @var bool
+	 */
+	private $untrusted_source = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -223,7 +231,9 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $check_href ) );
+					// Links from untrusted sources must not become automatic open redirects.
+					$confirm_only = $this->untrusted_source && ! Redirect_Handler::allows_auto_redirect( $check_href, $rules );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $check_href, $confirm_only ) );
 				}
 			}
 
@@ -315,7 +325,12 @@ class Content_Processor {
 	 * @return string Modified comment HTML.
 	 */
 	public function process_comment_text( $comment_text ) {
-		return $this->process_external_content( $comment_text, 'process_comments' );
+		// Anyone can write a comment, and its author sees it before moderation.
+		$this->untrusted_source = true;
+		$comment_text           = $this->process_external_content( $comment_text, 'process_comments' );
+		$this->untrusted_source = false;
+
+		return $comment_text;
 	}
 
 	/**

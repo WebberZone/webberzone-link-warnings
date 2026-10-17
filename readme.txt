@@ -276,6 +276,10 @@ Release date: 3 November 2026
 * Disable Warnings For setting under General to hide warnings from logged-in users or selected roles. Link attributes and screen reader text are still added.
 * `wzlw_link_rules` and `wzlw_is_disabled_for_current_user` filters, and the `wzlw_is_disabled_for_current_user()` function.
 
+**Security**
+
+* Hardened the redirect screen so it no longer redirects automatically to destinations from comments or signing requests. Visitors now click Continue for those links.
+
 **Fixed**
 
 * Links that open in the same tab were announced to screen readers as opening in a new window.

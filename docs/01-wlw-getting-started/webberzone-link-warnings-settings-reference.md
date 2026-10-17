@@ -257,6 +257,8 @@ The message displayed on the redirect page above the destination URL.
 
 The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely — the user must click the “Continue to site” link manually.
 
+The countdown only applies to destinations the site vouches for: links in your posts, widgets, menus and template parts, destinations on your own site, and destinations covered by a redirect rule. Links in comments, and links the JavaScript scan has signed on request, show the redirect screen without a countdown, so the visitor has to click “Continue to site”. This stops anyone from using your redirect screen as an automatic redirect to a site of their choosing.
+
 **Default:** `5`
 **Range:** 0–60
 **Setting key:** `redirect_countdown`

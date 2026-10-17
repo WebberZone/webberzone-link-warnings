@@ -419,6 +419,26 @@ namespace {
 		$method->setAccessible( true );
 		expect( null !== $method->invoke( $handler, $destination ), 'The redirect endpoint did not match the signed destination.' );
 	};
+	$tests['untrusted destinations get confirm-only redirect signatures'] = static function () {
+		settings( array( 'warning_method' => 'redirect', 'link_rules' => rules( array( array( 'partner.test', 'redirect' ) ) ) ) );
+		$rules = Link_Rules::get_rules();
+		expect( Redirect_Handler::allows_auto_redirect( '/go/deal/', $rules ), 'A same-site destination was not allowed to redirect automatically.' );
+		expect( Redirect_Handler::allows_auto_redirect( 'https://partner.test/x', $rules ), 'A redirect-rule destination was not allowed to redirect automatically.' );
+		expect( ! Redirect_Handler::allows_auto_redirect( 'https://evil.example/', $rules ), 'An arbitrary destination was allowed to redirect automatically.' );
+
+		$full    = Redirect_Handler::get_redirect_url( 'https://evil.example/' );
+		$confirm = Redirect_Handler::get_redirect_url( 'https://evil.example/', true );
+		parse_str( (string) wp_parse_url( $full, PHP_URL_QUERY ), $full_query );
+		parse_str( (string) wp_parse_url( $confirm, PHP_URL_QUERY ), $confirm_query );
+		expect( '1' === ( $confirm_query['wzlw_confirm'] ?? '' ) && ! isset( $full_query['wzlw_confirm'] ), 'The confirm-only flag is missing or misplaced.' );
+		expect( $full_query['wzlw_sig'] !== $confirm_query['wzlw_sig'], 'A confirm-only signature equals the full signature, so the flag could be dropped.' );
+
+		$link    = '<a href="https://evil.example/">x</a><a href="/go/deal/">y</a>';
+		$comment = apply_filters( 'comment_text', $link, null, array() );
+		$post    = process( $link );
+		expect( 1 === substr_count( $comment, 'wzlw_confirm=1' ), 'Only the external comment link should be confirm-only: ' . $comment );
+		expect( false === strpos( $post, 'wzlw_confirm' ), 'Post content links were signed confirm-only.' );
+	};
 	$tests['author-written rule attributes are removed'] = static function () {
 		settings( array( 'warning_method' => 'modal' ) );
 		$attrs = link_attributes( process( '<a data-wzlw-method="inline" data-wzlw-rule="x" href="https://outside.test/">go</a>' ), 'https://outside.test/' );

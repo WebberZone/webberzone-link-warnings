@@ -47,6 +47,12 @@ namespace {
 	function is_admin() {
 		return ! empty( $GLOBALS['wzlw_test_is_admin'] );
 	}
+	function is_user_logged_in() {
+		return ! empty( $GLOBALS['wzlw_test_roles'] );
+	}
+	function wp_get_current_user() {
+		return (object) array( 'roles' => $GLOBALS['wzlw_test_roles'] ?? array() );
+	}
 	function is_singular() {
 		return true;
 	}
@@ -59,6 +65,7 @@ namespace {
 
 	use WebberZone\Link_Warnings\Admin\Activator;
 	use WebberZone\Link_Warnings\Content_Processor;
+	use WebberZone\Link_Warnings\Link_Rules;
 	use WebberZone\Link_Warnings\Options_API;
 	use WebberZone\Link_Warnings\Redirect_Handler;
 
@@ -109,6 +116,7 @@ namespace {
 		);
 		$GLOBALS['wzlw_test_updates']  = array();
 		$GLOBALS['wzlw_test_is_admin'] = false;
+		$GLOBALS['wzlw_test_roles']    = array();
 		$GLOBALS['wzlw_test_is_rest']  = false;
 		Options_API::flush_cache();
 	}
@@ -133,7 +141,7 @@ namespace {
 		while ( $processor->next_tag( 'A' ) ) {
 			if ( $href === $processor->get_attribute( 'href' ) ) {
 				$result = array();
-				foreach ( array( 'class', 'rel', 'aria-label', 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-excluded' ) as $name ) {
+				foreach ( array( 'class', 'rel', 'aria-label', 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-excluded', 'data-wzlw-rule', 'data-wzlw-method' ) as $name ) {
 					$result[ $name ] = $processor->get_attribute( $name );
 				}
 				return $result;
@@ -167,7 +175,7 @@ namespace {
 			parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 			$received = esc_url_raw( $query['url'] ?? '' );
 			expect( $destination === $received, 'Destination changed during request decoding.' );
-			expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature no longer matches.' );
+			expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature no longer matches.' );
 			expect( is_valid_url( $received ), 'Redirect endpoint rejects a URL it signed itself.' );
 		};
 	}
@@ -203,7 +211,306 @@ namespace {
 		settings( array( 'excluded_domains' => 'trusted.test' ) );
 		$html = process( '<a href="https://trusted.test/report.pdf">PDF</a>' );
 		$link = link_attributes( $html, 'https://trusted.test/report.pdf' );
-		expect( 'true' === $link['data-wzlw-excluded'] && null === $link['data-wzlw-download'], 'Excluded download link was processed.' );
+		expect( Content_Processor::get_exclusion_token() === $link['data-wzlw-excluded'] && null === $link['data-wzlw-download'], 'Excluded download link was processed.' );
+	};
+	$tests['download scope external skips files on the site'] = static function () {
+		settings( array( 'download_scope' => 'external' ) );
+		$html = process(
+			'<a href="/wp-content/uploads/a.pdf">root-relative</a>'
+			. '<a href="https://site.test/wp-content/uploads/b.pdf">absolute</a>'
+			. '<a href="https://outside.test/c.pdf">external</a>'
+			. '<a class="wzlw-affiliate" href="/go/d.pdf">affiliate</a>'
+			. '<a class="wzlw-force-external" href="/e.pdf">forced</a>'
+		);
+		expect( false === strpos( (string) link_attributes( $html, '/wp-content/uploads/a.pdf' )['class'], 'wzlw-processed' ), 'Root-relative file link was processed.' );
+		expect( false === strpos( (string) link_attributes( $html, 'https://site.test/wp-content/uploads/b.pdf' )['class'], 'wzlw-processed' ), 'Same-site file link was processed.' );
+		expect( 'true' === link_attributes( $html, 'https://outside.test/c.pdf' )['data-wzlw-download'], 'External file link lost its download warning.' );
+		expect( 'true' === link_attributes( $html, '/go/d.pdf' )['data-wzlw-download'], 'Affiliate file link lost its download warning.' );
+		expect( 'true' === link_attributes( $html, '/e.pdf' )['data-wzlw-download'], 'Force-external file link lost its download warning.' );
+
+		settings( array( 'download_scope' => 'all' ) );
+		$html = process( '<a href="/wp-content/uploads/a.pdf">root-relative</a>' );
+		expect( 'true' === link_attributes( $html, '/wp-content/uploads/a.pdf' )['data-wzlw-download'], 'Download scope "all" skipped a site file.' );
+	};
+	$tests['warnings can be disabled for logged-in users and roles'] = static function () {
+		$content = '<a href="https://outside.test/role/" target="_blank">go</a>';
+		$cases   = array(
+			array( 'logged_in', array(), false ),
+			array( 'logged_in', array( 'subscriber' ), true ),
+			array( 'role:administrator', array( 'subscriber' ), false ),
+			array( 'role:administrator', array( 'editor', 'administrator' ), true ),
+			array( 'role:shop manager,role:editor', array( 'shop manager' ), true ),
+			array( '', array( 'administrator' ), false ),
+		);
+		foreach ( $cases as $case ) {
+			list( $disable_for, $roles, $disabled ) = $case;
+			settings(
+				array(
+					'disable_for'              => $disable_for,
+					'link_attributes_external' => array( 'nofollow' ),
+				)
+			);
+			$GLOBALS['wzlw_test_roles'] = $roles;
+			$html                       = process( $content );
+			$attrs                      = link_attributes( $html, 'https://outside.test/role/' );
+			$label                      = '"' . $disable_for . '" with roles [' . implode( ',', $roles ) . ']';
+			expect( $disabled === ( null === $attrs['data-wzlw-external'] ), 'Wrong warning state for ' . $label . '.' );
+			expect( $disabled === ( false === strpos( $html, 'wzlw-icon' ) ), 'Wrong indicator state for ' . $label . '.' );
+			expect( 'nofollow' === $attrs['rel'], 'Link attributes were not applied for ' . $label . '.' );
+		}
+	};
+	function rules( array $rows ) {
+		$rules = array();
+		foreach ( $rows as $index => $row ) {
+			$rules[] = array(
+				'row_id' => 'rule' . $index,
+				'fields' => array(
+					'pattern' => $row[0],
+					'action'  => $row[1],
+					'message' => $row[2] ?? '',
+				),
+			);
+		}
+		return $rules;
+	}
+	$tests['link rule patterns normalize and match as in the shared fixture'] = static function () {
+		$cases = json_decode( (string) file_get_contents( __DIR__ . '/fixtures/link-rules.json' ), true );
+		expect( is_array( $cases ) && count( $cases ) > 40, 'Link rule fixture is missing.' );
+		foreach ( $cases as $case ) {
+			$rules = Link_Rules::get_rules( array( 'link_rules' => rules( array( array( $case['pattern'], 'modal' ) ) ) ) );
+			expect( 1 === count( $rules ), 'Rule was dropped: ' . $case['pattern'] );
+			expect( $case['normalized'] === $rules[0]['pattern'] && $case['hostOnly'] === $rules[0]['host_only'], 'Normalized form changed for ' . $case['pattern'] . ': ' . $rules[0]['pattern'] );
+			$start   = microtime( true );
+			$matched = null !== Link_Rules::match( $case['href'], 'site.test', $rules );
+			expect( $case['matches'] === $matched, 'Pattern ' . $case['pattern'] . ' gave the wrong result for ' . substr( $case['href'], 0, 60 ) . '.' );
+			expect( microtime( true ) - $start < 0.5, 'Matching was slow for ' . $case['pattern'] . '.' );
+		}
+	};
+	$tests['invalid link rules are dropped'] = static function () {
+		$rules = Link_Rules::get_rules( array( 'link_rules' => rules( array( array( '', 'modal' ), array( 'example.com', 'bogus' ), array( '  ', 'exclude' ), array( 'ok.test', 'exclude' ) ) ) ) );
+		expect( 1 === count( $rules ) && 'ok.test' === $rules[0]['pattern'], 'Invalid rules were kept.' );
+		expect( array() === Link_Rules::get_rules( array( 'link_rules' => 'not an array' ) ), 'A malformed rules setting broke get_rules().' );
+
+		$filter = static function () {
+			return array( 'junk', array( 'id' => 'x', 'action' => 'modal' ), array( 'id' => array(), 'pattern' => 'a.test', 'action' => 'modal' ), array( 'id' => 'ok', 'pattern' => '/go/*', 'action' => 'modal' ) );
+		};
+		add_filter( 'wzlw_link_rules', $filter );
+		$rules = Link_Rules::get_rules( array() );
+		remove_filter( 'wzlw_link_rules', $filter );
+		expect( 1 === count( $rules ) && 'site.test/go/*' === $rules[0]['pattern'] && '' === $rules[0]['message'], 'The wzlw_link_rules filter output was not validated.' );
+		expect( null === Link_Rules::match( '/internal/', 'site.test', $rules ), 'A filtered rule matched an unrelated link.' );
+	};
+	$tests['link rules set the method per link and the first match wins'] = static function () {
+		settings(
+			array(
+				'warning_method'   => 'inline',
+				'excluded_domains' => 'trusted.test',
+				'link_rules'       => rules(
+					array(
+						array( 'outside.test/first/*', 'modal', 'First rule' ),
+						array( 'outside.test', 'redirect' ),
+						array( '/go/*', 'inline_modal' ),
+						array( 'trusted.test', 'modal' ),
+						array( 'skip.test', 'exclude' ),
+					)
+				),
+			)
+		);
+		$html = process(
+			'<a href="https://outside.test/first/a">first</a>'
+			. '<a href="https://outside.test/other">second</a>'
+			. '<a href="/go/product/">cloaked</a>'
+			. '<a href="https://trusted.test/">trusted</a>'
+			. '<a href="https://skip.test/">skipped</a>'
+			. '<a class="wzlw-force-external" href="https://skip.test/forced">forced</a>'
+			. '<a href="https://plain.test/">plain</a>'
+		);
+		$first   = link_attributes( $html, 'https://outside.test/first/a' );
+		$second  = link_attributes( $html, 'https://outside.test/other' );
+		$cloaked = link_attributes( $html, '/go/product/' );
+		$trusted = link_attributes( $html, 'https://trusted.test/' );
+		$skipped = link_attributes( $html, 'https://skip.test/' );
+		$forced  = link_attributes( $html, 'https://skip.test/forced' );
+		$plain   = link_attributes( $html, 'https://plain.test/' );
+
+		expect( 'modal' === $first['data-wzlw-method'] && 'rule0' === $first['data-wzlw-rule'], 'First matching rule did not win.' );
+		expect( 'redirect' === $second['data-wzlw-method'], 'Domain rule did not apply.' );
+		expect( 'inline_modal' === $cloaked['data-wzlw-method'] && '/go/product/' === $cloaked['data-wzlw-url'], 'Root-relative rule did not process an internal link.' );
+		expect( 'modal' === $trusted['data-wzlw-method'] && null === $trusted['data-wzlw-excluded'], 'A rule did not override the excluded domains list.' );
+		expect( 'true' === $trusted['data-wzlw-external'], 'A rule-matched excluded domain was not treated as external.' );
+		expect( Content_Processor::get_exclusion_token() === $skipped['data-wzlw-excluded'] && null === $skipped['data-wzlw-url'], 'Exclude rule did not exclude the link.' );
+		expect( null === $forced['data-wzlw-excluded'], 'Force-external class did not override an exclude rule.' );
+		expect( null === $plain['data-wzlw-method'] && null === $plain['data-wzlw-url'], 'An unmatched link did not use the global inline method.' );
+
+		$markup = static function ( $href ) use ( $html ) {
+			preg_match( '#<a[^>]*href="' . preg_quote( $href, '#' ) . '"[^>]*>.*?</a>#s', $html, $match );
+			return $match[0] ?? '';
+		};
+		expect( false === strpos( $markup( 'https://outside.test/first/a' ), 'wzlw-icon' ), 'A modal-only rule link got an inline icon.' );
+		expect( false !== strpos( $markup( '/go/product/' ), 'wzlw-icon' ), 'An inline rule link got no icon.' );
+		expect( false !== strpos( $markup( 'https://plain.test/' ), 'wzlw-icon' ), 'The global inline method stopped adding icons.' );
+	};
+	$tests['inline rules add indicators when the global method has none'] = static function () {
+		settings(
+			array(
+				'warning_method' => 'modal',
+				'link_rules'     => rules( array( array( 'inline.test', 'inline' ) ) ),
+			)
+		);
+		$html = process( '<a href="https://inline.test/">rule</a><a href="https://modal.test/">global</a>' );
+		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'Inline rule and global modal produced the wrong number of icons.' );
+		expect( 'true' === link_attributes( $html, 'https://modal.test/' )['data-wzlw-external'], 'Global modal link lost its attributes.' );
+
+		$second = process( $html );
+		expect( 1 === substr_count( $second, 'class="wzlw-icon"' ), 'A second pass duplicated the rule indicator.' );
+	};
+	$tests['the redirect screen takes its rule from the signed destination only'] = static function () {
+		settings(
+			array(
+				'warning_method' => 'inline',
+				'link_rules'     => rules( array( array( 'msg.test', 'redirect', 'Custom message' ), array( 'modal.test', 'modal', 'Modal message' ) ) ),
+			)
+		);
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'get_redirect_rule' );
+		$method->setAccessible( true );
+		expect( 'Custom message' === ( $method->invoke( $handler, 'https://msg.test/page' )['message'] ?? null ), 'Redirect rule was not found for its destination.' );
+		expect( null === $method->invoke( $handler, 'https://modal.test/' ), 'A non-redirect rule enabled the redirect screen.' );
+		expect( null === $method->invoke( $handler, 'https://evil.example/phish' ), 'An unmatched destination enabled the redirect screen.' );
+
+		$html = process( '<a href="https://msg.test/">msg</a>' );
+		expect( false === strpos( $html, 'wzlw_rule' ), 'The redirect URL still carries a rule parameter.' );
+	};
+	$tests['backslash and control characters cannot hide an external link'] = static function () {
+		settings( array( 'excluded_domains' => 'trusted.test' ) );
+		$html = process( '<a href="/\\evil.test/x">a</a><a href="https:\\\\evil.test/y">b</a><a href="https://evil.test\\@trusted.test/z">c</a>' );
+		expect( 3 === substr_count( $html, 'data-wzlw-external="true"' ), 'A backslash URL was not treated as external: ' . $html );
+		expect( false === strpos( $html, 'data-wzlw-excluded' ), 'A backslash URL matched an excluded domain.' );
+	};
+	$tests['indicators read target and method from the opening tag only'] = static function () {
+		settings( array( 'warning_method' => 'inline' ) );
+		$html = process( '<a href="https://outside.test/?target=_blank">same tab</a><a href="https://outside.test/b">set target=_blank here</a>' );
+		expect( false === strpos( $html, 'screen-reader-text' ), 'Text resembling target=_blank added new-window screen reader text.' );
+		$html = process( '<a data-x-data-wzlw-method="modal" href="https://outside.test/c">c</a>' );
+		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'A look-alike attribute changed the link method.' );
+	};
+	$tests['users with warnings disabled keep new-tab screen reader text'] = static function () {
+		settings( array( 'disable_for' => 'logged_in', 'link_rules' => rules( array( array( 'rule.test', 'modal' ) ) ) ) );
+		$GLOBALS['wzlw_test_roles'] = array( 'subscriber' );
+		$html = process( '<a href="https://outside.test/new" target="_blank">new</a><a href="https://outside.test/same">same</a><a href="https://rule.test/" target="_blank">rule</a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'New-tab links lost their screen reader text for a user with warnings disabled: ' . $html );
+		expect( false === strpos( $html, 'wzlw-icon' ) && false === strpos( $html, 'data-wzlw-url' ) && false === strpos( $html, 'data-wzlw-method' ), 'A user with warnings disabled still got warnings.' );
+	};
+	$tests['target=_blank is matched case-insensitively'] = static function () {
+		settings();
+		$html = process( '<a class="wzlw-no-icon" target="_BLANK" href="https://outside.test/a">a</a><a target="_Blank" aria-label="Docs" href="https://outside.test/b">b</a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'An uppercase _BLANK target lost its screen reader text.' );
+		expect( 'Docs, Opens in a new window' === link_attributes( $html, 'https://outside.test/b' )['aria-label'], 'An uppercase _BLANK target lost its ARIA suffix.' );
+	};
+	$tests['backslash links are signed in the form the redirect endpoint matches'] = static function () {
+		settings( array( 'warning_method' => 'modal', 'link_rules' => rules( array( array( 'example.com/go/*', 'redirect' ) ) ) ) );
+		$html      = process( '<a href="https://example.com\\go\\deal">deal</a>' );
+		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'A' );
+		parse_str( (string) wp_parse_url( (string) $processor->get_attribute( 'data-wzlw-redirect-url' ), PHP_URL_QUERY ), $query );
+		$destination = rawurldecode( $query['url'] ?? '' );
+		expect( 'https://example.com/go/deal' === $destination, 'The signed destination was not normalized: ' . $destination );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'get_redirect_rule' );
+		$method->setAccessible( true );
+		expect( null !== $method->invoke( $handler, $destination ), 'The redirect endpoint did not match the signed destination.' );
+	};
+	$tests['untrusted destinations get confirm-only redirect signatures'] = static function () {
+		settings( array( 'warning_method' => 'redirect', 'link_rules' => rules( array( array( 'partner.test', 'redirect' ) ) ) ) );
+		$rules = Link_Rules::get_rules();
+		expect( Redirect_Handler::allows_auto_redirect( '/go/deal/', $rules ), 'A same-site destination was not allowed to redirect automatically.' );
+		expect( Redirect_Handler::allows_auto_redirect( 'https://partner.test/x', $rules ), 'A redirect-rule destination was not allowed to redirect automatically.' );
+		expect( ! Redirect_Handler::allows_auto_redirect( 'https://evil.example/', $rules ), 'An arbitrary destination was allowed to redirect automatically.' );
+
+		$full    = Redirect_Handler::get_redirect_url( 'https://evil.example/' );
+		$confirm = Redirect_Handler::get_redirect_url( 'https://evil.example/', true );
+		parse_str( (string) wp_parse_url( $full, PHP_URL_QUERY ), $full_query );
+		parse_str( (string) wp_parse_url( $confirm, PHP_URL_QUERY ), $confirm_query );
+		expect( '1' === ( $confirm_query['wzlw_confirm'] ?? '' ) && ! isset( $full_query['wzlw_confirm'] ), 'The confirm-only flag is missing or misplaced.' );
+		expect( $full_query['wzlw_sig'] !== $confirm_query['wzlw_sig'], 'A confirm-only signature equals the full signature, so the flag could be dropped.' );
+		expect( hash_hmac( 'sha256', 'https://evil.example/', wp_salt( 'auth' ) ) !== $full_query['wzlw_sig'], 'Full signatures still match the pre-1.7.0 format.' );
+
+		$link    = '<a href="https://evil.example/">x</a><a href="/go/deal/">y</a>';
+		$comment = apply_filters( 'comment_text', $link, null, array() );
+		$post    = process( $link );
+		expect( 1 === substr_count( $comment, 'wzlw_confirm=1' ), 'Only the external comment link should be confirm-only: ' . $comment );
+		expect( false === strpos( $post, 'wzlw_confirm' ), 'Post content links were signed confirm-only.' );
+	};
+	$tests['the redirect countdown only runs for visitors arriving from this site'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'allows_countdown' );
+		$method->setAccessible( true );
+		$cases = array(
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', true ),
+			array( 'https://evil.example/', false, null, false ),
+			array( 'https://evil.example/', false, 'https://mail.example/inbox', false ),
+			array( 'https://evil.example/', false, 'https://site.test.evil.example/', false ),
+			array( 'https://evil.example/', false, 'https://site.test:9999/', false ),
+			array( 'https://evil.example/', true, 'https://site.test/blog/post/', false ),
+			array( '/go/deal/', false, null, true ),
+			array( 'https://site.test/x', false, null, true ),
+			array( 'https://evil.example/', false, null, true, 'same-origin' ),
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', false, 'cross-site' ),
+			array( 'https://evil.example/', false, 'https://site.test/blog/post/', false, 'none' ),
+			array( 'https://evil.example/', false, null, false, 'same-site' ),
+			array( 'https://evil.example/', true, null, false, 'same-origin' ),
+		);
+		foreach ( $cases as $case ) {
+			list( $destination, $confirm_only, $referer, $expected ) = $case;
+			if ( null === $referer ) {
+				unset( $_SERVER['HTTP_REFERER'] );
+			} else {
+				$_SERVER['HTTP_REFERER'] = $referer;
+			}
+			if ( isset( $case[4] ) ) {
+				$_SERVER['HTTP_SEC_FETCH_SITE'] = $case[4];
+			} else {
+				unset( $_SERVER['HTTP_SEC_FETCH_SITE'] );
+			}
+			expect( $expected === $method->invoke( $handler, $destination, $confirm_only ), 'Wrong countdown decision for ' . $destination . ' from ' . var_export( $referer, true ) . ' / ' . ( $case[4] ?? 'no Sec-Fetch-Site' ) . '.' );
+		}
+		unset( $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_SEC_FETCH_SITE'] );
+	};
+	$tests['same-site checks respect ports and look-alike hosts'] = static function () {
+		$cases = array(
+			'/x'                         => true,
+			'https://site.test/x'        => true,
+			'https://SITE.test./x'       => true,
+			'https://site.test:443/x'    => true,
+			'//site.test/x'              => true,
+			'https://site.test:9999/x'   => false,
+			'//site.test@evil.example/'  => false,
+			'https://site.test.evil.ex/' => false,
+			'/\\evil.example/'         => false,
+			''                           => false,
+		);
+		foreach ( $cases as $url => $expected ) {
+			expect( $expected === Redirect_Handler::is_same_site( (string) $url ), 'Wrong same-site result for ' . $url . '.' );
+		}
+	};
+	$tests['confirm-only signatures are never upgraded and ugc links are untrusted'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$comment = apply_filters( 'comment_text', '<a href="https://evil.example/">x</a>', null, array() );
+		$again   = apply_filters( 'render_block', $comment, array( 'blockName' => 'core/template-part' ) );
+		expect( 1 === substr_count( $again, 'wzlw_confirm=1' ), 'A template-part pass upgraded a comment link signature: ' . $again );
+		$ugc = process( '<a rel="external nofollow ugc" href="https://author.example/">author</a>' );
+		expect( 1 === substr_count( $ugc, 'wzlw_confirm=1' ), 'A rel="ugc" link got a full signature.' );
+	};
+	$tests['author-written rule attributes are removed'] = static function () {
+		settings( array( 'warning_method' => 'modal' ) );
+		$attrs = link_attributes( process( '<a data-wzlw-method="inline" data-wzlw-rule="x" href="https://outside.test/">go</a>' ), 'https://outside.test/' );
+		expect( null === $attrs['data-wzlw-method'] && null === $attrs['data-wzlw-rule'] && 'true' === $attrs['data-wzlw-external'], 'Author-written rule attributes survived.' );
+
+		settings( array( 'disable_for' => 'logged_in', 'link_rules' => rules( array( array( 'outside.test', 'modal' ) ) ) ) );
+		$GLOBALS['wzlw_test_roles'] = array( 'subscriber' );
+		$attrs = link_attributes( process( '<a data-wzlw-method="modal" data-wzlw-rule="rule0" href="https://outside.test/">go</a>' ), 'https://outside.test/' );
+		expect( null === $attrs['data-wzlw-method'] && null === $attrs['data-wzlw-rule'], 'Rule attributes survived for a user with warnings disabled.' );
 	};
 	$tests['download indicators use a distinct icon class'] = static function () {
 		settings();
@@ -257,7 +564,8 @@ namespace {
 		expect( 1 === substr_count( $second, 'class="wzlw-icon"' ), 'A processed link received duplicate indicators.' );
 
 		settings( array( 'visual_indicator' => 'none' ) );
-		$first  = apply_filters( 'render_block', $content, $block );
+		$content = '<a href="https://outside.test/repeated/" target="_blank">external link</a>';
+		$first   = apply_filters( 'render_block', $content, $block );
 		$second = apply_filters( 'render_block', $first, $block );
 		expect( 1 === substr_count( $second, 'screen-reader-text' ), 'A screen-reader-only indicator was duplicated.' );
 	};
@@ -272,7 +580,7 @@ namespace {
 	};
 	$tests['repeated classification does not duplicate classes or ARIA labels'] = static function () {
 		settings();
-		$content = '<a aria-label="Product page" href="https://outside.test/repeat/">go</a>';
+		$content = '<a aria-label="Product page" href="https://outside.test/repeat/" target="_blank">go</a>';
 		$block   = array( 'blockName' => 'core/template-part' );
 		$first   = apply_filters( 'render_block', $content, $block );
 		$second  = apply_filters( 'render_block', $first, $block );
@@ -308,7 +616,7 @@ namespace {
 			try {
 				$html = process( '<a href="https://outside.test/" target="_blank" aria-label="Example">test</a>' );
 				$link = link_attributes( $html, 'https://outside.test/' );
-				expect( 'true' === $link['data-wzlw-excluded'], 'PHP exclusion decision was not preserved.' );
+				expect( Content_Processor::get_exclusion_token() === $link['data-wzlw-excluded'], 'PHP exclusion decision was not preserved.' );
 				expect( null === $link['data-wzlw-url'] && null === $link['data-wzlw-blank'], 'Excluded link still has warning attributes.' );
 			} finally {
 				remove_filter( 'wzlw_excluded_domains', $filter, 10 );
@@ -324,7 +632,7 @@ namespace {
 			)
 		);
 		$html = process( '<a href="//sub.outside.test/" target="_blank">excluded</a><a href="//outside.test/">base</a><a class="wzlw-affiliate" href="https://sub.outside.test/">affiliate</a>' );
-		expect( 'true' === link_attributes( $html, '//sub.outside.test/' )['data-wzlw-excluded'], 'Wildcard exclusion failed.' );
+		expect( Content_Processor::get_exclusion_token() === link_attributes( $html, '//sub.outside.test/' )['data-wzlw-excluded'], 'Wildcard exclusion failed.' );
 		expect( 'true' === link_attributes( $html, '//outside.test/' )['data-wzlw-external'], 'Wildcard unexpectedly excluded its base domain.' );
 		$affiliate = link_attributes( $html, 'https://sub.outside.test/' );
 		expect( 'true' === $affiliate['data-wzlw-external'] && 'sponsored' === $affiliate['rel'], 'Affiliate did not override exclusion.' );
@@ -382,7 +690,7 @@ namespace {
 		parse_str( (string) wp_parse_url( $signed, PHP_URL_QUERY ), $query );
 		$received = esc_url_raw( $query['url'] ?? '' );
 		expect( is_valid_url( $received ), 'Signed network-path destination was rejected by the endpoint.' );
-		expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for network-path destination.' );
+		expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for network-path destination.' );
 	};
 	$tests['every signed link in redirect mode is accepted by the endpoint'] = static function () {
 		settings( array( 'warning_method' => 'redirect', 'scope' => 'both' ) );
@@ -404,17 +712,31 @@ namespace {
 			parse_str( (string) wp_parse_url( $signed, PHP_URL_QUERY ), $query );
 			$received = esc_url_raw( $query['url'] ?? '' );
 			expect( is_valid_url( $received ), 'Endpoint rejects a URL it signed: ' . $processor->get_attribute( 'href' ) );
-			expect( hash_equals( hash_hmac( 'sha256', $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for ' . $processor->get_attribute( 'href' ) );
+			expect( hash_equals( hash_hmac( 'sha256', 'full|v2|' . $received, wp_salt( 'auth' ) ), $query['wzlw_sig'] ?? '' ), 'Signature mismatch for ' . $processor->get_attribute( 'href' ) );
 		}
 		expect( 5 === $checked, 'Expected 5 signed links, saw ' . $checked . '.' );
 	};
 	$tests['uppercase closing tags receive indicators and screen-reader text'] = static function () {
 		settings();
-		$html = process( wp_kses_post( '<A href="https://outside.test/">test</A>' ) );
+		$html = process( wp_kses_post( '<A href="https://outside.test/" target="_blank">test</A>' ) );
 		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'Uppercase link has no icon.' );
 		expect( 1 === substr_count( $html, 'class="screen-reader-text"' ), 'Uppercase link has no screen-reader text.' );
 		$html = process( wp_kses_post( '<A class="wzlw-no-icon" href="https://outside.test/" target="_blank">test</A>' ) );
 		expect( false === strpos( $html, 'class="wzlw-icon"' ) && 1 === substr_count( $html, 'class="screen-reader-text"' ), 'Suppressed uppercase link lost its screen-reader text.' );
+	};
+	$tests['same-tab links get no new-window screen reader text'] = static function () {
+		foreach ( array( 'icon', 'text', 'both', 'none' ) as $visual ) {
+			settings( array( 'visual_indicator' => $visual ) );
+			$html = process( '<a aria-label="Docs" href="https://outside.test/same/">same</a><a href="https://outside.test/icon/"><svg></svg></a><a class="wzlw-no-icon" href="https://outside.test/quiet/">quiet</a>' );
+			expect( false === strpos( $html, 'screen-reader-text' ), 'Same-tab link received new-window screen reader text with the ' . $visual . ' indicator.' );
+			expect( 'Docs' === link_attributes( $html, 'https://outside.test/same/' )['aria-label'], 'Same-tab link ARIA label was changed with the ' . $visual . ' indicator.' );
+			expect( 'true' === link_attributes( $html, 'https://outside.test/same/' )['data-wzlw-external'], 'Same-tab link lost its warning attributes.' );
+		}
+		settings();
+		$html = process( '<a href="https://outside.test/same/">same</a>' );
+		expect( 1 === substr_count( $html, 'class="wzlw-icon"' ), 'Same-tab external link lost its icon.' );
+		$html = process( '<a href="https://outside.test/new/" target="_blank">new</a><a href="https://outside.test/icon/" target="_blank"><svg></svg></a>' );
+		expect( 2 === substr_count( $html, 'class="screen-reader-text"' ), 'New-tab links lost their screen reader text.' );
 	};
 	$tests['no-icon target detection accepts single-quoted attributes'] = static function () {
 		settings();

@@ -66,8 +66,7 @@ class Frontend_Handler {
 			true
 		);
 
-		$site_url_parts = wp_parse_url( home_url() );
-		$site_host      = strtolower( rtrim( (string) ( $site_url_parts['host'] ?? '' ), '.' ) );
+		$site_host = Link_Rules::site_host();
 
 		$excluded_domains_raw = $settings['excluded_domains'] ?? '';
 		if ( is_string( $excluded_domains_raw ) ) {
@@ -113,6 +112,10 @@ class Frontend_Handler {
 				'siteHost'                  => $site_host,
 				'excludedDomains'           => $excluded_domains_js,
 				'downloadExtensions'        => $download_extensions,
+				'downloadScope'             => $settings['download_scope'] ?? 'all',
+				'warningsDisabled'          => wzlw_is_disabled_for_current_user(),
+				'linkRules'                 => Link_Rules::to_js( Link_Rules::get_rules( $settings ) ),
+				'excludedToken'             => Content_Processor::get_exclusion_token(),
 				'scope'                     => $settings['scope'] ?? 'external',
 				'warningMethod'             => $method,
 				'noIconClass'               => array_values( array_filter( array_map( 'trim', explode( ',', isset( $settings['no_icon_class'] ) ? $settings['no_icon_class'] : 'wzlw-no-icon' ) ) ) ),
@@ -151,7 +154,7 @@ class Frontend_Handler {
 		$settings = wzlw_get_settings();
 		$method   = isset( $settings['warning_method'] ) ? $settings['warning_method'] : 'inline_modal';
 
-		if ( ! in_array( $method, array( 'modal', 'inline_modal' ), true ) ) {
+		if ( ( ! in_array( $method, array( 'modal', 'inline_modal' ), true ) && ! Link_Rules::uses_action( array( 'modal', 'inline_modal' ) ) ) || wzlw_is_disabled_for_current_user() ) {
 			return;
 		}
 

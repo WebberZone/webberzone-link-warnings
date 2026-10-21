@@ -11,7 +11,7 @@ toc: true
 
 [toc]
 
-This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings > Link Warnings**. The settings page is organized into three tabs: General, Display, and Advanced.
+This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings > Link Warnings**. The settings page is organized into four tabs: General, Display, Rules, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
@@ -34,7 +34,7 @@ Controls how users are warned about external links.
 
 ### Inline Indicator Scope
 
-Determines which links receive inline indicators. Modal and redirect warnings always apply to external links only.
+Determines which links receive warnings. With `both`, modal and redirect warnings also apply to internal links that open in a new tab.
 
 | Value | Label | Behavior |
 | --- | --- | --- |
@@ -82,6 +82,17 @@ Processes the rendered output of block-theme template parts. This covers links i
 
 **Default:** enabled
 **Setting key:** `process_template_parts`
+
+### Disable Warnings For
+
+Hides warnings from logged-in users, for example while you edit your own site. Tick **All logged-in users**, or tick individual roles. Visitors who are not logged in always see warnings.
+
+For the users you select, the plugin adds no visible indicators, data attributes or modal markup, and link rules do not apply. The configured Link Attributes are still added, and links that open in a new tab keep their hidden screen reader text, so screen reader users with an account are still told when a new tab opens.
+
+Most page caches skip logged-in users. If yours caches pages for logged-in users, it may serve a cached page with or without warnings to the wrong users.
+
+**Default:** none selected
+**Setting key:** `disable_for` (values: `logged_in`, or `role:` followed by the role slug, such as `role:administrator`)
 
 ## Display tab
 
@@ -140,7 +151,7 @@ The visible text displayed next to links when the visual indicator is set to “
 
 #### Screen Reader Text
 
-Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. This is always added to processed links regardless of the visual indicator setting.
+Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. It is added to processed links that open in a new tab (`target="_blank"`), regardless of the visual indicator setting. Links that open in the same tab do not get it.
 
 **Default:** `Opens in a new window`
 **Setting key:** `screen_reader_text`
@@ -246,9 +257,49 @@ The message displayed on the redirect page above the destination URL.
 
 The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely — the user must click the “Continue to site” link manually.
 
+The countdown only runs for visitors who reach the redirect screen from a page on your site. Browsers report this in the `Sec-Fetch-Site` header, which is sent even with `rel="noreferrer"` or `Referrer-Policy: no-referrer`; older browsers without it fall back to the `Referer` header. Opened from an email, a bookmark or another site, the screen waits for the visitor to click “Continue to site”. Links in comments, links from previews and links with `rel="ugc"` always wait for the click, unless they point to your own site or match a redirect rule. Together, this stops anyone from using your redirect screen as an automatic redirect to a site of their choosing.
+
+The redirect screen is never cached. Redirect links in cached pages keep working after you change the warning method or rules. Redirect links signed by versions before 1.7.0 still open the redirect screen but always wait for the click.
+
 **Default:** `5`
 **Range:** 0–60
 **Setting key:** `redirect_countdown`
+
+## Rules tab
+
+### Link Rules
+
+An ordered list of rules that give links matching a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs.
+
+Each rule has three fields:
+
+| Field | Description |
+| --- | --- |
+| URL Pattern | The pattern to match. See below. |
+| Action | `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect`, or `exclude`. The first five are the same as the Warning Method options. `exclude` gives the link no warning. |
+| Message | Optional. Replaces the modal message, or the redirect screen message, for links that match this rule. |
+
+**Pattern syntax.** `*` matches any characters and is the only wildcard. Matching ignores the case of ASCII letters, the `http://` or `https://` scheme, ports and fragments.
+
+| Pattern | Matches |
+| --- | --- |
+| `example.com` | Every link to `example.com`, whatever the path. Not its subdomains. |
+| `*.example.com` | Every link to a subdomain of `example.com`. Not `example.com` itself. |
+| `example.com/go/*` | Links to `example.com` whose path starts with `/go/`. |
+| `amazon.*/dp/*` | Product links on any `amazon.` domain, such as `amazon.com` or `amazon.co.uk`. |
+| `/go/*` | Links on your own site whose path starts with `/go/`, such as cloaked affiliate links. |
+
+A pattern without a slash matches the domain only. A pattern with a slash matches the domain and the path, including any query string, so it must match to the end: use a trailing `*` to match everything below a path. Relative links that do not start with a slash, such as `page/`, are not matched.
+
+**How rules combine with other settings:**
+
+* A rule with a warning action applies to the link even if it is internal, outside the Inline Indicator Scope, or on the Excluded Domains list.
+* An `exclude` rule behaves like an Excluded Domains entry. The Affiliate Link and Force External classes still override it.
+* The Suppress Icon class and wrapper class still hide the icon on a matching link.
+* The modal markup and the redirect screen are enabled when any rule uses them, even if the Warning Method does not.
+
+**Default:** no rules
+**Setting key:** `link_rules`
 
 ## Advanced tab
 
@@ -260,6 +311,18 @@ A comma-separated list of file extensions whose links should receive a download 
 
 **Default:** `pdf, zip, doc, docx, xls, xlsx, exe, dmg`
 **Setting key:** `download_extensions`
+
+#### Download Warning Scope
+
+Chooses which download links get a download warning.
+
+| Value | Label | Behavior |
+| --- | --- | --- |
+| `all` | All download links | Every link to a configured file extension, whatever the host. |
+| `external` | Download links to external sites only | Skips files on your own site, including root-relative links such as `/wp-content/uploads/file.pdf`. Links with the Force External or Affiliate Link class still count as external. |
+
+**Default:** `all`
+**Setting key:** `download_scope`
 
 ### Link Attributes
 

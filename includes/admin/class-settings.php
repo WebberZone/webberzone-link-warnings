@@ -252,6 +252,7 @@ class Settings {
 			'process_nav_menus'            => 1,
 			'process_comments'             => 1,
 			'process_template_parts'       => 1,
+			'disable_for'                  => '',
 
 			// Display — Inline Indicators.
 			'visual_indicator'             => 'icon',
@@ -278,6 +279,9 @@ class Settings {
 			'redirect_message'             => '',
 			'redirect_countdown'           => 5,
 
+			// Rules.
+			'link_rules'                   => array(),
+
 			// Advanced — Link Attributes.
 			'link_attributes_external'     => array(),
 			'link_attributes_affiliate'    => array(),
@@ -286,6 +290,7 @@ class Settings {
 
 			// Advanced — Exclusions and Classes.
 			'download_extensions'          => 'pdf, zip, doc, docx, xls, xlsx, exe, dmg',
+			'download_scope'               => 'all',
 			'excluded_domains'             => '',
 			'no_icon_class'                => 'wzlw-no-icon',
 			'no_icon_wrapper_class'        => 'wzlw-no-icon-wrapper',
@@ -305,6 +310,7 @@ class Settings {
 		$settings_sections = array(
 			'general'  => esc_html__( 'General', 'webberzone-link-warnings' ),
 			'display'  => esc_html__( 'Display', 'webberzone-link-warnings' ),
+			'rules'    => esc_html__( 'Rules', 'webberzone-link-warnings' ),
 			'advanced' => esc_html__( 'Advanced', 'webberzone-link-warnings' ),
 		);
 
@@ -322,6 +328,7 @@ class Settings {
 		$settings = array(
 			'general'  => self::settings_general(),
 			'display'  => self::settings_display(),
+			'rules'    => self::settings_rules(),
 			'advanced' => self::settings_advanced(),
 		);
 
@@ -355,7 +362,7 @@ class Settings {
 			'scope'                   => array(
 				'id'      => 'scope',
 				'name'    => esc_html__( 'Inline Indicator Scope', 'webberzone-link-warnings' ),
-				'desc'    => esc_html__( 'Choose which links show inline indicators. Modal and redirect warnings always apply to external links only.', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose which links get warnings. With the second option, modal and redirect warnings also apply to internal links that open in a new tab.', 'webberzone-link-warnings' ),
 				'type'    => 'radio',
 				'default' => $defaults['scope'],
 				'options' => array(
@@ -411,9 +418,36 @@ class Settings {
 				'type'    => 'checkbox',
 				'default' => $defaults['process_template_parts'],
 			),
+			'disable_for'             => array(
+				'id'      => 'disable_for',
+				'name'    => esc_html__( 'Disable Warnings For', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Hide warnings from these logged-in users, for example while you edit your own site. Link attributes and the hidden screen reader text on links that open in a new tab are still added. Visitors who are not logged in always see warnings.', 'webberzone-link-warnings' ),
+				'type'    => 'multicheck',
+				'default' => $defaults['disable_for'],
+				'options' => self::get_disable_for_options(),
+			),
 		);
 
 		return apply_filters( self::$prefix . '_settings_general', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+	}
+
+	/**
+	 * Get the options for the Disable Warnings For setting.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array Option labels keyed by value.
+	 */
+	public static function get_disable_for_options() {
+		$options = array(
+			'logged_in' => esc_html__( 'All logged-in users', 'webberzone-link-warnings' ),
+		);
+
+		foreach ( wp_roles()->get_names() as $role => $name ) {
+			$options[ 'role:' . $role ] = esc_html( translate_user_role( $name ) );
+		}
+
+		return $options;
 	}
 
 	/**
@@ -679,6 +713,17 @@ class Settings {
 				'default' => $defaults['download_extensions'],
 				'size'    => 'large',
 			),
+			'download_scope'               => array(
+				'id'      => 'download_scope',
+				'name'    => esc_html__( 'Download Warning Scope', 'webberzone-link-warnings' ),
+				'desc'    => esc_html__( 'Choose which download links get a download warning. With the second option, files on your own site, including root-relative links such as /wp-content/uploads/file.pdf, are left alone.', 'webberzone-link-warnings' ),
+				'type'    => 'radio',
+				'default' => $defaults['download_scope'],
+				'options' => array(
+					'all'      => esc_html__( 'All download links', 'webberzone-link-warnings' ),
+					'external' => esc_html__( 'Download links to external sites only', 'webberzone-link-warnings' ),
+				),
+			),
 			'exclusions_header'            => array(
 				'id'   => 'exclusions_header',
 				'name' => '<h3>' . esc_html__( 'Exclusions and Classes', 'webberzone-link-warnings' ) . '</h3>',
@@ -727,6 +772,86 @@ class Settings {
 		);
 
 		return apply_filters( self::$prefix . '_settings_advanced', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+	}
+
+	/**
+	 * Rules settings.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return array Rules settings.
+	 */
+	public static function settings_rules() {
+		$defaults = self::get_defaults();
+		$settings = array(
+			'link_rules_header' => array(
+				'id'   => 'link_rules_header',
+				'name' => '<h3>' . esc_html__( 'Link Rules', 'webberzone-link-warnings' ) . '</h3>',
+				'desc' => wp_kses(
+					__( 'Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule.', 'webberzone-link-warnings' ),
+					array( 'code' => array() )
+				),
+				'type' => 'header',
+			),
+			'link_rules'        => array(
+				'id'                => 'link_rules',
+				'name'              => esc_html__( 'Rules', 'webberzone-link-warnings' ),
+				'desc'              => '',
+				'type'              => 'repeater',
+				'default'           => $defaults['link_rules'],
+				'live_update_field' => 'pattern',
+				'new_item_text'     => esc_html__( 'New rule', 'webberzone-link-warnings' ),
+				'add_button_text'   => esc_html__( 'Add rule', 'webberzone-link-warnings' ),
+				'fields'            => array(
+					array(
+						'id'   => 'pattern',
+						'name' => esc_html__( 'URL Pattern', 'webberzone-link-warnings' ),
+						'desc' => esc_html__( 'For example: example.com, *.example.com, example.com/go/* or /go/*', 'webberzone-link-warnings' ),
+						'type' => 'text',
+						'size' => 'large',
+					),
+					array(
+						'id'      => 'action',
+						'name'    => esc_html__( 'Action', 'webberzone-link-warnings' ),
+						'type'    => 'select',
+						'default' => 'modal',
+						'options' => self::get_link_rule_actions(),
+					),
+					array(
+						'id'   => 'message',
+						'name' => esc_html__( 'Message', 'webberzone-link-warnings' ),
+						'desc' => esc_html__( 'Optional. Replaces the modal or redirect screen message for links that match this rule.', 'webberzone-link-warnings' ),
+						'type' => 'textarea',
+					),
+				),
+			),
+		);
+
+		/**
+		 * Filters the Rules settings array.
+		 *
+		 * @since 1.7.0
+		 *
+		 * @param array $settings Rules settings.
+		 */
+		return apply_filters( self::$prefix . '_settings_rules', $settings ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+	}
+
+	/**
+	 * Get the actions a link rule can take.
+	 *
+	 * @since 1.7.0
+	 * @return array<string, string> Action labels keyed by action.
+	 */
+	public static function get_link_rule_actions() {
+		return array(
+			'modal'           => esc_html__( 'Modal dialog', 'webberzone-link-warnings' ),
+			'inline'          => esc_html__( 'Inline indicator only', 'webberzone-link-warnings' ),
+			'inline_modal'    => esc_html__( 'Inline indicator + modal dialog', 'webberzone-link-warnings' ),
+			'redirect'        => esc_html__( 'Redirect screen', 'webberzone-link-warnings' ),
+			'inline_redirect' => esc_html__( 'Inline indicator + redirect screen', 'webberzone-link-warnings' ),
+			'exclude'         => esc_html__( 'Exclude (no warning)', 'webberzone-link-warnings' ),
+		);
 	}
 
 	/**

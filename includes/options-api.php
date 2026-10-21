@@ -120,3 +120,42 @@ function wzlw_settings_reset() {
 function wzlw_update_settings( array $settings, bool $merge = true, bool $autoload = true ) {
 	return \WebberZone\Link_Warnings\Options_API::update_settings( $settings, $merge, $autoload );
 }
+
+/**
+ * Check whether warnings are disabled for the current user.
+ *
+ * Link attributes are still applied; only the warnings are switched off.
+ *
+ * @since 1.7.0
+ *
+ * @return bool True if warnings should not be shown to the current user.
+ */
+function wzlw_is_disabled_for_current_user() {
+	$disabled = false;
+
+	if ( is_user_logged_in() ) {
+		$disable_for = wzlw_get_option( 'disable_for', '' );
+		$disable_for = is_array( $disable_for ) ? $disable_for : explode( ',', (string) $disable_for );
+		$disable_for = array_map( 'trim', array_map( 'strval', $disable_for ) );
+
+		if ( in_array( 'logged_in', $disable_for, true ) ) {
+			$disabled = true;
+		} else {
+			foreach ( (array) wp_get_current_user()->roles as $role ) {
+				if ( in_array( 'role:' . $role, $disable_for, true ) ) {
+					$disabled = true;
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Filter whether warnings are disabled for the current user.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param bool $disabled True if warnings are disabled for the current user.
+	 */
+	return (bool) apply_filters( 'wzlw_is_disabled_for_current_user', $disabled );
+}

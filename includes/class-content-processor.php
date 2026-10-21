@@ -42,12 +42,28 @@ class Content_Processor {
 	private $site_host;
 
 	/**
+	 * Warning method that overrides every link's own while indicators are added.
+	 *
+	 * @since 1.7.0
+	 * @var string
+	 */
+	private $method_override = '';
+
+	/**
+	 * Whether the content being processed comes from a source the site does not control.
+	 *
+	 * @since 1.7.0
+	 * @var bool
+	 */
+	private $untrusted_source = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		$this->site_host = strtolower( rtrim( (string) wp_parse_url( home_url(), PHP_URL_HOST ), '.' ) );
+		$this->site_host = Link_Rules::site_host();
 
 		Hook_Registry::add_filter( 'the_content', array( $this, 'process_content' ), 999 );
 		Hook_Registry::add_filter( 'the_excerpt', array( $this, 'process_content' ), 999 );
@@ -79,7 +95,9 @@ class Content_Processor {
 		}
 
 		// Load fresh settings on each content processing.
-		$this->settings = wzlw_get_settings();
+		$this->settings    = wzlw_get_settings();
+		$warnings_disabled = wzlw_is_disabled_for_current_user();
+		$rules             = Link_Rules::get_rules( $this->settings );
 
 		// Use WP_HTML_Tag_Processor to parse links.
 		$processor            = new \WP_HTML_Tag_Processor( $content );
@@ -143,21 +161,33 @@ class Content_Processor {
 			// Determine if link should be processed.
 			$is_affiliate = $affiliate_depth > 0 || $this->link_has_affiliate_class( $processor );
 			$is_forced    = $is_affiliate || $force_external_depth > 0 || $this->link_has_force_external_class( $processor );
-			$is_excluded  = ! $is_forced && $this->is_excluded_domain( $href );
-			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $href ) );
-			$is_download  = ! $is_excluded && $this->is_download_link( $href );
+			$check_href   = Link_Rules::normalize_href( $href );
+			$rule         = Link_Rules::match( $check_href, $this->site_host, $rules );
+			$rule_method  = ( $rule && 'exclude' !== $rule['action'] ) ? $rule['action'] : '';
+			$is_excluded  = ! $is_forced && '' === $rule_method && ( null !== $rule || $this->is_excluded_domain( $check_href ) );
+			$is_external  = $is_forced || ( ! $is_excluded && $this->is_external_link( $check_href ) );
+			$is_download  = ! $is_excluded && ( $is_external || 'external' !== ( $this->settings['download_scope'] ?? 'all' ) ) && $this->is_download_link( $check_href );
+
+			// Users with warnings disabled keep the link classification but get no rule method.
+			if ( $warnings_disabled ) {
+				$rule_method = '';
+			}
 
 			if ( $is_excluded ) {
-				$processor->set_attribute( 'data-wzlw-excluded', 'true' );
-				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url' ) as $attribute ) {
+				$processor->set_attribute( 'data-wzlw-excluded', self::get_exclusion_token() );
+				foreach ( array( 'data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-rule', 'data-wzlw-method' ) as $attribute ) {
 					$processor->remove_attribute( $attribute );
 				}
 			} else {
 				$processor->remove_attribute( 'data-wzlw-excluded' );
 			}
+			if ( '' === $rule_method ) {
+				$processor->remove_attribute( 'data-wzlw-rule' );
+				$processor->remove_attribute( 'data-wzlw-method' );
+			}
 			$this->apply_link_attributes( $processor, $is_external, $is_affiliate );
-			$has_target     = '_blank' === $processor->get_attribute( 'target' );
-			$should_process = $this->should_process_link( $is_external, $has_target, $is_download );
+			$has_target     = $this->is_new_tab_target( $processor->get_attribute( 'target' ) );
+			$should_process = '' !== $rule_method || $this->should_process_link( $is_external, $has_target, $is_download );
 
 			// Inside a skip wrapper, target="_blank" links still need ARIA for accessibility
 			// even when the visual icon/modal is suppressed.
@@ -180,10 +210,18 @@ class Content_Processor {
 				continue;
 			}
 
+			// A matching rule sets this link's own warning method. Users with warnings
+			// disabled get none: only the screen reader text for new-tab links remains.
+			$warning_method = $warnings_disabled ? 'none' : ( $this->settings['warning_method'] ?? 'none' );
+			if ( '' !== $rule_method ) {
+				$warning_method = $rule_method;
+				$processor->set_attribute( 'data-wzlw-rule', $rule['id'] );
+				$processor->set_attribute( 'data-wzlw-method', $rule_method );
+			}
+
 			// Add data attributes for JavaScript handling.
-			$warning_method = $this->settings['warning_method'] ?? 'none';
 			if ( in_array( $warning_method, array( 'modal', 'inline_modal', 'redirect', 'inline_redirect' ), true ) ) {
-				$processor->set_attribute( 'data-wzlw-url', $href );
+				$processor->set_attribute( 'data-wzlw-url', $check_href );
 				if ( $is_external ) {
 					$processor->set_attribute( 'data-wzlw-external', 'true' );
 				} elseif ( $has_target ) {
@@ -193,14 +231,24 @@ class Content_Processor {
 					$processor->set_attribute( 'data-wzlw-download', 'true' );
 				}
 				if ( in_array( $warning_method, array( 'redirect', 'inline_redirect' ), true ) ) {
-					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $href ) );
+					// Links from untrusted sources must not become automatic open redirects. Comment
+					// and user links carry rel="ugc", previews show unpublished content, and a
+					// confirm-only signature from an earlier pass is never upgraded.
+					$untrusted    = $this->untrusted_source
+						|| ( function_exists( 'is_preview' ) && is_preview() )
+						|| in_array( 'ugc', preg_split( '/\s+/', strtolower( (string) $processor->get_attribute( 'rel' ) ) ), true )
+						|| false !== strpos( (string) $processor->get_attribute( 'data-wzlw-redirect-url' ), 'wzlw_confirm=1' );
+					$confirm_only = $untrusted && ! Redirect_Handler::allows_auto_redirect( $check_href, $rules );
+					$processor->set_attribute( 'data-wzlw-redirect-url', Redirect_Handler::get_redirect_url( $check_href, $confirm_only ) );
 				}
 			}
 
-			// Add ARIA attributes for accessibility.
-			$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
-			if ( $aria_label ) {
-				$processor->set_attribute( 'aria-label', $aria_label );
+			// Add ARIA attributes for accessibility. Same-tab links don't open a new window.
+			if ( $has_target ) {
+				$aria_label = $this->get_aria_label( $processor->get_attribute( 'aria-label' ) );
+				if ( $aria_label ) {
+					$processor->set_attribute( 'aria-label', $aria_label );
+				}
 			}
 
 			// Add class for styling.
@@ -211,7 +259,7 @@ class Content_Processor {
 			if ( $is_download ) {
 				$new_classes[] = 'wzlw-download';
 			}
-			if ( $skip_depth > 0 ) {
+			if ( $skip_depth > 0 || $warnings_disabled ) {
 				$new_classes = array_merge( $new_classes, $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' ) );
 			}
 			$processor->set_attribute( 'class', $this->merge_classes( $processor->get_attribute( 'class' ), $new_classes ) );
@@ -219,12 +267,38 @@ class Content_Processor {
 
 		$processed_content = $processor->get_updated_html();
 
-		// Add visual indicators if inline method is used.
-		if ( in_array( $this->settings['warning_method'] ?? 'none', array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
-			$processed_content = $this->add_visual_indicators( $processed_content );
+		// Add visual indicators if the global method or any rule uses an inline method.
+		// For users with warnings disabled, every processed link carries the no-icon class,
+		// so an inline pass adds only the screen reader text for new-tab links.
+		$inline_methods = array( 'inline', 'inline_modal', 'inline_redirect' );
+		if ( $warnings_disabled || in_array( $this->settings['warning_method'] ?? 'none', $inline_methods, true ) || Link_Rules::uses_action( $inline_methods, $rules ) ) {
+			$this->method_override = $warnings_disabled ? 'inline' : '';
+			$processed_content     = $this->add_visual_indicators( $processed_content );
+			$this->method_override = '';
 		}
 
 		return $processed_content;
+	}
+
+	/**
+	 * Get the token that marks a link as excluded by PHP.
+	 *
+	 * PHP can exclude domains through the wzlw_excluded_domains filter, which the
+	 * JavaScript scan cannot repeat, so the scan trusts PHP's marker. A random token
+	 * per request, also passed to the script, stops content authors from writing the
+	 * marker themselves.
+	 *
+	 * @since 1.7.0
+	 * @return string Token.
+	 */
+	public static function get_exclusion_token() {
+		static $token = null;
+
+		if ( null === $token ) {
+			$token = bin2hex( random_bytes( 8 ) );
+		}
+
+		return $token;
 	}
 
 	/**
@@ -278,7 +352,12 @@ class Content_Processor {
 	 * @return string Modified comment HTML.
 	 */
 	public function process_comment_text( $comment_text ) {
-		return $this->process_external_content( $comment_text, 'process_comments' );
+		// Anyone can write a comment, and its author sees it before moderation.
+		$this->untrusted_source = true;
+		$comment_text           = $this->process_external_content( $comment_text, 'process_comments' );
+		$this->untrusted_source = false;
+
+		return $comment_text;
 	}
 
 	/**
@@ -543,6 +622,21 @@ class Content_Processor {
 	private function add_indicator_to_link( $matches ) {
 		$link_html = $matches[0];
 
+		// Read the opening tag's own attributes; the link text can contain anything.
+		$tag = new \WP_HTML_Tag_Processor( $link_html );
+		$tag->next_tag( 'A' );
+		$has_target = $this->is_new_tab_target( $tag->get_attribute( 'target' ) );
+
+		// A rule can give a link its own method; only inline methods get an indicator.
+		$link_method    = $tag->get_attribute( 'data-wzlw-method' );
+		$warning_method = is_string( $link_method ) && '' !== $link_method ? $link_method : ( $this->settings['warning_method'] ?? 'none' );
+		if ( '' !== $this->method_override ) {
+			$warning_method = $this->method_override;
+		}
+		if ( ! in_array( $warning_method, array( 'inline', 'inline_modal', 'inline_redirect' ), true ) ) {
+			return $link_html;
+		}
+
 		// The same HTML can pass through more than one supported content filter.
 		$has_indicator = preg_match( '/\bclass=["\'][^"\']*\b(?:wzlw-icon|wzlw-text)\b[^"\']*["\']/i', $link_html )
 			|| false !== stripos( $link_html, $this->get_screen_reader_text() );
@@ -562,7 +656,7 @@ class Content_Processor {
 			$has_no_icon_class = is_array( $link_classes ) && ! empty( array_intersect( $no_icon_classes, $link_classes ) );
 		}
 		if ( $has_no_icon_class ) {
-			if ( preg_match( '/\btarget\s*=\s*(?:"_blank"|\'_blank\'|_blank)/i', $link_html ) ) {
+			if ( $has_target ) {
 				$link_html = str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
 			}
 			return $link_html;
@@ -570,11 +664,11 @@ class Content_Processor {
 
 		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.
 		if ( ! $this->link_has_visible_text( $matches[1] ?? '' ) ) {
-			return str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
+			return $has_target ? str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html ) : $link_html;
 		}
 
 		$is_download = (bool) preg_match( '/\bclass=["\'][^"\']*\bwzlw-download\b[^"\']*["\']/i', $link_html );
-		$indicator   = $this->get_visual_indicator( $is_download );
+		$indicator   = $this->get_visual_indicator( $is_download, $has_target );
 
 		if ( empty( $indicator ) ) {
 			return $link_html;
@@ -584,6 +678,17 @@ class Content_Processor {
 		$link_html = str_ireplace( '</a>', $indicator . '</a>', $link_html );
 
 		return $link_html;
+	}
+
+	/**
+	 * Check whether a target attribute opens a new tab. HTML matches `_blank` case-insensitively.
+	 *
+	 * @since 1.7.0
+	 * @param mixed $target Target attribute value.
+	 * @return bool True if the link opens in a new tab.
+	 */
+	private function is_new_tab_target( $target ) {
+		return is_string( $target ) && '_blank' === strtolower( $target );
 	}
 
 	/**
@@ -634,7 +739,7 @@ class Content_Processor {
 			}
 		}
 
-		if ( '_blank' === $processor->get_attribute( 'target' ) ) {
+		if ( $this->is_new_tab_target( $processor->get_attribute( 'target' ) ) ) {
 			foreach ( array( 'noopener', 'noreferrer' ) as $rel ) {
 				if ( in_array( $rel, $attributes, true ) ) {
 					$rel_values[] = $rel;
@@ -682,19 +787,21 @@ class Content_Processor {
 	 *
 	 * @since 1.0.0
 	 * @param bool $is_download Whether the link points to a configured download extension.
+	 * @param bool $has_target  Whether the link opens in a new tab.
 	 * @return string Indicator HTML.
 	 */
-	private function get_visual_indicator( $is_download = false ) {
-		$visual = $this->settings['visual_indicator'] ?? 'icon';
+	private function get_visual_indicator( $is_download = false, $has_target = true ) {
+		$visual             = $this->settings['visual_indicator'] ?? 'icon';
+		$screen_reader_text = $has_target ? $this->get_screen_reader_text() : '';
 
 		if ( 'none' === $visual ) {
-			return $this->get_screen_reader_text();
+			return $screen_reader_text;
 		}
 
 		$indicator = '';
 
 		// Add screen reader text.
-		$indicator .= $this->get_screen_reader_text();
+		$indicator .= $screen_reader_text;
 
 		// Add visual elements.
 		if ( 'icon' === $visual || 'both' === $visual ) {

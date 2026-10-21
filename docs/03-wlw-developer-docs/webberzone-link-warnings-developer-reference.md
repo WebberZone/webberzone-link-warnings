@@ -114,6 +114,18 @@ wzlw_settings_reset();
 
 **Returns:** `bool`
 
+### `wzlw_is_disabled_for_current_user()`
+
+Returns whether warnings are hidden from the current user under the **Disable Warnings For** setting. Link attributes are still applied for these users.
+
+```php
+if ( ! wzlw_is_disabled_for_current_user() ) {
+    // Output something that only makes sense alongside the warnings.
+}
+```
+
+**Returns:** `bool`
+
 ## Filter hooks
 
 ### `wzlw_get_settings`
@@ -131,3 +143,43 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 **Parameters:**
 
 - `$settings` *(array)* — The merged settings array.
+
+### `wzlw_is_disabled_for_current_user`
+
+Filters whether warnings are hidden from the current user.
+
+```php
+add_filter( 'wzlw_is_disabled_for_current_user', function ( bool $disabled ): bool {
+    // Hide warnings from users who can edit posts.
+    return $disabled || current_user_can( 'edit_posts' );
+} );
+```
+
+**Parameters:**
+
+- `$disabled` *(bool)* — True if warnings are disabled for the current user.
+
+### `wzlw_link_rules`
+
+Filters the Link Rules before they are validated. Rules are checked in order and the first match wins. Patterns use the same syntax as the Rules tab. Rules with a missing or invalid pattern, action or ID are dropped.
+
+```php
+add_filter( 'wzlw_link_rules', function ( array $rules ): array {
+    // Always show the modal for links to partner.example, ahead of the saved rules.
+    array_unshift(
+        $rules,
+        array(
+            'id'      => 'partner',
+            'pattern' => 'partner.example',
+            'action'  => 'modal',
+            'message' => 'You are leaving for our partner site.',
+        )
+    );
+    return $rules;
+} );
+```
+
+**Parameters:**
+
+- `$rules` *(array[])* — Rules, each with `id`, `pattern`, `action` and optional `message` keys. `action` is one of `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect` or `exclude`.
+- `$settings` *(array)* — The plugin settings.

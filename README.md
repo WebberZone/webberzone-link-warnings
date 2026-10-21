@@ -44,6 +44,8 @@ WebberZone Link Warnings uses a two-layer approach to process links across your 
 - __Automatic Link Attributes__: Add `nofollow`, `sponsored`, `ugc`, `noopener`, `noreferrer` and `target="_blank"` to external links, affiliate links, or both — no post edits needed
 - __Affiliate Link Marking__: Flag a link or container with a class and give affiliate links their own attributes
 - __Domain Exclusions__: Allow trusted domains to treat them as internal links
+- __Link Rules__: Give links that match a URL pattern, such as `amazon.com/dp/*` or `/go/*`, their own warning method and message, or exclude them
+- __Hide Warnings While You Edit__: Turn warnings off for logged-in users or selected roles
 - __Sitewide Coverage__: Server-side filters process widget output, navigation menus, comment text, and block-theme template parts, while the JavaScript scan covers remaining theme output
 - __Post Type Control__: PHP-side processing is scoped to configured post types; JS scanning covers the full page regardless
 - __Built to support accessibility best practices for external link behaviour in WordPress__: Adds screen reader text, ARIA attributes, and keyboard-friendly modal confirmations
@@ -112,6 +114,9 @@ After activation, the setup wizard guides you through the initial configuration.
    - Excluded domains
    - Enabled post types
    - Force-external class name (default: `wzlw-force-external`)
+   - Link rules by URL pattern, each with its own warning method and message
+   - Download warnings for all files, or for files on external sites only
+   - Warnings hidden from logged-in users or selected roles
 
 The external content toggles apply server-side before the page is sent to the browser. The JavaScript scan continues to cover output that another plugin or theme adds after the server-side filters run.
 
@@ -138,6 +143,8 @@ The checkbox label comes from the __Don't Show Again Label__ setting and is regi
 
 Links whose URL path ends in a configured file extension are treated as downloadable files, even when the file is hosted on the current site. The default extensions are `pdf, zip, doc, docx, xls, xlsx, exe, dmg`. Change the comma-separated list under __Settings > WebberZone Link Warnings > Advanced > Download Links__.
 
+To warn only for files on other sites, set __Download Warning Scope__ to "Download links to external sites only". Files on your own site, including root-relative links such as `/wp-content/uploads/file.pdf`, are then left alone.
+
 Download links use their own modal title and message, configured under __Display > Modal Dialog__. They also receive a download indicator icon when icons are enabled. Query strings and fragments are ignored when matching extensions, so `/download?file=report.pdf` is not matched unless the path itself ends in `.pdf`.
 
 ## Excluding Icons on Specific Links
@@ -156,7 +163,7 @@ To exclude all links inside a wrapper element (e.g. a navigation block or card),
 </div>
 ```
 
-Both approaches suppress the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added.
+Both approaches suppress the visual indicator (icon and/or text). The modal or redirect warning still applies if your warning method includes one. Screen reader text and ARIA attributes are still added to links that open in a new tab.
 
 ## Forcing Links to Be Treated as External
 
@@ -278,6 +285,20 @@ Yes. Copy the template file to `your-theme/webberzone-link-warnings/redirect-scr
 ### Can visitors stop the modal from showing every time?
 
 Yes. Set __Modal Frequency__ to "Once per browser session" or "Once every N days" and the modal gains a "Don't show again" checkbox. See [Letting Visitors Dismiss the Modal](#letting-visitors-dismiss-the-modal) for the details.
+
+### How do I give some links a different warning?
+
+Go to Settings > WebberZone Link Warnings > Rules and add a rule. Each rule has a URL pattern, an action and an optional message. Rules are checked from top to bottom and the first match wins. Links that match no rule use your normal settings.
+
+`*` matches any characters. `example.com` matches every link to that domain, `*.example.com` matches its subdomains, `amazon.com/dp/*` matches product pages, and `/go/*` matches cloaked links on your own site. The action can be any warning method, or Exclude to give the link no warning.
+
+### How do I stop download warnings on files hosted on my own site?
+
+Go to Settings > WebberZone Link Warnings > Advanced > Download Links and set __Download Warning Scope__ to "Download links to external sites only". Links to files on other sites keep their download warning.
+
+### Can I hide the warnings while I am logged in?
+
+Yes. Go to Settings > WebberZone Link Warnings > General and use __Disable Warnings For__. Tick "All logged-in users" or individual roles, such as Administrator and Editor. Visitors who are not logged in always see warnings. Link attributes such as `nofollow`, and the hidden screen reader text on links that open in a new tab, are still added for everyone.
 
 ### Does this modify my database content?
 

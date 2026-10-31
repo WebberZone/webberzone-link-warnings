@@ -271,20 +271,24 @@ Release date: 3 November 2026
 
 **Added**
 
-* Rules tab for giving links that match a URL pattern their own warning method and message, or excluding them. `*` is the wildcard, and `/go/*` matches links on your own site.
-* Download Warning Scope setting under Advanced > Download Links to skip download warnings for files hosted on your own site.
-* Disable Warnings For setting under General to hide warnings from logged-in users or selected roles. Link attributes and screen reader text are still added.
+* Rules tab for assigning warning methods, custom messages, or exclusions by URL pattern, including internal paths such as `/go/*`. The first matching rule wins.
+* Separate modal dismissals for each rule, so dismissing one warning does not hide another rule's message.
+* Download Warning Scope setting to skip download warnings for files hosted on your own site.
+* Disable Warnings For setting to hide warnings from logged-in users or selected roles while preserving link attributes and new-tab screen reader text.
 * `wzlw_link_rules` and `wzlw_is_disabled_for_current_user` filters, and the `wzlw_is_disabled_for_current_user()` function.
 
 **Security**
 
-* Hardened the redirect screen so the countdown only runs for visitors arriving from your own site. Opened from anywhere else, for links from comments or previews, and for redirect links signed by earlier versions, it waits for the visitor to click Continue. The screen is no longer cached.
+* Restricted automatic external redirects to visitors arriving from the site, required confirmation for legacy links and untrusted destinations, and disabled redirect-screen caching.
+* Prevented author-supplied exclusion markers and URLs containing backslashes or control characters from bypassing warnings.
+* Kept a confirmation prompt when redirect URL signing failed instead of following the link without a warning.
 
 **Fixed**
 
-* Links that open in the same tab were announced to screen readers as opening in a new window.
-* Links written with backslashes, such as `/\evil.example/` or `https:\\evil.example/`, were treated as internal or excluded and showed no warning.
-* The Inline Indicator Scope description said modal and redirect warnings applied to external links only, but the second option also applied them to internal links that open in a new tab.
+* Links that opened in the same tab were announced to screen readers as opening in a new window.
+* Mixed-case `target="_blank"` values were not consistently recognized when applying warnings, link attributes, and navigation behavior.
+* Previously signed redirect links stopped working after switching away from a redirect warning method.
+* The Inline Indicator Scope description incorrectly said modal and redirect warnings applied only to external links.
 
 = Earlier versions =
 
@@ -293,4 +297,4 @@ For the changelog of earlier versions, please refer to the [releases page on Git
 == Upgrade Notice ==
 
 = 1.7.0 =
-Adds URL pattern rules, an option to skip download warnings for files on your own site, and an option to hide warnings from logged-in users. Same-tab links are no longer announced as opening a new window. No action needed.
+Security and feature release. Hardens redirect screens and prevents warning bypasses. Adds URL pattern rules and controls for download warnings and logged-in users. Update recommended.

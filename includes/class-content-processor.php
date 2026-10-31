@@ -624,7 +624,7 @@ class Content_Processor {
 
 		// Read the opening tag's own attributes; the link text can contain anything.
 		$tag = new \WP_HTML_Tag_Processor( $link_html );
-		$tag->next_tag( 'A' );
+		$tag->next_tag( array( 'tag_name' => 'A' ) );
 		$has_target = $this->is_new_tab_target( $tag->get_attribute( 'target' ) );
 
 		// A rule can give a link its own method; only inline methods get an indicator.

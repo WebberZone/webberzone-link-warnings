@@ -78,7 +78,7 @@ class Link_Rules {
 		 */
 		$rules = apply_filters( 'wzlw_link_rules', $rules, $settings );
 
-		return self::validate( is_array( $rules ) ? $rules : array() );
+		return self::validate( $rules );
 	}
 
 	/**

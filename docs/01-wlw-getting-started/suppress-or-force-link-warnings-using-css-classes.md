@@ -11,15 +11,15 @@ toc: true
 
 [toc]
 
-[WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) gives you two sets of CSS classes you can add directly to links (or their containers) in your content. One set suppresses the warning icon or modal on specific links. The other set treats links as external even when they point to your own domain.
+[WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) gives you two sets of CSS classes you can add directly to links (or their containers) in your content. One set suppresses the warning icon on specific links. The other set treats links as external even when they point to your own domain.
 
 You do not need to write any code. You add these classes the same way you would add any CSS class in your page builder, block editor, or theme.
 
-## Exclusion classes: Turn off warnings on specific links
+## Suppress visual indicators on specific links
 
-Use these when the plugin adds a warning icon or modal to a link you do not want it to touch. Common examples include a “back to top” link, a logo link, or a navigation link placed within content.
+Use these when you want to hide a link’s visual indicator while keeping any modal or redirect warning. Common examples include a “back to top” link, a logo link, or a navigation link placed within content.
 
-### Turn off warnings on a single link
+### Suppress the indicator on a single link
 
 Add the class `wzlw-no-icon` directly to the `<a>` tag.
 
@@ -29,9 +29,9 @@ Add the class `wzlw-no-icon` directly to the `<a>` tag.
 
 The visual indicator (icon and/or text) is suppressed. The modal or redirect warning still applies if your warning method includes one. If the link opens in a new tab, a hidden screen-reader label is still added so screen reader users know the tab will open.
 
-### Turn off warnings on a group of links
+### Suppress indicators on a group of links
 
-Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every link inside that element will have its icon and modal suppressed.
+Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every link inside that element will have its visual indicator (icon and/or text) suppressed. The modal or redirect warning still applies if your warning method includes one — the same as the single-link class above.
 
 ```html
 <div class="wzlw-no-icon-wrapper">
@@ -40,16 +40,18 @@ Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every 
 </div>
 ```
 
-This is useful for a sponsor block, an icon grid, or any section where you want no warnings at all.
+This is useful for a sponsor block, an icon grid, or any section where you want no visual indicators.
 
 ### How to add these classes in WordPress
 
 **Block editor (Gutenberg):**
 
-1. Select the link or the block that wraps your links.
+1. Select the block that contains your links.
 2. Open the block settings panel on the right.
 3. Under **Advanced**, find the **Additional CSS class(es)** field.
-4. Type `wzlw-no-icon` (for a single link block) or `wzlw-no-icon-wrapper` (for a group).
+4. Enter `wzlw-no-icon-wrapper` to suppress indicators on links inside the block.
+
+The **Additional CSS class(es)** field normally applies to the block container, not its `<a>` tag. Use the wrapper class there. To apply `wzlw-no-icon` to one anchor, edit that link’s HTML.
 
 **Classic editor:**
 
@@ -88,7 +90,7 @@ Every link inside the wrapper is treated as external, regardless of its URL.
 
 ### How to add these classes in WordPress
 
-The steps are identical to the exclusion classes above. Add `wzlw-force-external` to a single link element, or `wzlw-force-external-wrapper` to the section, column, or block that contains the links you want to force.
+Add `wzlw-force-external` to an anchor’s HTML, or add `wzlw-force-external-wrapper` to the section, column, or block containing the links. Use the wrapper class in the block editor’s **Additional CSS class(es)** field.
 
 ## Affiliate classes: Mark links for automatic rel/target attributes
 
@@ -117,20 +119,20 @@ An affiliate-marked link is always treated as external for warning purposes too 
 
 ### How to add these classes in WordPress
 
-The steps are identical to the exclusion classes above. Add `wzlw-affiliate` to a single link element, or `wzlw-affiliate-wrapper` to the section, column, or block that contains the links you want to mark.
+Add `wzlw-affiliate` to an anchor’s HTML, or add `wzlw-affiliate-wrapper` to the section, column, or block containing the links. Use the wrapper class in the block editor’s **Additional CSS class(es)** field.
 
 ## Combining both sets of classes
 
-You can use exclusion and force-external classes together. For example, you could force all links in an affiliate section to be treated as external, then exclude one specific link inside that section:
+You can use exclusion and force-external classes together. For example, you could force all links in an affiliate section to be treated as external, then suppress the indicator on one link inside that section:
 
 ```html
 <div class="wzlw-force-external-wrapper">
   <a href="/go/product-a/">Product A</a>
-  <a href="/go/product-b/" class="wzlw-no-icon">Product B (no warning)</a>
+  <a href="/go/product-b/" class="wzlw-no-icon">Product B (no indicator)</a>
 </div>
 ```
 
-Product A gets the warning. Product B is excluded from the warning even though it is inside the force-external wrapper.
+Product A gets the icon and any modal or redirect warning. Product B also gets the modal or redirect warning, but its icon is suppressed by the `wzlw-no-icon` class even though it is inside the force-external wrapper.
 
 ## Changing the default class names
 
@@ -146,4 +148,4 @@ Any link carrying **any** of the listed classes will be treated as a match. The 
 
 ## Adding class names to navigation menus
 
-If you’re using **Appearances > Menus** to manage your navigation menus, you can add the wrapper classes above to force external links and/or hide the icon. You will need to enable viewing this via Screen Options dropdown that you can find in the top right of the page.
+For classic menus, open **Appearance → Menus → Screen Options** and enable **CSS Classes**. Menu-item classes normally apply to the `<li>` container, so use `wzlw-no-icon-wrapper`, `wzlw-force-external-wrapper`, or `wzlw-affiliate-wrapper` for its descendant links.

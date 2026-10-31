@@ -13,7 +13,7 @@ toc: true
 
 [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) uses CSS custom properties (variables) for all colors, spacing, and visual tokens. You can override these in your theme stylesheet without modifying plugin files.
 
-This guide covers the CSS class reference, custom property reference, and common customization recipes — including replacing the default external link icon.
+Use these classes and variables to customize indicators, modals, and redirect screens.
 
 ## CSS classes added to links
 
@@ -65,7 +65,7 @@ The download icon uses the `--wzlw-download-icon-content` CSS variable. The defa
 
 ### Screen reader text
 
-Added to processed links that open in a new tab (`target="_blank"`), regardless of the visual indicator setting:
+Inline warning methods add this span to processed new-tab links (`target="_blank"`), even when visual indicators are suppressed. It is also retained when warnings are disabled for selected users. Pure modal and redirect methods do not append this span:
 
 ```html
 <span class="screen-reader-text">Opens in a new window</span>
@@ -131,6 +131,7 @@ Defined in `includes/assets/css/redirect.css`:
     --wzlw-radius-lg: 8px;
     --wzlw-radius-md: 6px;
     --wzlw-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --wzlw-shadow-card-soft: 0 1px 3px rgba(0, 0, 0, 0.08);
     --wzlw-shadow-primary-hover: 0 4px 12px rgba(2, 116, 190, 0.2);
     --wzlw-transition: all 0.2s ease;
 }
@@ -138,7 +139,7 @@ Defined in `includes/assets/css/redirect.css`:
 
 ## Overriding custom properties
 
-Add overrides in your theme’s stylesheet (or via the Customizer’s Additional CSS). Your rules load after the plugin stylesheet, so they take precedence without `!important`.
+Add overrides in your theme’s stylesheet (or via the Customizer’s Additional CSS). Ensure your overrides load after the plugin stylesheet, or use a more specific selector. Theme stylesheet order varies. The **Enqueue order** example below declares the required dependency.
 
 ```css
 :root {
@@ -172,7 +173,7 @@ The default icon is the ↗ character, rendered via the `--wzlw-icon-content` CS
 
 ```css
 .wzlw-icon::before {
-    content: '1F517'; /* Link emoji, or any Unicode code point. */
+    content: '\1F517'; /* Link emoji, or any Unicode code point. */
     font-size: 0.875em;
 }
 ```
@@ -184,7 +185,7 @@ If your theme already loads an icon font, you can reference a glyph:
 ```css
 .wzlw-icon::before {
     font-family: 'dashicons';
-    content: 'f504'; /* Dashicons external link glyph. */
+    content: '\f504'; /* Dashicons external link glyph. */
     font-size: 14px;
     vertical-align: middle;
 }

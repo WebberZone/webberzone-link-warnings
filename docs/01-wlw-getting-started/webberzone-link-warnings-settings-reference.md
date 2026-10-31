@@ -11,13 +11,13 @@ toc: true
 
 [toc]
 
-This document describes all available settings for the [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) plugin. All plugin settings are available at **Settings > Link Warnings**. The settings page is organized into four tabs: General, Display, Rules, and Advanced.
+[WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) settings are available at **Settings → Link Warnings**. The tabs are General, Display, Rules, and Advanced.
 
 Settings are stored in a single WordPress option: `wzlw_settings`.
 
-## General tab
+**General tab**
 
-### Warning Method
+## Warning Method
 
 Controls how users are warned about external links.
 
@@ -32,7 +32,7 @@ Controls how users are warned about external links.
 **Default:** `inline_modal`
 **Setting key:** `warning_method`
 
-### Inline Indicator Scope
+## Inline Indicator Scope
 
 Determines which links receive warnings. With `both`, modal and redirect warnings also apply to internal links that open in a new tab.
 
@@ -44,65 +44,67 @@ Determines which links receive warnings. With `both`, modal and redirect warning
 **Default:** `external`
 **Setting key:** `scope`
 
-### Enabled Post Types
+## Enabled Post Types
 
-Select which post types the plugin processes. Only singular views of the selected post types are affected. Archive pages, search results, and other non-singular views are not processed.
+Select which post types receive server-side processing of post content and excerpts on singular views. This setting does not disable the sitewide JavaScript scan or the separate External Content filters. Links on archives and search results can still be processed in the browser.
 
 **Default:** `post, page`
 **Setting key:** `enabled_post_types`
 
-### External Content
+**External Content**
 
 These toggles control the server-side filters that process links outside post content. They are enabled by default. The sitewide JavaScript scan can still process markup added later by a theme or another plugin.
 
-#### Process Widget Output
+## Process Widget Output
 
 Processes links in block, Text, and Custom HTML widget output before it is sent to the browser.
 
 **Default:** enabled
 **Setting key:** `process_widgets`
 
-#### Process Navigation Menus
+## Process Navigation Menus
 
 Processes links in classic navigation menu output before it is sent to the browser. Links in block-theme Navigation blocks are covered by Process Block Theme Template Parts when the block is rendered inside a template part.
 
 **Default:** enabled
 **Setting key:** `process_nav_menus`
 
-#### Process Comments
+## Process Comments
 
 Processes links in displayed comment text.
 
 **Default:** enabled
 **Setting key:** `process_comments`
 
-#### Process Block Theme Template Parts
+## Process Block Theme Template Parts
 
 Processes the rendered output of block-theme template parts. This covers links in headers, footers, and other template parts without processing every individual block twice.
 
 **Default:** enabled
 **Setting key:** `process_template_parts`
 
-### Disable Warnings For
+## Disable Warnings For
 
 Hides warnings from logged-in users, for example while you edit your own site. Tick **All logged-in users**, or tick individual roles. Visitors who are not logged in always see warnings.
 
-For the users you select, the plugin adds no visible indicators, data attributes or modal markup, and link rules do not apply. The configured Link Attributes are still added, and links that open in a new tab keep their hidden screen reader text, so screen reader users with an account are still told when a new tab opens.
+For the users you select, the plugin suppresses visible indicators, click warnings, and modal markup. Rule warning methods do not apply. Internal processing markers can still be present. The configured Link Attributes are still added, and processed links that open in a new tab keep their hidden screen reader text, so screen reader users with an account are still told when a new tab opens.
+
+On multisite, selected roles are the user’s roles on the current site. **All logged-in users** also covers super admins who are not members of that site.
 
 Most page caches skip logged-in users. If yours caches pages for logged-in users, it may serve a cached page with or without warnings to the wrong users.
 
 **Default:** none selected
 **Setting key:** `disable_for` (values: `logged_in`, or `role:` followed by the role slug, such as `role:administrator`)
 
-## Display tab
+**Display tab**
 
 The Display tab is divided into three sections: Inline Indicators, Modal Dialog, and Redirect Screen.
 
-### Inline Indicators
+**Inline Indicators**
 
 These settings control the visual indicators appended to processed links. They apply when the warning method includes an inline component (`inline`, `inline_modal`, or `inline_redirect`).
 
-#### Visual Indicator
+## Visual Indicator
 
 | Value | Label | Output |
 | --- | --- | --- |
@@ -114,95 +116,95 @@ These settings control the visual indicators appended to processed links. They a
 **Default:** `icon`
 **Setting key:** `visual_indicator`
 
-#### Icon Style
+## Icon Style
 
 Selects which icon to display next to external links. Options include several built-in arrow and external link symbols, plus a Custom option that uses whatever you enter in the Custom Icon field.
 
 **Default:** `arrow_ne`
 **Setting key:** `icon_style`
 
-#### Custom Icon
+## Custom Icon
 
 A custom icon character or symbol, used only when Icon Style is set to “Custom”. Accepts Unicode symbols or emoji.
 
 **Default:** empty
 **Setting key:** `custom_icon`
 
-#### Icon Color
+## Icon Color
 
 The color for the icon.
 
 **Default:** `#595959`
 **Setting key:** `icon_color`
 
-#### Icon Background Color
+## Icon Background Color
 
 Background color for the icon. Leave empty for transparent.
 
 **Default:** empty
 **Setting key:** `icon_background`
 
-#### Indicator Text
+## Indicator Text
 
 The visible text displayed next to links when the visual indicator is set to “Text” or “Icon + text”.
 
 **Default:** `(opens in new window)`
 **Setting key:** `indicator_text`
 
-#### Screen Reader Text
+## Screen Reader Text
 
-Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. It is added to processed links that open in a new tab (`target="_blank"`), regardless of the visual indicator setting. Links that open in the same tab do not get it.
+Hidden text added inside a `<span class="screen-reader-text">` element for assistive technology. Inline warning methods add it to processed new-tab links (`target="_blank"`), including when visual indicators are suppressed. The disabled-user path also preserves this text. Pure modal and redirect methods do not append the inline span. Existing ARIA labels on processed new-tab links can still receive the announcement. Same-tab links do not get a new-window announcement.
 
 **Default:** `Opens in a new window`
 **Setting key:** `screen_reader_text`
 
-### Modal Dialog
+**Modal Dialog**
 
 These settings control the confirmation dialog shown when the warning method includes a modal component (`modal` or `inline_modal`).
 
-#### Modal Title
+## Modal Title
 
 The heading displayed at the top of the modal dialog.
 
 **Default:** `You are leaving this site`
 **Setting key:** `modal_title`
 
-#### Modal Message
+## Modal Message
 
 The body text displayed in the modal dialog, below the title.
 
 **Default:** `You are about to visit an external website. Continue?`
 **Setting key:** `modal_message`
 
-#### Download Modal Title
+## Download Modal Title
 
 The heading displayed when a visitor follows a link whose URL path ends in a configured downloadable file extension.
 
 **Default:** `You are about to download a file`
 **Setting key:** `download_modal_title`
 
-#### Download Modal Message
+## Download Modal Message
 
 The body text displayed for configured downloadable file links.
 
 **Default:** `This link will download a file. Continue?`
 **Setting key:** `download_modal_message`
 
-#### Continue Button Text
+## Continue Button Text
 
 The label for the button that opens the external link.
 
 **Default:** `Continue`
 **Setting key:** `modal_continue_text`
 
-#### Cancel Button Text
+## Cancel Button Text
 
 The label for the button that closes the modal and returns the user to the page.
 
 **Default:** `Cancel`
 **Setting key:** `modal_cancel_text`
 
-#### Modal Frequency
+## Modal Frequency
 
 Controls how often the modal is shown to the same visitor. Leaving this on **Always show the modal** keeps the original behavior — every click on an external link opens the modal.
 
@@ -212,12 +214,12 @@ Choosing either of the other options adds a **Don't show again** checkbox to the
 - **Once per browser session** — the dismissal is stored in `sessionStorage` and cleared when the browser tab is closed.
 - **Once every N days** — the dismissal is stored in `localStorage` and expires after the number of days set below.
 
-Dismissals are stored per browser, not per user account, so nothing is written to your database.
+Dismissals are stored per browser, not per user account, so nothing is written to your database. Each matching rule has its own dismissal key. Dismissing a general warning does not dismiss a rule’s warning, and dismissing one rule does not dismiss another.
 
 **Default:** `always`
 **Setting key:** `modal_frequency`
 
-#### Remember Dismissal For
+## Remember Dismissal For
 
 The number of days a dismissal is remembered. Only used when the frequency is set to **Once every N days**.
 
@@ -225,7 +227,7 @@ The number of days a dismissal is remembered. Only used when the frequency is se
 **Range:** 1–365
 **Setting key:** `modal_frequency_days`
 
-#### Dismissal Scope
+## Dismissal Scope
 
 Determines how broadly a dismissal applies.
 
@@ -235,39 +237,41 @@ Determines how broadly a dismissal applies.
 **Default:** `domain`
 **Setting key:** `modal_frequency_scope`
 
-#### Don't Show Again Label
+## Don't Show Again Label
 
 The label displayed next to the checkbox in the modal.
 
 **Default:** `Don't show this warning again`
 **Setting key:** `modal_dismiss_text`
 
-### Redirect Screen
+**Redirect Screen**
 
 These settings control the interstitial redirect page shown when the warning method includes a redirect component (`redirect` or `inline_redirect`).
 
-#### Redirect Message
+## Redirect Message
 
 The message displayed on the redirect page above the destination URL.
 
 **Default:** `You are being redirected to an external site.`
 **Setting key:** `redirect_message`
 
-#### Redirect Countdown
+## Redirect Countdown
 
 The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely — the user must click the “Continue to site” link manually.
 
-The countdown only runs for visitors who reach the redirect screen from a page on your site. Browsers report this in the `Sec-Fetch-Site` header, which is sent even with `rel="noreferrer"` or `Referrer-Policy: no-referrer`; older browsers without it fall back to the `Referer` header. Opened from an email, a bookmark or another site, the screen waits for the visitor to click “Continue to site”. Links in comments, links from previews and links with `rel="ugc"` always wait for the click, unless they point to your own site or match a redirect rule. Together, this stops anyone from using your redirect screen as an automatic redirect to a site of their choosing.
+For external destinations, a full signature can count down only when the browser reports arrival from the same origin through `Sec-Fetch-Site`, or falls back to a same-site `Referer` when that header is absent. Direct visits from an email, bookmark, or another site require **Continue to site**. Same-site destinations remain eligible for a countdown, but confirm-only signatures never count down.
 
-The redirect screen is never cached. Redirect links in cached pages keep working after you change the warning method or rules. Redirect links signed by versions before 1.7.0 still open the redirect screen but always wait for the click.
+Links generated during server processing of comment text or previews receive confirm-only signatures unless the destination is same-site or matches a redirect rule. Browser processing also detects `rel="ugc"` and previews. Browser-only comment links without `rel="ugc"` cannot be identified as user content. A ready-made signed redirect URL pasted into a comment is already a same-site link and is not reclassified by its original source.
+
+The redirect screen sends no-cache headers and sets `DONOTCACHEPAGE`. Redirect links in cached pages keep working after you change the warning method or rules. Redirect links signed by versions before 1.7.0 still open the redirect screen but always wait for the click.
 
 **Default:** `5`
 **Range:** 0–60
 **Setting key:** `redirect_countdown`
 
-## Rules tab
+**Rules tab**
 
-### Link Rules
+## Rules
 
 An ordered list of rules that give links matching a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs.
 
@@ -301,30 +305,30 @@ A pattern without a slash matches the domain only. The domain in a pattern is ma
 **Default:** no rules
 **Setting key:** `link_rules`
 
-## Advanced tab
+**Advanced tab**
 
-### Download Links
+**Download Links**
 
-#### Downloadable File Extensions
+## Downloadable File Extensions
 
 A comma-separated list of file extensions whose links should receive a download warning. Matching uses the URL path, is case-insensitive, and ignores query strings and fragments. Internal and external URLs are both supported. Do not include the leading dot.
 
 **Default:** `pdf, zip, doc, docx, xls, xlsx, exe, dmg`
 **Setting key:** `download_extensions`
 
-#### Download Warning Scope
+## Download Warning Scope
 
 Chooses which download links get a download warning.
 
 | Value | Label | Behavior |
 | --- | --- | --- |
 | `all` | All download links | Every link to a configured file extension, whatever the host. |
-| `external` | Download links to external sites only | Skips files on your own site, including root-relative links such as `/wp-content/uploads/file.pdf`. Links with the Force External or Affiliate Link class still count as external. |
+| `external` | Download links to external sites only | Skips download classification for files on your own site, including root-relative links such as `/wp-content/uploads/file.pdf`. Other warning rules and new-tab scope still apply. Force External and Affiliate Link classes still count as external. |
 
 **Default:** `all`
 **Setting key:** `download_scope`
 
-### Link Attributes
+**Link Attributes**
 
 Automatically add `rel` and `target` attributes to matching links at render time. Two independent sets of checkboxes are available — one for **External Links**, one for **Affiliate Links** (see Affiliate Link Class below) — so you can, for example, add `nofollow` to affiliate links only while leaving other external links untouched.
 
@@ -344,7 +348,7 @@ Every option is off by default; nothing is added until you tick it.
 **Default:** none selected
 **Setting keys:** `link_attributes_external`, `link_attributes_affiliate`
 
-### Affiliate Link Class
+## Affiliate Link Class
 
 The CSS class that marks a specific link as an affiliate link. Add this class directly to an `<a>` tag. A link with this class also receives the **Affiliate Links** attribute set above, and is treated as external for warning purposes even if it points to your own domain (the same way the Force External Class does).
 
@@ -353,7 +357,7 @@ Accepts a comma-separated list of class names.
 **Default:** `wzlw-affiliate`
 **Setting key:** `affiliate_class`
 
-### Affiliate Link Wrapper Class
+## Affiliate Link Wrapper Class
 
 The CSS class that marks every link inside a wrapper element as an affiliate link. Add it to any containing element.
 
@@ -362,9 +366,9 @@ Accepts a comma-separated list of class names.
 **Default:** `wzlw-affiliate-wrapper`
 **Setting key:** `affiliate_wrapper_class`
 
-### Excluded Domains
+## Excluded Domains
 
-A list of domains (one per line) that should be treated as internal. Links pointing to these domains are not processed by the plugin, even if they would otherwise be classified as external.
+A list of domains (one per line) that should be treated as internal. These entries suppress warnings unless a warning rule or an Affiliate Link or Force External class overrides the exclusion. Applicable new-tab ARIA announcements can remain.
 
 Enter domain names without the protocol. Two entry formats are supported:
 
@@ -394,7 +398,7 @@ example.com
 **Default:** empty
 **Setting key:** `excluded_domains`
 
-### Suppress Icon Class
+## Suppress Icon Class
 
 The CSS class name that suppresses the visual indicator (icon and/or text) when added directly to an `<a>` tag. The modal or redirect warning still applies if your warning method includes one. Screen reader text is still added if the link opens in a new tab.
 
@@ -403,16 +407,16 @@ Accepts a comma-separated list of class names. A link carrying any of the listed
 **Default:** `wzlw-no-icon`
 **Setting key:** `no_icon_class`
 
-### Suppress Icon Wrapper Class
+## Suppress Icon Wrapper Class
 
-The CSS class name that suppresses visual indicators on all links inside a wrapper element. Add it to any containing element to exclude every link inside it.
+The CSS class name that suppresses visual indicators on all links inside a wrapper element. Add it to any containing element. The modal or redirect warning still applies if your warning method includes one.
 
 Accepts a comma-separated list of class names.
 
 **Default:** `wzlw-no-icon-wrapper`
 **Setting key:** `no_icon_wrapper_class`
 
-### Force External Class
+## Force External Class
 
 The CSS class name that forces a specific link to be treated as external, regardless of its URL. Add it directly to an `<a>` tag.
 
@@ -421,7 +425,7 @@ Accepts a comma-separated list of class names.
 **Default:** `wzlw-force-external`
 **Setting key:** `force_external_class`
 
-### Force External Wrapper Class
+## Force External Wrapper Class
 
 The CSS class name that forces all links inside a wrapper element to be treated as external. Add it to any containing element.
 
@@ -435,7 +439,7 @@ Accepts a comma-separated list of class names.
 All settings can be read and modified programmatically using the wrapper functions defined in `includes/options-api.php`:
 
 ```php
-// Get all settings (merged with defaults).
+// Get the saved settings.
 $settings = wzlw_get_settings();
 
 // Get a single setting with an optional fallback.

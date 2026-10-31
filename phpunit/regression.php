@@ -512,6 +512,60 @@ namespace {
 		$attrs = link_attributes( process( '<a data-wzlw-method="modal" data-wzlw-rule="rule0" href="https://outside.test/">go</a>' ), 'https://outside.test/' );
 		expect( null === $attrs['data-wzlw-method'] && null === $attrs['data-wzlw-rule'], 'Rule attributes survived for a user with warnings disabled.' );
 	};
+	$tests['processed links carry the provenance token'] = static function () {
+		settings( array( 'warning_method' => 'inline' ) );
+		$html = process( '<a href="https://outside.test/token/">go</a><a data-wzlw-token="guess" href="/internal/">internal</a>' );
+		$processor = new \WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'A' );
+		expect( Content_Processor::get_exclusion_token() === $processor->get_attribute( 'data-wzlw-token' ), 'A processed link has no provenance token: ' . $html );
+		$processor->next_tag( 'A' );
+		expect( Content_Processor::get_exclusion_token() !== $processor->get_attribute( 'data-wzlw-token' ), 'An unprocessed link got the provenance token.' );
+	};
+	$tests['author-written indicator markup does not suppress the inline indicator'] = static function () {
+		settings( array( 'warning_method' => 'inline' ) );
+		foreach ( array( '<span class="wzlw-icon" style="display:none"></span>', '<span class="wzlw-text" style="display:none"></span>' ) as $forged ) {
+			$html = process( '<a data-wzlw-indicator="guess" href="https://outside.test/forged/">go' . $forged . '</a>' );
+			expect( 1 === substr_count( $html, '<span class="wzlw-icon" aria-hidden="true"></span>' ), 'Forged indicator markup suppressed the indicator: ' . $html );
+		}
+		settings( array( 'warning_method' => 'inline', 'visual_indicator' => 'none' ) );
+		$html = process( '<a target="_blank" href="https://outside.test/forged/">go<span class="screen-reader-text" hidden>x</span></a>' );
+		expect( 1 === substr_count( $html, '>Opens in a new window</span>' ), 'Forged screen reader markup suppressed the new-window text: ' . $html );
+	};
+	$tests['the signing endpoint keeps untrusted destinations confirm-only'] = static function () {
+		settings( array( 'warning_method' => 'redirect', 'link_rules' => rules( array( array( 'partner.test', 'redirect' ) ) ) ) );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$confirm = static function ( $url ) {
+			parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+			return '1' === ( $query['wzlw_confirm'] ?? '' );
+		};
+		$urls = array( 'https://evil.test/%7Ba%7D', '/go/deal/', 'https://partner.test/x' );
+		$full = $handler->sign_urls( $urls );
+		$safe = $handler->sign_urls( $urls, true );
+		expect( 3 === count( $full ) && ! $confirm( $full['https://evil.test/%7Ba%7D'] ), 'Trusted signing changed.' );
+		expect( $confirm( $safe['https://evil.test/%7Ba%7D'] ), 'An untrusted destination got a full signature.' );
+		expect( ! $confirm( $safe['/go/deal/'] ) && ! $confirm( $safe['https://partner.test/x'] ), 'Same-site or redirect-rule destinations lost their automatic redirect.' );
+
+		settings( array( 'warning_method' => 'modal' ) );
+		expect( array() === $handler->sign_urls( $urls, true ), 'Destinations were signed without a redirect method or rule.' );
+	};
+	$tests['a brace link in a comment cannot be upgraded to a full signature'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$comment = apply_filters( 'comment_text', '<a href="https://evil.test/{a}">x</a>', null, array() );
+		expect( 1 === substr_count( $comment, 'wzlw_confirm=1' ), 'The comment link was not confirm-only: ' . $comment );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$signed  = $handler->sign_urls( array( 'https://evil.test/%7Ba%7D' ), true );
+		expect( false !== strpos( (string) ( $signed['https://evil.test/%7Ba%7D'] ?? '' ), 'wzlw_confirm=1' ), 'Signing the browser form again upgraded the signature.' );
+	};
+	$tests['a wildcard in the host part of a rule never reaches the path'] = static function () {
+		settings( array( 'warning_method' => 'modal', 'link_rules' => rules( array( array( '*.amazon.com/dp/*', 'exclude' ) ) ) ) );
+		$html = process( '<a href="https://evil.test/x.amazon.com/dp/y">a</a><a href="https://evil.test/?q=.amazon.com/dp/1">b</a><a href="https://www.amazon.com/dp/1">c</a>' );
+		expect( 'true' === link_attributes( $html, 'https://evil.test/x.amazon.com/dp/y' )['data-wzlw-external'], 'A path containing the host pattern was excluded.' );
+		expect( 'true' === link_attributes( $html, 'https://evil.test/?q=.amazon.com/dp/1' )['data-wzlw-external'], 'A query containing the host pattern was excluded.' );
+		expect( Content_Processor::get_exclusion_token() === link_attributes( $html, 'https://www.amazon.com/dp/1' )['data-wzlw-excluded'], 'The matching link was not excluded.' );
+
+		settings( array( 'warning_method' => 'modal', 'link_rules' => rules( array( array( '*.partner.test/go/*', 'redirect' ) ) ) ) );
+		expect( ! Redirect_Handler::allows_auto_redirect( 'https://evil.test/x.partner.test/go/1', Link_Rules::get_rules() ), 'A crafted path matched a redirect rule.' );
+	};
 	$tests['download indicators use a distinct icon class'] = static function () {
 		settings();
 		$html = process( '<a href="/files/report.pdf">PDF</a><a href="https://outside.test/page">External</a>' );

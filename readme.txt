@@ -36,7 +36,7 @@ WebberZone Link Warnings uses a two-layer approach to process links across your 
 * __Automatic Link Attributes__: Add `nofollow`, `sponsored`, `ugc`, `noopener`, `noreferrer` and `target="_blank"` to external links, affiliate links, or both — no post edits needed
 * __Affiliate Link Marking__: Flag a link or container with a class and give affiliate links their own attributes
 * __Domain Exclusions__: Allow trusted domains to treat them as internal links
-* __Link Rules__: Give links that match a URL pattern, such as `amazon.com/dp/*` or `/go/*`, their own warning method and message, or exclude them
+* __Link Rules__: Give links that match a URL pattern, such as `www.amazon.com/dp/*` or `/go/*`, their own warning method and message, or exclude them
 * __Hide Warnings While You Edit__: Turn warnings off for logged-in users or selected roles
 * __Sitewide Coverage__: Server-side filters process widget output, navigation menus, comment text, and block-theme template parts, while the JavaScript scan covers remaining theme output
 * __Post Type Control__: PHP-side processing is scoped to configured post types; JS scanning covers the full page regardless
@@ -236,7 +236,7 @@ The default is "Always show the modal", which is the behaviour from earlier vers
 
 Go to Settings > WebberZone Link Warnings > Rules and add a rule. Each rule has a URL pattern, an action and an optional message. Rules are checked from top to bottom and the first match wins. Links that match no rule use your normal settings.
 
-`*` matches any characters. `example.com` matches every link to that domain, `*.example.com` matches its subdomains, `amazon.com/dp/*` matches product pages, and `/go/*` matches cloaked links on your own site. The action can be any warning method, or Exclude to give the link no warning.
+`*` matches any characters. `example.com` matches every link to that domain, `*.example.com` matches its subdomains, `www.amazon.com/dp/*` matches product pages, and `/go/*` matches cloaked links on your own site. The action can be any warning method, or Exclude to give the link no warning.
 
 = How do I stop download warnings on files hosted on my own site? =
 
@@ -280,7 +280,7 @@ Release date: 3 November 2026
 **Security**
 
 * Restricted automatic external redirects to visitors arriving from the site, required confirmation for legacy links and untrusted destinations, and disabled redirect-screen caching.
-* Prevented author-supplied exclusion markers and URLs containing backslashes or control characters from bypassing warnings.
+* Prevented author-supplied exclusion and processing markers and URLs containing backslashes or control characters from bypassing warnings.
 * Kept a confirmation prompt when redirect URL signing failed instead of following the link without a warning.
 
 **Fixed**

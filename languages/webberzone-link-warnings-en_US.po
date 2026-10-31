@@ -29,37 +29,37 @@ msgid "https://webberzone.com/"
 msgstr ""
 
 #: includes/admin/class-settings.php:518
-#: includes/class-content-processor.php:814
-#: includes/class-frontend-handler.php:130
+#: includes/class-content-processor.php:808
+#: includes/class-frontend-handler.php:131
 msgid "(opens in new window)"
 msgstr ""
 
 #: includes/admin/class-settings.php:525
-#: includes/class-content-processor.php:828
-#: includes/class-content-processor.php:840
-#: includes/class-frontend-handler.php:131
+#: includes/class-content-processor.php:822
+#: includes/class-content-processor.php:834
+#: includes/class-frontend-handler.php:132
 msgid "Opens in a new window"
 msgstr ""
 
 #: includes/admin/class-settings.php:540
-#: includes/class-frontend-handler.php:132
+#: includes/class-frontend-handler.php:133
 msgid "You are leaving this site"
 msgstr ""
 
 #: includes/admin/class-settings.php:547
-#: includes/class-frontend-handler.php:133
+#: includes/class-frontend-handler.php:134
 msgid "You are about to visit an external website. Continue?"
 msgstr ""
 
 #: includes/admin/class-settings.php:568
-#: includes/class-frontend-handler.php:136
-#: includes/class-frontend-handler.php:183
+#: includes/class-frontend-handler.php:137
+#: includes/class-frontend-handler.php:184
 msgid "Continue"
 msgstr ""
 
 #: includes/admin/class-settings.php:575
-#: includes/class-frontend-handler.php:137
-#: includes/class-frontend-handler.php:182
+#: includes/class-frontend-handler.php:138
+#: includes/class-frontend-handler.php:183
 msgid "Cancel"
 msgstr ""
 
@@ -388,7 +388,7 @@ msgstr ""
 msgid "Follow us"
 msgstr ""
 
-#: includes/class-frontend-handler.php:168
+#: includes/class-frontend-handler.php:169
 msgid "Close dialog"
 msgstr ""
 
@@ -589,7 +589,7 @@ msgstr ""
 msgid "Support WebberZone Link Warnings"
 msgstr ""
 
-#: includes/class-frontend-handler.php:174
+#: includes/class-frontend-handler.php:175
 msgid "External URL:"
 msgstr ""
 
@@ -614,7 +614,7 @@ msgid "CSS class that forces all links inside a wrapper element to be treated as
 msgstr ""
 
 #: includes/admin/class-settings.php:615
-#: includes/class-frontend-handler.php:162
+#: includes/class-frontend-handler.php:163
 msgid "Don't show this warning again"
 msgstr ""
 
@@ -791,7 +791,7 @@ msgid "Title shown when a visitor follows a link to a configured downloadable fi
 msgstr ""
 
 #: includes/admin/class-settings.php:554
-#: includes/class-frontend-handler.php:134
+#: includes/class-frontend-handler.php:135
 msgid "You are about to download a file"
 msgstr ""
 
@@ -804,7 +804,7 @@ msgid "Message shown when a visitor follows a link to a configured downloadable 
 msgstr ""
 
 #: includes/admin/class-settings.php:561
-#: includes/class-frontend-handler.php:135
+#: includes/class-frontend-handler.php:136
 msgid "This link will download a file. Continue?"
 msgstr ""
 
@@ -877,10 +877,6 @@ msgstr ""
 msgid "Link Rules"
 msgstr ""
 
-#: includes/admin/class-settings.php:791
-msgid "Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule."
-msgstr ""
-
 #: includes/admin/class-settings.php:803
 msgid "New rule"
 msgstr ""
@@ -923,4 +919,8 @@ msgstr ""
 
 #: includes/admin/class-settings.php:853
 msgid "Exclude (no warning)"
+msgstr ""
+
+#: includes/admin/class-settings.php:791
+msgid "Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>www.amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule."
 msgstr ""

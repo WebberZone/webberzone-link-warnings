@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Patterns use `*` as a wildcard and nothing else. Matching uses a plain wildcard
  * matcher rather than regular expressions, so it cannot backtrack catastrophically,
  * and every step is mirrored exactly in modal.js: normalize_href() and
- * normalizeRuleHref(), get_subject() and getRuleSubject(), wildcard_match() and
- * wildcardMatch(). Patterns and subjects are lowercased in ASCII only, so PHP and
+ * normalizeRuleHref(), get_subject() and getRuleSubject(), matches_subject() and
+ * matchesSubject(), wildcard_match() and wildcardMatch(). Patterns and subjects are lowercased in ASCII only, so PHP and
  * JavaScript always fold case the same way.
  *
  * @since 1.7.0
@@ -147,13 +147,34 @@ class Link_Rules {
 		}
 
 		foreach ( $rules as $rule ) {
-			$target = $rule['host_only'] ? $subject['host'] : $subject['host'] . $subject['path'];
-			if ( self::wildcard_match( $rule['pattern'], $target ) ) {
+			if ( self::matches_subject( $rule['pattern'], $subject ) ) {
 				return $rule;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Match a normalized pattern against a subject from get_subject().
+	 *
+	 * The host and the path are matched separately, so a `*` in the host part can
+	 * never reach into the path, and `*.example.com/go/*` cannot match
+	 * `https://evil.test/x.example.com/go/`.
+	 *
+	 * @since 1.7.0
+	 * @param string $pattern Normalized pattern.
+	 * @param array  $subject Subject with host and path keys.
+	 * @return bool True if the subject matches.
+	 */
+	public static function matches_subject( $pattern, array $subject ) {
+		$slash = strpos( $pattern, '/' );
+		if ( false === $slash ) {
+			return self::wildcard_match( $pattern, $subject['host'] );
+		}
+
+		return self::wildcard_match( substr( $pattern, 0, $slash ), $subject['host'] )
+			&& self::wildcard_match( substr( $pattern, $slash ), $subject['path'] );
 	}
 
 	/**

@@ -76,6 +76,7 @@
 		const noIconClasses = Array.isArray(settings.noIconClass) ? settings.noIconClass : (settings.noIconClass ? [settings.noIconClass] : []);
 
 		const linksNeedingRedirectUrl = [];
+		const linksNeedingConfirmUrl = [];
 
 		document.querySelectorAll('a').forEach(function (link) {
 			const href = link.getAttribute('href');
@@ -144,6 +145,9 @@
 			const isInlineMethod = ['inline', 'inline_modal', 'inline_redirect'].includes(linkMethod);
 			const needsDataAttrs = !warningsDisabled && ['modal', 'inline_modal', 'redirect', 'inline_redirect'].includes(linkMethod);
 			const needsRedirectUrl = ['redirect', 'inline_redirect'].includes(linkMethod);
+			// Without PHP's token, a signed URL on the link was not written by PHP.
+			const staleConfirm = isConfirmOnlyUrl(link.getAttribute('data-wzlw-redirect-url'));
+			link.removeAttribute('data-wzlw-redirect-url');
 			if (linkRuleMethod) {
 				link.setAttribute('data-wzlw-rule', rule.id);
 				link.setAttribute('data-wzlw-method', linkRuleMethod);
@@ -176,12 +180,14 @@
 					link.setAttribute('data-wzlw-download', 'true');
 				}
 				if (needsRedirectUrl) {
-					linksNeedingRedirectUrl.push(link);
+					(staleConfirm || isUntrustedLink(link) ? linksNeedingConfirmUrl : linksNeedingRedirectUrl).push(link);
 				}
 			}
 
 			if (isInlineMethod) {
-				const indicator = buildIndicatorHtml(!!(warningsDisabled || inNoIconWrapper || hasNoIconClass), hasTarget, isDownload, !hasVisibleText(link));
+				// Indicators from a page cached before the token are kept as presentation, not trusted.
+				const existing = getExistingIndicators(link);
+				const indicator = buildIndicatorHtml(!!(warningsDisabled || inNoIconWrapper || hasNoIconClass || existing.visual), hasTarget && !existing.screenReader, isDownload, !hasVisibleText(link));
 				if (indicator) {
 					link.insertAdjacentHTML('beforeend', indicator);
 				}
@@ -191,19 +197,46 @@
 		// Links signed by PHP in a form the browser parses differently, such as an href with
 		// braces that esc_url_raw() strips, fail validation on click; sign them again.
 		document.querySelectorAll('a[data-wzlw-redirect-url]').forEach(function (link) {
-			if (settings.warningsDisabled || !link.hasAttribute('data-wzlw-redirect-url')) {
+			if (settings.warningsDisabled || !link.hasAttribute('data-wzlw-redirect-url') || !isServerProcessed(link)) {
 				return;
 			}
 			const destination = parseHttpUrl(link.getAttribute('href'));
-			if (destination && !getRedirectUrl(link, destination) && !linksNeedingRedirectUrl.includes(link)) {
+			if (destination && !getRedirectUrl(link, destination) && !linksNeedingRedirectUrl.includes(link) && !linksNeedingConfirmUrl.includes(link)) {
+				// A confirm-only signature from PHP stays confirm-only when the link is signed again.
+				const confirmOnly = isConfirmOnlyUrl(link.getAttribute('data-wzlw-redirect-url')) || isUntrustedLink(link);
 				link.setAttribute('data-wzlw-url', destination.href);
-				linksNeedingRedirectUrl.push(link);
+				(confirmOnly ? linksNeedingConfirmUrl : linksNeedingRedirectUrl).push(link);
 			}
 		});
 
 		if (linksNeedingRedirectUrl.length) {
-			fetchRedirectUrls(linksNeedingRedirectUrl);
+			fetchRedirectUrls(linksNeedingRedirectUrl, false);
 		}
+		if (linksNeedingConfirmUrl.length) {
+			fetchRedirectUrls(linksNeedingConfirmUrl, true);
+		}
+	}
+
+	/**
+	 * Return true if a redirect URL carries a confirm-only signature.
+	 *
+	 * @param {string|null} value
+	 * @return {boolean}
+	 */
+	function isConfirmOnlyUrl(value) {
+		const url = parseHttpUrl(value);
+		return !!url && '1' === url.searchParams.get('wzlw_confirm');
+	}
+
+	/**
+	 * Return true if a link comes from content the site does not control, mirroring the
+	 * rel="ugc" and preview checks in PHP's Content_Processor::process_content().
+	 *
+	 * @param {HTMLElement} link
+	 * @return {boolean}
+	 */
+	function isUntrustedLink(link) {
+		return !!settings.isPreview || (link.getAttribute('rel') || '').toLowerCase().split(/\s+/).includes('ugc');
 	}
 
 	/**
@@ -221,23 +254,26 @@
 	/**
 	 * Return true if PHP already processed this link.
 	 *
-	 * The marker class alone is not proof: a content author can write it, and skipping
-	 * on that would let any link opt out of every warning. PHP always leaves state
-	 * alongside it — data attributes under the modal and redirect methods, an indicator
-	 * or screen reader span under the inline methods.
+	 * The marker class alone is not proof: a content author can write it, and any other
+	 * attribute or indicator markup with it, so skipping on those would let any link
+	 * opt out of every warning. PHP also leaves its per-request token on the link.
 	 *
 	 * @param {HTMLAnchorElement} link Link to test.
 	 * @return {boolean}
 	 */
 	function isServerProcessed(link) {
-		if (!link.classList.contains('wzlw-processed')) {
-			return false;
-		}
+		return link.classList.contains('wzlw-processed') && hasServerToken(link, 'data-wzlw-token');
+	}
 
-		const stateAttributes = ['data-wzlw-url', 'data-wzlw-external', 'data-wzlw-blank', 'data-wzlw-download', 'data-wzlw-redirect-url', 'data-wzlw-excluded', 'data-wzlw-method'];
-
-		return stateAttributes.some(function (name) { return link.hasAttribute(name); })
-			|| !!link.querySelector('.wzlw-icon, .wzlw-text, .screen-reader-text');
+	/**
+	 * Return true if a link attribute carries PHP's per-request token.
+	 *
+	 * @param {HTMLElement} link
+	 * @param {string} name Attribute name.
+	 * @return {boolean}
+	 */
+	function hasServerToken(link, name) {
+		return !!settings.excludedToken && settings.excludedToken === link.getAttribute(name);
 	}
 
 	/**
@@ -248,7 +284,7 @@
 	 * @return {boolean}
 	 */
 	function isPhpExcluded(link) {
-		return !!settings.excludedToken && settings.excludedToken === link.getAttribute('data-wzlw-excluded');
+		return hasServerToken(link, 'data-wzlw-excluded');
 	}
 
 	/**
@@ -523,11 +559,27 @@
 			return null;
 		}
 		for (const rule of linkRules) {
-			if (wildcardMatch(rule.pattern, rule.hostOnly ? subject.host : subject.host + subject.path)) {
+			if (matchesSubject(rule.pattern, subject)) {
 				return rule;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Match the host and path parts of a pattern separately, so a * in the host
+	 * never reaches into the path, mirroring PHP's Link_Rules::matches_subject().
+	 *
+	 * @param {string} pattern
+	 * @param {{host: string, path: string}} subject
+	 * @return {boolean}
+	 */
+	function matchesSubject(pattern, subject) {
+		const slash = pattern.indexOf('/');
+		if (-1 === slash) {
+			return wildcardMatch(pattern, subject.host);
+		}
+		return wildcardMatch(pattern.slice(0, slash), subject.host) && wildcardMatch(pattern.slice(slash), subject.path);
 	}
 
 	/**
@@ -620,6 +672,37 @@
 	}
 
 	/**
+	 * Find indicators already on a link in exactly the markup PHP and this script write.
+	 *
+	 * Only direct children with no other attributes count, so markup that hides itself or
+	 * sits inside a hidden wrapper is not mistaken for a visible indicator. Such markup
+	 * only stops a duplicate; it never stops the link from being classified.
+	 *
+	 * @param {HTMLElement} link
+	 * @return {{visual: boolean, screenReader: boolean}}
+	 */
+	function getExistingIndicators(link) {
+		const icons = ['<span class="wzlw-icon" aria-hidden="true"></span>', '<span class="wzlw-icon wzlw-download-icon" aria-hidden="true"></span>'];
+		const text = '<span class="wzlw-text" aria-hidden="true">' + escText(settings.indicatorText || '') + '</span>';
+		const srText = '<span class="screen-reader-text">' + escText(settings.screenReaderText || '') + '</span>';
+		const children = Array.from(link.children || []).map(function (child) { return child.outerHTML; });
+		return {
+			visual: children.some(function (html) { return icons.includes(html) || html === text; }),
+			screenReader: !!settings.screenReaderText && children.includes(srText),
+		};
+	}
+
+	/**
+	 * Escape text the way the browser serializes it in outerHTML.
+	 *
+	 * @param {string} str
+	 * @return {string}
+	 */
+	function escText(str) {
+		return str.replace(/&/g, '&amp;').replace(/\u00a0/g, '&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
+
+	/**
 	 * Minimal HTML escaping for text injected via insertAdjacentHTML.
 	 *
 	 * @param {string} str
@@ -654,14 +737,18 @@
 	 * Only used for redirect/inline_redirect methods.
 	 *
 	 * @param {HTMLElement[]} links
+	 * @param {boolean} confirmOnly Whether the links need confirm-only signatures.
 	 */
-	function fetchRedirectUrls(links) {
+	function fetchRedirectUrls(links, confirmOnly) {
 		links.forEach(function (link) {
 			link.setAttribute('data-wzlw-signing', 'true');
 		});
 		const formData = new FormData();
 		formData.append('action', 'wzlw_sign_urls');
 		formData.append('nonce', settings.nonce || '');
+		if (confirmOnly) {
+			formData.append('confirm', '1');
+		}
 		links.forEach(function (link) {
 			formData.append('urls[]', link.getAttribute('data-wzlw-url'));
 		});

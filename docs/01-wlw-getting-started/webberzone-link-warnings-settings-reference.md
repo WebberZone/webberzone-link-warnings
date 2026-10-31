@@ -286,10 +286,10 @@ Each rule has three fields:
 | `example.com` | Every link to `example.com`, whatever the path. Not its subdomains. |
 | `*.example.com` | Every link to a subdomain of `example.com`. Not `example.com` itself. |
 | `example.com/go/*` | Links to `example.com` whose path starts with `/go/`. |
-| `amazon.*/dp/*` | Product links on any `amazon.` domain, such as `amazon.com` or `amazon.co.uk`. |
+| `www.amazon.com/dp/*` | Product links on `www.amazon.com`. Add a separate rule for each other domain, such as `www.amazon.co.uk/dp/*`. |
 | `/go/*` | Links on your own site whose path starts with `/go/`, such as cloaked affiliate links. |
 
-A pattern without a slash matches the domain only. A pattern with a slash matches the domain and the path, including any query string, so it must match to the end: use a trailing `*` to match everything below a path. Relative links that do not start with a slash, such as `page/`, are not matched.
+A pattern without a slash matches the domain only. The domain in a pattern is matched exactly, so `example.com` does not cover `www.example.com`, and a `*` in the domain never matches part of the path. A pattern with a slash matches the domain and the path, including any query string, so it must match to the end: use a trailing `*` to match everything below a path. Relative links that do not start with a slash, such as `page/`, are not matched.
 
 **How rules combine with other settings:**
 

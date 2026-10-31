@@ -4,6 +4,29 @@ const { join } = require('node:path');
 const { test } = require('node:test');
 const vm = require('node:vm');
 
+// Top-level elements of a markup string, enough for the indicator markup the tests use.
+function topLevelElements(markup) {
+	const elements = [];
+	const tags = /<(\/?)([a-z]+)\b[^>]*>/gi;
+	let depth = 0;
+	let start = 0;
+	let match;
+	while ((match = tags.exec(markup))) {
+		if (match[1]) {
+			depth--;
+			if (0 === depth) {
+				elements.push({ outerHTML: markup.slice(start, tags.lastIndex) });
+			}
+		} else {
+			if (0 === depth) {
+				start = match.index;
+			}
+			depth++;
+		}
+	}
+	return elements;
+}
+
 function element(attributes = {}, innerMarkup = '') {
 	const attrs = { ...attributes };
 	const listeners = {};
@@ -13,6 +36,7 @@ function element(attributes = {}, innerMarkup = '') {
 		textContent: '',
 		checked: false,
 		markup: innerMarkup,
+		get children() { return topLevelElements(this.markup); },
 		getAttribute: (name) => name === 'class' ? [...classes].join(' ') : (attrs[name] ?? null),
 		hasAttribute: (name) => Object.hasOwn(attrs, name),
 		setAttribute: (name, value) => { attrs[name] = String(value); },
@@ -88,7 +112,7 @@ function boot(script, attributes, overrides = {}, innerMarkup = '', windowExtras
 		URL,
 		FormData,
 		CSS: { escape: (value) => value },
-		fetch: async () => ({ json: async () => ({ success: true, data: {} }) }),
+		fetch: windowExtras.fetch || (async () => ({ json: async () => ({ success: true, data: {} }) })),
 	};
 	vm.runInNewContext(script, context);
 	return {
@@ -140,7 +164,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	}
 	for (const destination of ['javascript:void(0)', 'https://outside.test/', 'https://site.test/blog/other/', redirectUrl('https://different.test/')]) {
 		test(`${filename}: rejects forged redirect attribute: ${destination}`, () => {
-			const page = boot(script, { href: '/safe/', class: 'wzlw-processed', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': destination }, { warningMethod: 'redirect' });
+			const page = boot(script, { href: '/safe/', class: 'wzlw-processed', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': destination }, { warningMethod: 'redirect', excludedToken: 'tok' });
 			// Fail closed: the click is stopped and the link is signed again.
 			assert.equal(page.click(), true);
 			assert.equal(page.location.href, 'https://site.test/blog/post/');
@@ -152,7 +176,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		test(`${filename}: valid signed redirect retains navigation behavior for ${target || 'same tab'}`, () => {
 			const destination = 'https://outside.test/?a=1&b=2#section';
 			const signed = redirectUrl(destination);
-			const page = boot(script, { href: destination, target, rel: 'noreferrer', class: 'wzlw-processed', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': signed }, { warningMethod: 'redirect' });
+			const page = boot(script, { href: destination, target, rel: 'noreferrer', class: 'wzlw-processed', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': signed }, { warningMethod: 'redirect', excludedToken: 'tok' });
 			assert.equal(page.click(), true);
 			if (target) {
 				assert.deepEqual(page.opened[0], [signed, '_blank', 'noopener,noreferrer']);
@@ -163,7 +187,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	}
 	test(`${filename}: root-relative affiliate redirects still work`, () => {
 		const signed = redirectUrl('/go/product/');
-		const page = boot(script, { href: '/go/product/', class: 'wzlw-processed', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': signed }, { warningMethod: 'redirect' });
+		const page = boot(script, { href: '/go/product/', class: 'wzlw-processed', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': signed }, { warningMethod: 'redirect', excludedToken: 'tok' });
 		assert.equal(page.click(), true);
 		assert.equal(page.location.href, signed);
 	});
@@ -265,7 +289,7 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 	});
 	test(`${filename}: a PHP-processed rule link is left alone and uses its own method`, () => {
 		const rules = [{ id: 'm', pattern: 'outside.test', hostOnly: true, action: 'modal', message: 'Rule message' }];
-		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-processed wzlw-external', 'data-wzlw-rule': 'm', 'data-wzlw-method': 'modal', 'data-wzlw-url': 'https://outside.test/', 'data-wzlw-external': 'true' }, { linkRules: rules, warningMethod: 'inline' });
+		const page = boot(script, { href: 'https://outside.test/', class: 'wzlw-processed wzlw-external', 'data-wzlw-token': 'tok', 'data-wzlw-rule': 'm', 'data-wzlw-method': 'modal', 'data-wzlw-url': 'https://outside.test/', 'data-wzlw-external': 'true' }, { linkRules: rules, warningMethod: 'inline', excludedToken: 'tok' });
 		assert.equal(page.link.markup, '');
 		assert.equal(page.click(), true);
 		assert.equal(page.message.textContent, 'Rule message');
@@ -375,15 +399,15 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.click(), true);
 	});
 	test(`${filename}: a PHP-processed link is left alone`, () => {
-		const page = boot(script, { href: 'https://outside.test/done/', class: 'wzlw-processed wzlw-external', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://outside.test/done/' });
+		const page = boot(script, { href: 'https://outside.test/done/', class: 'wzlw-processed wzlw-external', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://outside.test/done/' }, { excludedToken: 'tok' });
 		assert.equal(page.link.markup, '');
 	});
 	test(`${filename}: a PHP-processed inline-only link is left alone`, () => {
-		const page = boot(script, { href: 'https://outside.test/inline/', class: 'wzlw-processed wzlw-external' }, { warningMethod: 'inline' }, '<span class="screen-reader-text">Opens in a new window</span><span class="wzlw-icon" aria-hidden="true"></span>');
+		const page = boot(script, { href: 'https://outside.test/inline/', class: 'wzlw-processed wzlw-external', 'data-wzlw-token': 'tok' }, { warningMethod: 'inline', excludedToken: 'tok' }, '<span class="screen-reader-text">Opens in a new window</span><span class="wzlw-icon" aria-hidden="true"></span>');
 		assert.equal(page.link.markup, '<span class="screen-reader-text">Opens in a new window</span><span class="wzlw-icon" aria-hidden="true"></span>');
 	});
 	test(`${filename}: an existing ARIA label is not appended twice`, () => {
-		const page = boot(script, { href: 'https://outside.test/aria/', class: 'wzlw-processed wzlw-external', 'aria-label': 'Docs, Opens in a new window' }, { screenReaderText: 'Opens in a new window', warningMethod: 'none' });
+		const page = boot(script, { href: 'https://outside.test/aria/', class: 'wzlw-processed wzlw-external', 'data-wzlw-token': 'tok', 'aria-label': 'Docs, Opens in a new window' }, { screenReaderText: 'Opens in a new window', warningMethod: 'none', excludedToken: 'tok' });
 		assert.equal(page.link.getAttribute('aria-label'), 'Docs, Opens in a new window');
 	});
 	for (const href of ['/path/', '//site.test/path/', '?query=1', '#section']) {
@@ -397,6 +421,93 @@ for (const filename of ['modal.js', 'modal.min.js']) {
 		assert.equal(page.link.getAttribute('data-wzlw-blank'), null);
 		assert.equal(page.link.markup, '');
 	});
+	for (const forged of [{ 'data-wzlw-excluded': 'x' }, { 'data-wzlw-url': 'x' }, { 'data-wzlw-method': 'inline' }, { 'data-wzlw-token': 'guess' }, {}]) {
+		test(`${filename}: forged processed markup without the token is scanned: ${JSON.stringify(forged)}`, () => {
+			const page = boot(script, { href: 'https://evil.test/', class: 'wzlw-processed', ...forged }, { warningMethod: 'modal', excludedToken: 'tok' });
+			assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+			assert.equal(page.click(), true);
+			assert.equal(page.modal.hasAttribute('hidden'), false);
+		});
+	}
+	test(`${filename}: forged indicator markup does not skip an inline-only link`, () => {
+		const page = boot(script, { href: 'https://evil.test/', class: 'wzlw-processed' }, { warningMethod: 'inline', excludedToken: 'tok' }, '<span class="wzlw-icon" style="display:none"></span>');
+		assert.equal(page.link.getAttribute('class').includes('wzlw-external'), true);
+		assert.equal((page.link.markup.match(/wzlw-icon/g) || []).length, 2);
+	});
+	function signingFetch(requests, signed) {
+		return async (_, options) => {
+			requests.push({ urls: options.body.getAll('urls[]'), confirm: options.body.get('confirm') });
+			return { json: async () => ({ success: true, data: signed || {} }) };
+		};
+	}
+	test(`${filename}: a confirm-only PHP signature stays confirm-only when the link is signed again`, async () => {
+		const requests = [];
+		const confirmUrl = redirectUrl('https://evil.test/a') + '&wzlw_confirm=1';
+		const page = boot(script, { href: 'https://evil.test/{a}', class: 'wzlw-processed', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-url': 'https://evil.test/a', 'data-wzlw-redirect-url': confirmUrl }, { warningMethod: 'redirect', excludedToken: 'tok' }, '', { fetch: signingFetch(requests) });
+		assert.deepEqual(requests, [{ urls: ['https://evil.test/%7Ba%7D'], confirm: '1' }]);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		assert.equal(page.link.getAttribute('data-wzlw-signing'), null);
+	});
+	test(`${filename}: a full PHP signature is signed again in full`, () => {
+		const requests = [];
+		boot(script, { href: 'https://outside.test/{a}', class: 'wzlw-processed', 'data-wzlw-token': 'tok', 'data-wzlw-external': 'true', 'data-wzlw-redirect-url': redirectUrl('https://outside.test/a') }, { warningMethod: 'redirect', excludedToken: 'tok' }, '', { fetch: signingFetch(requests) });
+		assert.deepEqual(requests, [{ urls: ['https://outside.test/%7Ba%7D'], confirm: null }]);
+	});
+	for (const [label, attributes, overrides, confirm] of [
+		['a rel="ugc" link', { href: 'https://author.test/', rel: 'external nofollow UGC' }, {}, '1'],
+		['a link on a preview', { href: 'https://outside.test/' }, { isPreview: true }, '1'],
+		['a stale confirm-only URL', { href: 'https://outside.test/', 'data-wzlw-redirect-url': redirectUrl('https://outside.test/') + '&wzlw_confirm=1' }, {}, '1'],
+		['an ordinary link', { href: 'https://outside.test/', rel: 'nofollow' }, {}, null],
+	]) {
+		test(`${filename}: browser-only signing of ${label} sends confirm=${confirm}`, () => {
+			const requests = [];
+			const page = boot(script, attributes, { warningMethod: 'redirect', ...overrides }, '', { fetch: signingFetch(requests) });
+			assert.equal(requests.length, 1);
+			assert.equal(requests[0].confirm, confirm);
+			assert.equal(page.link.hasAttribute('data-wzlw-redirect-url'), false, 'an unsigned redirect URL was kept');
+		});
+	}
+	test(`${filename}: an author-written full redirect URL on a ugc link is not used`, async () => {
+		const requests = [];
+		const extras = { fetch: async (...args) => { await signingFetch(requests)(...args); return { json: async () => ({ success: false }) }; }, confirm: () => false };
+		const page = boot(script, { href: 'https://author.test/', rel: 'ugc', 'data-wzlw-redirect-url': redirectUrl('https://author.test/') }, { warningMethod: 'redirect' }, '', extras);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		assert.equal(page.click(), true);
+		assert.equal(page.location.href, 'https://site.test/blog/post/');
+		assert.equal(page.opened.length, 0);
+	});
+	const cachedIcon = '<span class="wzlw-icon" aria-hidden="true"></span>';
+	const cachedSr = '<span class="screen-reader-text">Opens in a new window</span>';
+	const cachedText = '<span class="wzlw-text" aria-hidden="true">(opens in new window)</span>';
+	for (const method of ['inline', 'inline_modal', 'inline_redirect']) {
+		test(`${filename}: a cached pre-token ${method} link is classified again without duplicate indicators`, () => {
+			const requests = [];
+			const page = boot(script, { href: 'https://outside.test/cached/', target: '_blank', class: 'wzlw-processed wzlw-external', 'data-wzlw-external': 'true' }, { warningMethod: method, excludedToken: 'tok', screenReaderText: 'Opens in a new window', visualIndicator: 'both', indicatorText: '(opens in new window)' }, cachedSr + cachedIcon + cachedText, { fetch: signingFetch(requests) });
+			assert.equal(page.link.markup, cachedSr + cachedIcon + cachedText, 'a duplicate indicator or screen reader text was added');
+			assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+			if ('inline' !== method) {
+				assert.equal(page.link.getAttribute('data-wzlw-url'), 'https://outside.test/cached/');
+				assert.equal(page.click(), true, 'the cached link lost its click warning');
+			}
+			assert.equal(requests.length, 'inline_redirect' === method ? 1 : 0);
+		});
+	}
+	test(`${filename}: a cached pre-token link with only screen reader text still gets its icon`, () => {
+		const page = boot(script, { href: 'https://outside.test/cached/', target: '_blank', class: 'wzlw-processed wzlw-external' }, { warningMethod: 'inline_modal', excludedToken: 'tok', screenReaderText: 'Opens in a new window' }, cachedSr);
+		assert.equal(page.link.markup, cachedSr + cachedIcon);
+		assert.equal(page.click(), true);
+	});
+	test(`${filename}: a cached pre-token excluded marker does not skip classification`, () => {
+		const page = boot(script, { href: 'https://outside.test/old/', class: 'wzlw-processed', 'data-wzlw-excluded': 'true' }, { warningMethod: 'modal', excludedToken: 'tok' });
+		assert.equal(page.link.getAttribute('data-wzlw-external'), 'true');
+		assert.equal(page.click(), true);
+	});
+	for (const forged of ['<span class="wzlw-icon" aria-hidden="true" style="display:none"></span>', '<span style="display:none">' + cachedIcon + '</span>', '<span class="wzlw-icon wzlw-hide" aria-hidden="true"></span>', '<span class="wzlw-text" aria-hidden="true"></span>']) {
+		test(`${filename}: look-alike indicator markup is not taken for a visible indicator: ${forged}`, () => {
+			const page = boot(script, { href: 'https://outside.test/forged/', class: 'wzlw-processed' }, { warningMethod: 'inline', excludedToken: 'tok', indicatorText: '(opens in new window)' }, forged);
+			assert.equal(page.link.markup, forged + cachedIcon);
+		});
+	}
 	test(`${filename}: destination is revalidated when Continue is clicked`, () => {
 		const page = boot(script, { href: 'https://outside.test/' });
 		page.click();

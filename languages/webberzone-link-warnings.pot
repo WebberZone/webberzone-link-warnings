@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-31T11:44:40+00:00\n"
+"POT-Creation-Date: 2026-10-31T15:03:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webberzone-link-warnings\n"
@@ -440,8 +440,8 @@ msgid "Text displayed next to links (when text indicator is enabled)."
 msgstr ""
 
 #: includes/admin/class-settings.php:518
-#: includes/class-content-processor.php:814
-#: includes/class-frontend-handler.php:130
+#: includes/class-content-processor.php:808
+#: includes/class-frontend-handler.php:131
 msgid "(opens in new window)"
 msgstr ""
 
@@ -454,9 +454,9 @@ msgid "Hidden text for screen readers."
 msgstr ""
 
 #: includes/admin/class-settings.php:525
-#: includes/class-content-processor.php:828
-#: includes/class-content-processor.php:840
-#: includes/class-frontend-handler.php:131
+#: includes/class-content-processor.php:822
+#: includes/class-content-processor.php:834
+#: includes/class-frontend-handler.php:132
 msgid "Opens in a new window"
 msgstr ""
 
@@ -469,7 +469,7 @@ msgid "Title shown in the modal dialog."
 msgstr ""
 
 #: includes/admin/class-settings.php:540
-#: includes/class-frontend-handler.php:132
+#: includes/class-frontend-handler.php:133
 msgid "You are leaving this site"
 msgstr ""
 
@@ -482,7 +482,7 @@ msgid "Message shown in the modal dialog."
 msgstr ""
 
 #: includes/admin/class-settings.php:547
-#: includes/class-frontend-handler.php:133
+#: includes/class-frontend-handler.php:134
 msgid "You are about to visit an external website. Continue?"
 msgstr ""
 
@@ -495,7 +495,7 @@ msgid "Title shown when a visitor follows a link to a configured downloadable fi
 msgstr ""
 
 #: includes/admin/class-settings.php:554
-#: includes/class-frontend-handler.php:134
+#: includes/class-frontend-handler.php:135
 msgid "You are about to download a file"
 msgstr ""
 
@@ -508,7 +508,7 @@ msgid "Message shown when a visitor follows a link to a configured downloadable 
 msgstr ""
 
 #: includes/admin/class-settings.php:561
-#: includes/class-frontend-handler.php:135
+#: includes/class-frontend-handler.php:136
 msgid "This link will download a file. Continue?"
 msgstr ""
 
@@ -521,8 +521,8 @@ msgid "Text for the continue button."
 msgstr ""
 
 #: includes/admin/class-settings.php:568
-#: includes/class-frontend-handler.php:136
-#: includes/class-frontend-handler.php:183
+#: includes/class-frontend-handler.php:137
+#: includes/class-frontend-handler.php:184
 msgid "Continue"
 msgstr ""
 
@@ -535,8 +535,8 @@ msgid "Text for the cancel button."
 msgstr ""
 
 #: includes/admin/class-settings.php:575
-#: includes/class-frontend-handler.php:137
-#: includes/class-frontend-handler.php:182
+#: includes/class-frontend-handler.php:138
+#: includes/class-frontend-handler.php:183
 msgid "Cancel"
 msgstr ""
 
@@ -593,7 +593,7 @@ msgid "Label for the \"Don't show again\" checkbox in the modal."
 msgstr ""
 
 #: includes/admin/class-settings.php:615
-#: includes/class-frontend-handler.php:162
+#: includes/class-frontend-handler.php:163
 msgid "Don't show this warning again"
 msgstr ""
 
@@ -731,7 +731,7 @@ msgid "Link Rules"
 msgstr ""
 
 #: includes/admin/class-settings.php:791
-msgid "Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule."
+msgid "Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>www.amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule."
 msgstr ""
 
 #: includes/admin/class-settings.php:803
@@ -864,11 +864,11 @@ msgstr ""
 msgid "Follow us"
 msgstr ""
 
-#: includes/class-frontend-handler.php:168
+#: includes/class-frontend-handler.php:169
 msgid "Close dialog"
 msgstr ""
 
-#: includes/class-frontend-handler.php:174
+#: includes/class-frontend-handler.php:175
 msgid "External URL:"
 msgstr ""
 

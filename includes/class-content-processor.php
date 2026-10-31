@@ -263,6 +263,8 @@ class Content_Processor {
 				$new_classes = array_merge( $new_classes, $this->parse_class_setting( 'no_icon_class', 'wzlw-no-icon' ) );
 			}
 			$processor->set_attribute( 'class', $this->merge_classes( $processor->get_attribute( 'class' ), $new_classes ) );
+			// The marker class alone can be written by an author, so the scan also needs the token.
+			$processor->set_attribute( 'data-wzlw-token', self::get_exclusion_token() );
 		}
 
 		$processed_content = $processor->get_updated_html();
@@ -281,12 +283,12 @@ class Content_Processor {
 	}
 
 	/**
-	 * Get the token that marks a link as excluded by PHP.
+	 * Get the token that marks a link as excluded, processed or given an indicator by PHP.
 	 *
 	 * PHP can exclude domains through the wzlw_excluded_domains filter, which the
-	 * JavaScript scan cannot repeat, so the scan trusts PHP's marker. A random token
+	 * JavaScript scan cannot repeat, so the scan trusts PHP's markers. A random token
 	 * per request, also passed to the script, stops content authors from writing the
-	 * marker themselves.
+	 * markers themselves.
 	 *
 	 * @since 1.7.0
 	 * @return string Token.
@@ -637,15 +639,12 @@ class Content_Processor {
 			return $link_html;
 		}
 
-		// The same HTML can pass through more than one supported content filter.
-		$has_indicator = preg_match( '/\bclass=["\'][^"\']*\b(?:wzlw-icon|wzlw-text)\b[^"\']*["\']/i', $link_html )
-			|| false !== stripos( $link_html, $this->get_screen_reader_text() );
-		if ( ! $has_indicator && 'none' === ( $this->settings['visual_indicator'] ?? 'icon' ) ) {
-			$has_indicator = preg_match( '/<span\b[^>]*class=["\'][^"\']*\bscreen-reader-text\b[^"\']*["\'][^>]*>/i', $link_html );
-		}
-		if ( $has_indicator ) {
+		// Only an indicator this request added counts as one: authors can write the same markup.
+		if ( self::get_exclusion_token() === $tag->get_attribute( 'data-wzlw-indicator' ) ) {
 			return $link_html;
 		}
+		$tag->set_attribute( 'data-wzlw-indicator', self::get_exclusion_token() );
+		$marked_html = $tag->get_updated_html();
 
 		// Check if link has the no-icon class — suppress visual indicator but
 		// still add screen reader text for target="_blank" links.
@@ -656,15 +655,12 @@ class Content_Processor {
 			$has_no_icon_class = is_array( $link_classes ) && ! empty( array_intersect( $no_icon_classes, $link_classes ) );
 		}
 		if ( $has_no_icon_class ) {
-			if ( $has_target ) {
-				$link_html = str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html );
-			}
-			return $link_html;
+			return $has_target ? str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $marked_html ) : $link_html;
 		}
 
 		// A visual indicator on an icon-only link breaks fixed-size icon layouts such as social buttons.
 		if ( ! $this->link_has_visible_text( $matches[1] ?? '' ) ) {
-			return $has_target ? str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $link_html ) : $link_html;
+			return $has_target ? str_ireplace( '</a>', $this->get_screen_reader_text() . '</a>', $marked_html ) : $link_html;
 		}
 
 		$is_download = (bool) preg_match( '/\bclass=["\'][^"\']*\bwzlw-download\b[^"\']*["\']/i', $link_html );
@@ -675,9 +671,7 @@ class Content_Processor {
 		}
 
 		// Insert indicator before closing </a> tag.
-		$link_html = str_ireplace( '</a>', $indicator . '</a>', $link_html );
-
-		return $link_html;
+		return str_ireplace( '</a>', $indicator . '</a>', $marked_html );
 	}
 
 	/**

@@ -377,9 +377,25 @@ class Redirect_Handler {
 			wp_send_json_error( 'invalid_input' );
 		}
 
-		// Without a global redirect method, only destinations that a redirect rule covers are signed.
-		// Anyone can call this endpoint; allows_countdown() keeps its signatures from counting
-		// down for visitors who do not arrive from this site.
+		// Asking for confirm-only signatures can only weaken them, so anyone may.
+		$confirm_only = isset( $_POST['confirm'] ) && '1' === $_POST['confirm'];
+
+		wp_send_json_success( $this->sign_urls( $raw_urls, $confirm_only ) );
+	}
+
+	/**
+	 * Sign a batch of destinations for the redirect endpoint.
+	 *
+	 * Without a global redirect method, only destinations that a redirect rule covers are
+	 * signed. Anyone can call the endpoint; allows_countdown() keeps its signatures from
+	 * counting down for visitors who do not arrive from this site.
+	 *
+	 * @since 1.7.0
+	 * @param array $raw_urls     URLs as sent by the script.
+	 * @param bool  $confirm_only Whether the URLs come from content the site does not control.
+	 * @return array<string, string> Redirect URLs keyed by the URL as sent.
+	 */
+	public function sign_urls( array $raw_urls, $confirm_only = false ) {
 		$method          = wzlw_get_option( 'warning_method', 'inline_modal' );
 		$global_redirect = in_array( $method, array( 'redirect', 'inline_redirect' ), true );
 		$rules           = Link_Rules::get_rules();
@@ -394,10 +410,11 @@ class Redirect_Handler {
 			if ( ! $url || ! $this->is_valid_url( $url ) || ( ! $global_redirect && ! $this->get_redirect_rule( $url, $rules ) ) ) {
 				continue;
 			}
-			$result[ $raw_url ] = self::get_redirect_url( $url );
+			// The same rule as for untrusted content in Content_Processor::process_content().
+			$result[ $raw_url ] = self::get_redirect_url( $url, $confirm_only && ! self::allows_auto_redirect( $url, $rules ) );
 		}
 
-		wp_send_json_success( $result );
+		return $result;
 	}
 
 	/**

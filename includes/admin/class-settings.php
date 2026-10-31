@@ -788,7 +788,7 @@ class Settings {
 				'id'   => 'link_rules_header',
 				'name' => '<h3>' . esc_html__( 'Link Rules', 'webberzone-link-warnings' ) . '</h3>',
 				'desc' => wp_kses(
-					__( 'Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule.', 'webberzone-link-warnings' ),
+					__( 'Give links that match a URL pattern their own warning. Rules are checked from top to bottom and the first match wins. Links that match no rule use the settings on the other tabs. <code>*</code> matches any characters. A pattern without a slash matches the whole domain, for example <code>example.com</code> or <code>*.example.com</code> for its subdomains. A pattern with a slash matches the address, for example <code>www.amazon.com/dp/*</code>, and a pattern starting with a slash matches links on this site, for example <code>/go/*</code>. The Suppress Icon class still hides the icon, and the Affiliate and Force External classes override an Exclude rule.', 'webberzone-link-warnings' ),
 					array( 'code' => array() )
 				),
 				'type' => 'header',

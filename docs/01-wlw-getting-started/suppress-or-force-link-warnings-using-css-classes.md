@@ -27,7 +27,7 @@ Add the class `wzlw-no-icon` directly to the `<a>` tag.
 <a href="https://example.com" class="wzlw-no-icon">Example</a>
 ```
 
-The visual indicator (icon and/or text) is suppressed. The modal or redirect warning still applies if your warning method includes one. If the link opens in a new tab, a hidden screen-reader label is still added so screen reader users know the tab will open.
+The visual indicator (icon and/or text) is suppressed. The modal or redirect warning still applies if your warning method includes one. With an inline warning method, processed new-tab links keep their hidden screen reader text. Pure modal and redirect methods do not append that inline span. Existing ARIA labels can still receive the new-tab announcement.
 
 ### Suppress indicators on a group of links
 

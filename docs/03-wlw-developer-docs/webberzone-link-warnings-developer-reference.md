@@ -65,6 +65,10 @@ Removes a single key from the settings array.
 wzlw_delete_option( 'excluded_domains' );
 ```
 
+**Parameters:**
+
+- `$key` *(string)* — The setting key to remove.
+
 **Returns:** `bool`
 
 ### `wzlw_update_settings( $settings, $merge, $autoload )`
@@ -104,6 +108,10 @@ Returns the default value for a specific setting key.
 ```php
 $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 ```
+
+**Parameters:**
+
+- `$key` *(string)* — The setting key.
 
 **Returns:** `mixed` — The default value, or `false` if the key does not exist.
 

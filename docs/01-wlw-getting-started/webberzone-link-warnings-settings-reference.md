@@ -23,9 +23,9 @@ Controls how users are warned about external links.
 
 | Value | Label | Behavior |
 | --- | --- | --- |
-| `inline` | Inline indicators only | Adds visual indicators and screen reader text inside links. No click interception. |
+| `inline` | Inline indicators only | Adds configured visual indicators and hidden text for processed new-tab links. No click interception. |
 | `modal` | Modal dialog | Intercepts clicks and shows a confirmation dialog. No inline indicators. |
-| `redirect` | Redirect screen | Intercepts clicks and navigates to an interstitial page with a countdown. No inline indicators. |
+| `redirect` | Redirect screen | Opens an interstitial page with a countdown when automatic redirection is allowed. No inline indicators. |
 | `inline_modal` | Inline indicators + Modal dialog | Adds inline indicators and intercepts clicks to show a modal. |
 | `inline_redirect` | Inline indicators + Redirect screen | Adds inline indicators and intercepts clicks to show a redirect page. |
 
@@ -400,7 +400,7 @@ example.com
 
 ## Suppress Icon Class
 
-The CSS class name that suppresses the visual indicator (icon and/or text) when added directly to an `<a>` tag. The modal or redirect warning still applies if your warning method includes one. Screen reader text is still added if the link opens in a new tab.
+The CSS class name that suppresses the visual indicator (icon and/or text) when added directly to an `<a>` tag. The modal or redirect warning still applies if your warning method includes one. Inline methods still add hidden text for processed new-tab links. Pure modal and redirect methods do not append that span.
 
 Accepts a comma-separated list of class names. A link carrying any of the listed classes is treated as a match.
 

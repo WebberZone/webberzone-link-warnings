@@ -11,7 +11,7 @@ toc: true
 
 [toc]
 
-[WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) adds accessible warnings to external links and `target="_blank"` links in your WordPress content. It supports inline visual indicators, modal confirmation dialogs, and redirect interstitial screens — or combinations of these.
+[WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) adds accessible warnings to external links and `target="_blank"` links in your WordPress content. It supports inline visual indicators, modal confirmation dialogs, and redirect interstitial screens, or combinations of these.
 
 ## Requirements
 
@@ -48,11 +48,11 @@ wp plugin install webberzone-link-warnings --activate-network
 
 On first activation, an admin notice appears offering a guided setup wizard. It runs through five sequential steps:
 
-1. **Welcome** — introduction and the option to skip the wizard.
-2. **General Settings** — warning method and link scope.
-3. **Visual Indicators** — icon, text, both, or screen-reader-only, plus screen reader text.
-4. **Modal Dialog** — title, message, button text, modal frequency, and dismissal scope.
-5. **Redirect Screen** — message and countdown duration.
+1. **Welcome**: introduction and the option to skip the wizard.
+2. **General Settings**: warning method and link scope.
+3. **Visual Indicators**: icon, text, both, or screen-reader-only, plus screen reader text.
+4. **Modal Dialog**: title, message, button text, modal frequency, and dismissal scope.
+5. **Redirect Screen**: message and countdown duration.
 
 You can dismiss the wizard at any time and configure settings manually.
 
@@ -60,10 +60,10 @@ You can dismiss the wizard at any time and configure settings manually.
 
 All settings are available at **Settings > Link Warnings**. The settings page is organized into four tabs:
 
-- **General** — warning method, link scope, enabled post types, external content processing, and the Disable Warnings For list.
-- **Display** — inline indicator options, modal dialog text, download modal text, and redirect screen text.
-- **Rules** — link rules that give links matching a URL pattern their own warning method, or exclude them.
-- **Advanced** — automatic link attributes (`rel`/`target`), affiliate link marking, download extensions, download warning scope, excluded domains, and CSS class overrides.
+- **General**: warning method, link scope, enabled post types, external content processing, and the Disable Warnings For list.
+- **Display**: inline indicator options, modal dialog text, download modal text, and redirect screen text.
+- **Rules**: link rules that give links matching a URL pattern their own warning method, or exclude them.
+- **Advanced**: automatic link attributes (`rel`/`target`), affiliate link marking, download extensions, download warning scope, excluded domains, and CSS class overrides.
 
 See the [Settings Reference](https://webberzone.com/support/knowledgebase/webberzone-link-warnings-settings-reference/) for a full description of every option.
 
@@ -77,10 +77,10 @@ For each `<a>` tag in the output, the plugin:
 2. Checks the link against the Link Rules on the Rules tab. The first matching rule sets the link's warning method, or excludes it.
 3. Determines whether the link is external by comparing its host against the site host and the excluded domains list, or whether it carries the Affiliate Link Class or sits inside an Affiliate Link Wrapper Class (affiliate links are always treated as external).
 4. Applies the configured Link Attributes (`nofollow`, `sponsored`, `ugc`, `target="_blank"`, `noopener`, `noreferrer`) for external and/or affiliate links, merging into any existing `rel` value without duplicating.
-5. Applies scope rules — external links only, or external links plus internal `target="_blank"` links. A link that just gained `target="_blank"` from step 4 is included here.
+5. Applies scope rules: external links only, or external links plus internal `target="_blank"` links. A link that just gained `target="_blank"` from step 4 is included here.
 6. Adds CSS classes (`wzlw-processed`, `wzlw-external`) for styling.
 7. For links that open in a new tab, appends the configured screen reader text to any existing `aria-label` attribute.
-8. For modal and redirect methods, adds `data-wzlw-url` and either `data-wzlw-external` (external links) or `data-wzlw-blank` (processed non-external links opening in a new tab) — plus `data-wzlw-download` for configured download links and `data-wzlw-redirect-url` for the redirect methods specifically. These attributes are used by the frontend JavaScript.
+8. For modal and redirect methods, adds `data-wzlw-url` and either `data-wzlw-external` (external links) or `data-wzlw-blank` (processed non-external links opening in a new tab): plus `data-wzlw-download` for configured download links and `data-wzlw-redirect-url` for the redirect methods specifically. These attributes are used by the frontend JavaScript.
 9. For inline methods, appends the configured visual indicator markup inside the link. New-tab links also receive hidden screen reader text. Suppressed indicators and icon-only links can receive only the hidden text.
 
 When enabled, separate server-side filters also process block, Text, and Custom HTML widgets, classic navigation menus, displayed comment text, and complete block-theme template parts. Each source has its own toggle in the **External Content** section of the **General** tab. The filters reuse the same link classification, exclusions, indicators, and warning methods as post content.
@@ -109,4 +109,4 @@ The plugin uses WordPress’s native `WP_HTML_Tag_Processor` class for HTML pars
 
 ## What happens on deactivation
 
-Deactivating the plugin deletes the `wzlw_activation_redirect` transient, flushes the rewrite rules cache, and clears the object cache. Your content is unaffected — links return to their original rendered state because the plugin never modifies stored content.
+Deactivating the plugin deletes the `wzlw_activation_redirect` transient, flushes the rewrite rules cache, and clears the object cache. Your content is unaffected: links return to their original rendered state because the plugin never modifies stored content.

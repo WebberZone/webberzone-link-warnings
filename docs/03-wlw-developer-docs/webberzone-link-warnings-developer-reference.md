@@ -37,8 +37,8 @@ $method = wzlw_get_option( 'warning_method', 'inline' );
 
 **Parameters:**
 
-- `$key` *(string)* — The setting key.
-- `$default_value` *(mixed, optional)* — Fallback value. Default `null`.
+- `$key` *(string)*: The setting key.
+- `$default_value` *(mixed, optional)*: Fallback value. Default `null`.
 
 **Returns:** `mixed`
 
@@ -52,10 +52,10 @@ wzlw_update_option( 'warning_method', 'modal' );
 
 **Parameters:**
 
-- `$key` *(string)* — The setting key.
-- `$value` *(mixed)* — The new value.
+- `$key` *(string)*: The setting key.
+- `$value` *(mixed)*: The new value.
 
-**Returns:** `bool` — `true` if the option was updated.
+**Returns:** `bool`: `true` if the option was updated.
 
 ### `wzlw_delete_option( $key )`
 
@@ -67,7 +67,7 @@ wzlw_delete_option( 'excluded_domains' );
 
 **Parameters:**
 
-- `$key` *(string)* — The setting key to remove.
+- `$key` *(string)*: The setting key to remove.
 
 **Returns:** `bool`
 
@@ -85,9 +85,9 @@ wzlw_update_settings( $new_settings, false );
 
 **Parameters:**
 
-- `$settings` *(array)* — Settings to save.
-- `$merge` *(bool, optional)* — Whether to merge with existing settings. Default `true`.
-- `$autoload` *(bool, optional)* — Whether to autoload the option. Default `true`.
+- `$settings` *(array)*: Settings to save.
+- `$merge` *(bool, optional)*: Whether to merge with existing settings. Default `true`.
+- `$autoload` *(bool, optional)*: Whether to autoload the option. Default `true`.
 
 **Returns:** `bool`
 
@@ -111,9 +111,9 @@ $default_method = wzlw_get_default_option( 'warning_method' ); // 'inline_modal'
 
 **Parameters:**
 
-- `$key` *(string)* — The setting key.
+- `$key` *(string)*: The setting key.
 
-**Returns:** `mixed` — The default value, or `false` if the key does not exist.
+**Returns:** `mixed`: The default value, or `false` if the key does not exist.
 
 ### `wzlw_settings_reset()`
 
@@ -153,7 +153,7 @@ add_filter( 'wzlw_get_settings', function ( array $settings ): array {
 
 **Parameters:**
 
-- `$settings` *(array)* — The saved settings array.
+- `$settings` *(array)*: The saved settings array.
 
 **Returns:** `array`
 
@@ -170,7 +170,7 @@ add_filter( 'wzlw_is_disabled_for_current_user', function ( bool $disabled ): bo
 
 **Parameters:**
 
-- `$disabled` *(bool)* — True if warnings are disabled for the current user.
+- `$disabled` *(bool)*: True if warnings are disabled for the current user.
 
 **Returns:** `bool`
 
@@ -196,14 +196,14 @@ add_filter( 'wzlw_link_rules', function ( array $rules ): array {
 
 **Parameters:**
 
-- `$rules` *(array[])* — Rules, each with `id`, `pattern`, `action` and optional `message` keys. `action` is one of `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect` or `exclude`.
-- `$settings` *(array)* — The plugin settings.
+- `$rules` *(array[])*: Rules, each with `id`, `pattern`, `action` and optional `message` keys. `action` is one of `modal`, `inline`, `inline_modal`, `redirect`, `inline_redirect` or `exclude`.
+- `$settings` *(array)*: The plugin settings.
 
 **Returns:** `array[]`
 
 ### `wzlw_excluded_domains`
 
-Filters the excluded domains list while a link is being classified. PHP is the only place this filter runs — the browser-side scan cannot repeat it — so links PHP excluded through this filter carry a per-request token (`data-wzlw-excluded` with the value of `Content_Processor::get_exclusion_token()`) that the JavaScript trusts.
+Filters the excluded domains list while a link is being classified. PHP is the only place this filter runs (the browser-side scan cannot repeat it), so links PHP excluded through this filter carry a per-request token (`data-wzlw-excluded` with the value of `Content_Processor::get_exclusion_token()`) that the JavaScript trusts.
 
 ```php
 add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_host ): array {
@@ -215,8 +215,8 @@ add_filter( 'wzlw_excluded_domains', function ( array $domains, string $link_hos
 
 **Parameters:**
 
-- `$domains` *(array)* — Excluded domain entries, as configured in the Excluded Domains setting. Wildcard entries keep their `*.` prefix.
-- `$link_host` *(string)* — The lowercased host of the link being checked.
+- `$domains` *(array)*: Excluded domain entries, as configured in the Excluded Domains setting. Wildcard entries keep their `*.` prefix.
+- `$link_host` *(string)*: The lowercased host of the link being checked.
 
 **Returns:** `array`
 
@@ -232,11 +232,11 @@ add_filter( 'wzlw_get_option', function ( $value, $key, $default_value ) {
 
 **Parameters:**
 
-- `$value` *(mixed)* — The selected value.
-- `$key` *(string)* — The option key.
-- `$default_value` *(mixed)* — The resolved fallback.
+- `$value` *(mixed)*: The selected value.
+- `$key` *(string)*: The option key.
+- `$default_value` *(mixed)*: The resolved fallback.
 
-**Returns:** `mixed` — The option value.
+**Returns:** `mixed`: The option value.
 
 ### `wzlw_get_option_{$key}`
 
@@ -250,9 +250,9 @@ add_filter( 'wzlw_get_option_warning_method', function ( $value, $key, $default_
 
 **Parameters:**
 
-- `$value` *(mixed)* — The value after the general filter.
-- `$key` *(string)* — The option key.
-- `$default_value` *(mixed)* — The resolved fallback.
+- `$value` *(mixed)*: The value after the general filter.
+- `$key` *(string)*: The option key.
+- `$default_value` *(mixed)*: The resolved fallback.
 
 **Returns:** `mixed`
 
@@ -268,8 +268,8 @@ add_filter( 'wzlw_update_option', function ( $value, $key ) {
 
 **Parameters:**
 
-- `$value` *(mixed)* — The value to save.
-- `$key` *(string)* — The option key.
+- `$value` *(mixed)*: The value to save.
+- `$key` *(string)*: The option key.
 
 **Returns:** `mixed`
 
@@ -286,7 +286,7 @@ add_filter( 'wzlw_settings_defaults', function ( array $defaults ): array {
 
 **Parameters:**
 
-- `$defaults` *(array)* — Defaults keyed by option ID. Display-text values can be empty in the translation-free path.
+- `$defaults` *(array)*: Defaults keyed by option ID. Display-text values can be empty in the translation-free path.
 
 **Returns:** `array`
 
@@ -303,7 +303,7 @@ add_filter( 'wzlw_icon_options', function ( array $options ): array {
 
 **Parameters:**
 
-- `$options` *(array)* — Labels keyed by icon ID.
+- `$options` *(array)*: Labels keyed by icon ID.
 
 **Returns:** `array`
 
@@ -320,7 +320,7 @@ add_filter( 'wzlw_icon_map', function ( array $map ): array {
 
 **Parameters:**
 
-- `$map` *(array)* — Characters keyed by icon ID. Pair new IDs with `wzlw_icon_options` so they can be selected.
+- `$map` *(array)*: Characters keyed by icon ID. Pair new IDs with `wzlw_icon_options` so they can be selected.
 
 **Returns:** `array`
 

@@ -13,7 +13,7 @@ toc: true
 
 The redirect screen in [WebberZone Link Warnings](https://webberzone.com/plugins/webberzone-link-warnings/) supports theme template overrides and CSS customization.
 
-When the warning method is set to **Redirect screen** or **Inline indicators + Redirect screen** — or when a Link Rule with a redirect action matches the link — clicking a processed link opens an interstitial page before the user reaches the destination. This page shows the destination URL and a message. It shows a countdown only when automatic redirection is allowed and **Redirect Countdown** is greater than zero.
+Clicking a processed link opens an interstitial page when the warning method is **Redirect screen** or **Inline indicators + Redirect screen**, or when a Link Rule applies a redirect action. This page shows the destination URL and a message. It shows a countdown only when automatic redirection is allowed and **Redirect Countdown** is greater than zero.
 
 ## How the redirect screen works
 
@@ -51,13 +51,13 @@ $signature = hash_hmac( 'sha256', 'full|v2|' . $destination, wp_salt( 'auth' ) )
 $signature = hash_hmac( 'sha256', 'confirm|' . $destination, wp_salt( 'auth' ) );
 ```
 
-The destination is passed through `esc_url_raw()` before signing. Signatures produced by versions before 1.7.0 (a bare HMAC over the destination) are still accepted, but only as confirm-only — the screen always waits for the click.
+The destination is passed through `esc_url_raw()` before signing. Signatures produced by versions before 1.7.0 (a bare HMAC over the destination) are still accepted, but only as confirm-only: the screen always waits for the click.
 
 ## Open redirect protection
 
 `Redirect_Handler::is_valid_url()` accepts a destination in any of these forms:
 
-- **Root-relative paths** with no host and no scheme (e.g. `/go/product/`) — treated as same-site and valid on their own. This covers cloaked affiliate redirect links marked with the Affiliate Link Class or Affiliate Link Wrapper Class, which point at internal paths. A scheme-bearing but host-less value (e.g. `http:evil.com`) is deliberately rejected here, since browsers resolve that against a remote host when the scheme differs from the page's — an authority-less path is only trusted when the scheme is absent too.
+- **Root-relative paths** with no host and no scheme (e.g. `/go/product/`) (treated as same-site and valid on their own. This covers cloaked affiliate redirect links marked with the Affiliate Link Class or Affiliate Link Wrapper Class, which point at internal paths. A scheme-bearing but host-less value (e.g. `http:evil.com`) is deliberately rejected here, since browsers resolve that against a remote host when the scheme differs from the page's) an authority-less path is only trusted when the scheme is absent too.
 - **Network-path references** such as `//example.com/page`, which have a host but no scheme.
 - **Absolute `http` and `https` URLs** that pass `filter_var()` with `FILTER_VALIDATE_URL`. Same-site absolute URLs are valid because force-external and internal `target="_blank"` links can also use the redirect screen.
 
@@ -149,7 +149,7 @@ wzlwRedirect.destination // The destination URL.
 wzlwRedirect.countdown   // The countdown duration in seconds.
 ```
 
-When the screen must wait for a click — a confirm-only signature, or a visitor who did not arrive from this site — the server localizes an empty `destination` and a countdown of `0`, so `redirect.js` never starts a timer.
+When the screen must wait for a click (a confirm-only signature, or a visitor who did not arrive from this site), the server localizes an empty `destination` and a countdown of `0`, so `redirect.js` never starts a timer.
 
 ### Disabling auto-redirect
 

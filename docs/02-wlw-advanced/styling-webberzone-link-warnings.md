@@ -212,7 +212,7 @@ Key classes for the modal:
 | `wzlw-modal-cancel` | The cancel button. |
 | `wzlw-modal-continue` | The continue button. |
 
-Example — wider modal with a darker overlay:
+Example: wider modal with a darker overlay:
 
 ```css
 .wzlw-modal-container {
@@ -245,7 +245,7 @@ The redirect page uses a centered card layout. Key classes:
 | `wzlw-redirect-countdown` | The countdown text. |
 | `wzlw-countdown-number` | The countdown number. |
 
-Example — dark redirect page:
+Example: dark redirect page:
 
 ```css
 :root {

@@ -206,13 +206,13 @@ The label for the button that closes the modal and returns the user to the page.
 
 ## Modal Frequency
 
-Controls how often the modal is shown to the same visitor. Leaving this on **Always show the modal** keeps the original behavior — every click on an external link opens the modal.
+Controls how often the modal is shown to the same visitor. Leaving this on **Always show the modal** keeps the original behavior: every click on an external link opens the modal.
 
-Choosing either of the other options adds a **Don't show again** checkbox to the modal. When a visitor ticks it and clicks Continue, the dismissal is stored in their browser and the modal is skipped for subsequent clicks — the link then behaves like a normal link.
+Choosing either of the other options adds a **Don't show again** checkbox to the modal. When a visitor ticks it and clicks Continue, the dismissal is stored in their browser and the modal is skipped for subsequent clicks: the link then behaves like a normal link.
 
-- **Always show the modal** — no checkbox, the modal always appears.
-- **Once per browser session** — the dismissal is stored in `sessionStorage` and cleared when the browser tab is closed.
-- **Once every N days** — the dismissal is stored in `localStorage` and expires after the number of days set below.
+- **Always show the modal**: no checkbox, the modal always appears.
+- **Once per browser session**: the dismissal is stored in `sessionStorage` and cleared when the browser tab is closed.
+- **Once every N days**: the dismissal is stored in `localStorage` and expires after the number of days set below.
 
 Dismissals are stored per browser, not per user account, so nothing is written to your database. Each matching rule has its own dismissal key. Dismissing a general warning does not dismiss a rule’s warning, and dismissing one rule does not dismiss another.
 
@@ -224,15 +224,15 @@ Dismissals are stored per browser, not per user account, so nothing is written t
 The number of days a dismissal is remembered. Only used when the frequency is set to **Once every N days**.
 
 **Default:** `30`
-**Range:** 1–365
+**Range:** 1 to 365
 **Setting key:** `modal_frequency_days`
 
 ## Dismissal Scope
 
 Determines how broadly a dismissal applies.
 
-- **Per destination domain** — dismissing the warning for `example.com` suppresses the modal for that domain only. Other external links still show the warning.
-- **All external links** — a single dismissal suppresses the modal for every external link on the site.
+- **Per destination domain**: dismissing the warning for `example.com` suppresses the modal for that domain only. Other external links still show the warning.
+- **All external links**: a single dismissal suppresses the modal for every external link on the site.
 
 **Default:** `domain`
 **Setting key:** `modal_frequency_scope`
@@ -257,7 +257,7 @@ The message displayed on the redirect page above the destination URL.
 
 ## Redirect Countdown
 
-The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely — the user must click the “Continue to site” link manually.
+The number of seconds before the page automatically redirects to the external URL. Set to `0` to disable the automatic redirect entirely: the user must click the “Continue to site” link manually.
 
 For external destinations, a full signature can count down only when the browser reports arrival from the same origin through `Sec-Fetch-Site`, or falls back to a same-site `Referer` when that header is absent. Direct visits from an email, bookmark, or another site require **Continue to site**. Same-site destinations remain eligible for a countdown, but confirm-only signatures never count down.
 
@@ -266,7 +266,7 @@ Links generated during server processing of comment text or previews receive con
 The redirect screen sends no-cache headers and sets `DONOTCACHEPAGE`. Redirect links in cached pages keep working after you change the warning method or rules. Redirect links signed by versions before 1.7.0 still open the redirect screen but always wait for the click.
 
 **Default:** `5`
-**Range:** 0–60
+**Range:** 0 to 60
 **Setting key:** `redirect_countdown`
 
 **Rules tab**
@@ -330,7 +330,7 @@ Chooses which download links get a download warning.
 
 **Link Attributes**
 
-Automatically add `rel` and `target` attributes to matching links at render time. Two independent sets of checkboxes are available — one for **External Links**, one for **Affiliate Links** (see Affiliate Link Class below) — so you can, for example, add `nofollow` to affiliate links only while leaving other external links untouched.
+Automatically add `rel` and `target` attributes to matching links at render time. There are separate checkboxes for **External Links** and **Affiliate Links** (see Affiliate Link Class below). For example, you can add `nofollow` to affiliate links while leaving other external links untouched.
 
 | Option | Adds |
 | --- | --- |
@@ -338,10 +338,10 @@ Automatically add `rel` and `target` attributes to matching links at render time
 | Add rel="sponsored" | `rel="sponsored"` |
 | Add rel="ugc" | `rel="ugc"` |
 | Open in a new tab | `target="_blank"` |
-| Add rel="noopener" for new-tab links | `rel="noopener"` — only on links that open in a new tab (existing `target="_blank"` or the option above). |
-| Add rel="noreferrer" for new-tab links | `rel="noreferrer"` — same condition as `noopener`. This also stops the referrer being sent, which can break referrer-based affiliate attribution. |
+| Add rel="noopener" for new-tab links | `rel="noopener"`: only on links that open in a new tab (existing `target="_blank"` or the option above). |
+| Add rel="noreferrer" for new-tab links | `rel="noreferrer"`: same condition as `noopener`. This also stops the referrer being sent, which can break referrer-based affiliate attribution. |
 
-A link that already has a `rel` value keeps it — new values are appended, and matching ignores case, so a link with `rel="NoFollow"` is not given a duplicate.
+A link that already has a `rel` value keeps it: new values are appended, and matching ignores case, so a link with `rel="NoFollow"` is not given a duplicate.
 
 Every option is off by default; nothing is added until you tick it.
 
@@ -372,7 +372,7 @@ A list of domains (one per line) that should be treated as internal. These entri
 
 Enter domain names without the protocol. Two entry formats are supported:
 
-**Plain entry** — matches that exact domain only:
+**Plain entry**: matches that exact domain only:
 
 ```text
 example.com
@@ -380,7 +380,7 @@ example.com
 
 `example.com` matches `https://example.com/` but not `https://sub.example.com/`.
 
-**Wildcard entry** — matches subdomains only, not the base domain:
+**Wildcard entry**: matches subdomains only, not the base domain:
 
 ```text
 *.example.com

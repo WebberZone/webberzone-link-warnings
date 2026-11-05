@@ -31,7 +31,7 @@ The visual indicator (icon and/or text) is suppressed. The modal or redirect war
 
 ### Suppress indicators on a group of links
 
-Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every link inside that element will have its visual indicator (icon and/or text) suppressed. The modal or redirect warning still applies if your warning method includes one — the same as the single-link class above.
+Add the class `wzlw-no-icon-wrapper` to any element that wraps the links. Every link inside that element will have its visual indicator (icon and/or text) suppressed. The modal or redirect warning still applies if your warning method includes one, as with the single-link class above.
 
 ```html
 <div class="wzlw-no-icon-wrapper">
@@ -73,7 +73,7 @@ Add the class `wzlw-force-external` directly to the `<a>` tag.
 <a href="/go/affiliate-product/" class="wzlw-force-external">Buy now</a>
 ```
 
-The link will be processed exactly like an external link — it gets the warning icon, modal, or redirect, depending on your settings.
+The link will be processed exactly like an external link: it gets the warning icon, modal, or redirect, depending on your settings.
 
 ### Force all links in a section to be treated as external
 
@@ -94,7 +94,7 @@ Add `wzlw-force-external` to an anchor’s HTML, or add `wzlw-force-external-wra
 
 ## Affiliate classes: Mark links for automatic rel/target attributes
 
-Use these when you want the plugin to add `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"`, or new-tab attributes to specific links automatically, without touching every external link on the site. This is intended for affiliate or sponsored links. You still need to tick the attributes you want under **Settings → Link Warnings → Advanced → Link Attributes** — the classes below only mark *which* links count as affiliate links.
+Use these when you want the plugin to add `rel="nofollow"`, `rel="sponsored"`, `rel="ugc"`, or new-tab attributes to specific links automatically, without touching every external link on the site. This is intended for affiliate or sponsored links. You still need to tick the attributes you want under **Settings → Link Warnings → Advanced → Link Attributes**: the classes below only mark *which* links count as affiliate links.
 
 ### Mark a single link as an affiliate link
 
@@ -115,7 +115,7 @@ Add the class `wzlw-affiliate-wrapper` to any element that wraps the links.
 </div>
 ```
 
-An affiliate-marked link is always treated as external for warning purposes too — even if it points to a path on your own domain, such as a cloaked redirect link like `/go/product/`, and even if the domain is on your exclusion list.
+An affiliate-marked link is always treated as external for warning purposes too, even if it points to a path on your own domain, such as a cloaked redirect link like `/go/product/`, and even if the domain is on your exclusion list.
 
 ### How to add these classes in WordPress
 
@@ -138,7 +138,7 @@ Product A gets the icon and any modal or redirect warning. Product B also gets t
 
 The default class names (`wzlw-no-icon`, `wzlw-no-icon-wrapper`, `wzlw-force-external`, `wzlw-force-external-wrapper`, `wzlw-affiliate`, `wzlw-affiliate-wrapper`) can be changed under **Settings → Link Warnings → Advanced**. If you have changed them, use your custom class names wherever this guide shows the defaults.
 
-Each setting also accepts a comma-separated list of class names. This lets you honor multiple class conventions at once — for example, if you have an existing theme class you want to reuse alongside the plugin default:
+Each setting also accepts a comma-separated list of class names. This lets you honor multiple class conventions at once. For example, reuse an existing theme class alongside the plugin default:
 
 ```text
 wzlw-no-icon, my-theme-no-icon

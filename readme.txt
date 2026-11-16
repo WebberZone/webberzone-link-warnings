@@ -265,6 +265,12 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
+= 1.7.1 =
+
+**Added**
+
+* Save Changes button in settings navigation.
+
 = 1.7.0 =
 
 Release date: 1 November 2026

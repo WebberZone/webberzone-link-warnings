@@ -267,7 +267,7 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 = 1.7.1 =
 
-Release date: 20 November 2026
+Release date: 21 November 2026
 
 **Added**
 

@@ -5,7 +5,7 @@ Donate link: https://ajaydsouza.com/donate/
 Requires at least: 6.6
 Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -267,6 +267,8 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 = 1.7.2 =
 
+Release date: 26 November 2026
+
 **Fixed**
 
 * A redirect link wrapped inside another redirect link redirected straight away. It now waits for the visitor to confirm.
@@ -316,5 +318,5 @@ For the changelog of earlier versions, please refer to the [releases page on Git
 
 == Upgrade Notice ==
 
-= 1.7.1 =
-Keeps backslashes in settings values and adds a Save Changes button to the settings navigation. No action needed.
+= 1.7.2 =
+A redirect link wrapped inside another redirect link now waits for the visitor to confirm instead of redirecting straight away. No action needed.

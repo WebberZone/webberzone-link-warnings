@@ -64,7 +64,7 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/admin/class-settings.php:630
-#: includes/class-redirect-handler.php:302
+#: includes/class-redirect-handler.php:379
 msgid "You are being redirected to an external site."
 msgstr ""
 

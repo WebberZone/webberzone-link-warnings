@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: WebberZone Link Warnings 1.7.1\n"
+"Project-Id-Version: WebberZone Link Warnings 1.7.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/webberzone-link-warnings\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-21T04:13:17+00:00\n"
+"POT-Creation-Date: 2026-11-26T02:40:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webberzone-link-warnings\n"
@@ -606,7 +606,7 @@ msgid "Message shown on the redirect page."
 msgstr ""
 
 #: includes/admin/class-settings.php:630
-#: includes/class-redirect-handler.php:302
+#: includes/class-redirect-handler.php:379
 msgid "You are being redirected to an external site."
 msgstr ""
 

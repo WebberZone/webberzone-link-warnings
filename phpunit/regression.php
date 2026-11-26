@@ -477,6 +477,25 @@ namespace {
 		}
 		unset( $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_SEC_FETCH_SITE'] );
 	};
+	$tests['nested signed redirect URLs cannot auto-redirect'] = static function () {
+		settings( array( 'warning_method' => 'redirect' ) );
+		$inner = Redirect_Handler::get_redirect_url( 'https://evil.test/' );
+		$outer = Redirect_Handler::get_redirect_url( $inner );
+		parse_str( (string) wp_parse_url( $outer, PHP_URL_QUERY ), $query );
+		$nested_dest = isset( $query['url'] ) ? esc_url_raw( rawurldecode( (string) $query['url'] ) ) : '';
+		expect( Redirect_Handler::is_redirect_endpoint( $inner ), 'The inner redirect URL was not treated as the redirect endpoint.' );
+		expect( ! Redirect_Handler::is_same_site( $inner ), 'The redirect endpoint still counts as same-site.' );
+		$handler = ( new \ReflectionClass( Redirect_Handler::class ) )->newInstanceWithoutConstructor();
+		$method  = new \ReflectionMethod( Redirect_Handler::class, 'allows_countdown' );
+		$method->setAccessible( true );
+		unset( $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_SEC_FETCH_SITE'] );
+		expect( ! $method->invoke( $handler, $nested_dest, false ), 'A cold-open nested redirect still counted down.' );
+		$_SERVER['HTTP_SEC_FETCH_SITE'] = 'cross-site';
+		expect( ! $method->invoke( $handler, $nested_dest, false ), 'A cross-site nested redirect still counted down.' );
+		unset( $_SERVER['HTTP_SEC_FETCH_SITE'] );
+		$signed = $handler->sign_urls( array( $inner ) );
+		expect( ! isset( $signed[ $inner ] ), 'The public signer still signed a redirect endpoint URL.' );
+	};
 	$tests['same-site checks respect ports and look-alike hosts'] = static function () {
 		$cases = array(
 			'/x'                         => true,
@@ -485,6 +504,7 @@ namespace {
 			'https://site.test:443/x'    => true,
 			'//site.test/x'              => true,
 			'https://site.test:9999/x'   => false,
+			'https://site.test/external-redirect/' => false,
 			'//site.test@evil.example/'  => false,
 			'https://site.test.evil.ex/' => false,
 			'/\\evil.example/'         => false,

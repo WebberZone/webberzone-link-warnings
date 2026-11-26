@@ -93,6 +93,11 @@ class Redirect_Handler {
 			exit;
 		}
 
+		if ( self::is_redirect_endpoint( $destination ) ) {
+			wp_safe_redirect( home_url() );
+			exit;
+		}
+
 		// Verify HMAC signature to prevent open redirect abuse. A confirm-only signature
 		// has its own HMAC input, so it cannot be turned into an auto-redirecting one.
 		$confirm_only = isset( $_GET['wzlw_confirm'] ) && '1' === $_GET['wzlw_confirm']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -142,7 +147,7 @@ class Redirect_Handler {
 	 * automatically for a visitor who arrives from a page on this site, as reported by
 	 * Sec-Fetch-Site or, in browsers without it, the Referer. Opened from an email or
 	 * another site, the screen waits for the visitor to click Continue.
-	 * Destinations on this site are always safe to redirect to.
+	 * Destinations on this site are always safe to redirect to, except this plugin's redirect endpoint.
 	 *
 	 * @since 1.7.0
 	 * @param string $destination  Destination URL.
@@ -176,6 +181,10 @@ class Redirect_Handler {
 	 * @return bool True if the URL is on this site.
 	 */
 	public static function is_same_site( $url ) {
+		if ( self::is_redirect_endpoint( $url ) ) {
+			return false;
+		}
+
 		$url = Link_Rules::normalize_href( (string) $url );
 		if ( '' === $url ) {
 			return false;
@@ -199,6 +208,74 @@ class Redirect_Handler {
 		}
 
 		return (int) $port === (int) $home_port;
+	}
+
+	/**
+	 * Whether a URL targets this plugin's redirect screen.
+	 *
+	 * @since 1.7.2
+	 * @param string $url URL.
+	 * @return bool True when the URL is the redirect endpoint.
+	 */
+	public static function is_redirect_endpoint( $url ) {
+		$url = Link_Rules::normalize_href( (string) $url );
+		if ( '' === $url ) {
+			return false;
+		}
+
+		$site_host = Link_Rules::site_host();
+		$subject   = Link_Rules::get_subject( $url, $site_host );
+		if ( ! $subject || $site_host !== $subject['host'] ) {
+			return false;
+		}
+
+		$port = wp_parse_url( $url, PHP_URL_PORT );
+		if ( null === $port || false === $port ) {
+			$port = null;
+		} else {
+			$port = (int) $port;
+		}
+
+		$home_port = wp_parse_url( home_url(), PHP_URL_PORT );
+		if ( ! $home_port ) {
+			$home_port = 'http' === wp_parse_url( home_url(), PHP_URL_SCHEME ) ? 80 : 443;
+		}
+
+		if ( null !== $port && (int) $port !== (int) $home_port ) {
+			return false;
+		}
+
+		$query = wp_parse_url( $url, PHP_URL_QUERY );
+		if ( is_string( $query ) && '' !== $query ) {
+			parse_str( $query, $params );
+			if ( isset( $params['wzlw_redirect'] ) || isset( $params['wzlw_sig'] ) ) {
+				return true;
+			}
+		}
+
+		$endpoint = self::normalize_redirect_path( (string) wp_parse_url( home_url( 'external-redirect/' ), PHP_URL_PATH ) );
+		$path     = self::normalize_redirect_path( $subject['path'] );
+
+		return $endpoint === $path;
+	}
+
+	/**
+	 * Normalize a URL path for redirect endpoint comparison.
+	 *
+	 * @since 1.7.2
+	 * @param string $path URL path.
+	 * @return string Normalized path.
+	 */
+	private static function normalize_redirect_path( $path ) {
+		$path = strtolower( rawurldecode( (string) $path ) );
+		if ( preg_match( '#^(.*?)/index\.php(/.*)?$#', $path, $matches ) ) {
+			$tail = $matches[2] ?? '';
+			$path = '' !== $tail ? $tail : '/';
+		}
+
+		$path = rtrim( $path, '/' );
+
+		return '' === $path ? '/' : $path;
 	}
 
 	/**
@@ -407,7 +484,12 @@ class Redirect_Handler {
 				continue;
 			}
 			$url = esc_url_raw( $raw_url );
-			if ( ! $url || ! $this->is_valid_url( $url ) || ( ! $global_redirect && ! $this->get_redirect_rule( $url, $rules ) ) ) {
+			if (
+				! $url
+				|| ! $this->is_valid_url( $url )
+				|| self::is_redirect_endpoint( $url )
+				|| ( ! $global_redirect && ! $this->get_redirect_rule( $url, $rules ) )
+			) {
 				continue;
 			}
 			// The same rule as for untrusted content in Content_Processor::process_content().
@@ -427,7 +509,10 @@ class Redirect_Handler {
 	 */
 	public static function get_redirect_url( $destination, $confirm_only = false ) {
 		$destination = esc_url_raw( $destination );
-		$args        = array(
+		if ( self::is_redirect_endpoint( $destination ) ) {
+			$confirm_only = true;
+		}
+		$args = array(
 			'url'      => rawurlencode( $destination ),
 			'wzlw_sig' => self::sign( $destination, $confirm_only ),
 		);

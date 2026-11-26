@@ -265,6 +265,12 @@ Please report security bugs found in the source code of the WebberZone Link Warn
 
 == Changelog ==
 
+= 1.7.2 =
+
+**Fixed**
+
+* A redirect link wrapped inside another redirect link redirected straight away. It now waits for the visitor to confirm.
+
 = 1.7.1 =
 
 Release date: 21 November 2026
